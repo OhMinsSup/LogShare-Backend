@@ -20,7 +20,9 @@ export interface IUser extends Document {
       accessToken: string;
     };
   };
-
+  info: {
+    post: number;
+  };
   validatePassword(password: string): boolean;
   generate(): Promise<string>;
 }
@@ -29,15 +31,23 @@ export interface IUserModel extends Model<IUser> {
   findByEmailOrUsername(
     type: 'email' | 'username',
     value: string
-  ): DocumentQuery<IUser, IUser>;
+  ): Promise<DocumentQuery<IUser, IUser>>;
   localRegister(
     username: string,
     email: string,
     password: string
-  ): DocumentQuery<IUser, IUser>;
+  ): Promise<DocumentQuery<IUser, IUser>>;
+  Count(
+    type: 'post' | 'follower' | 'following',
+    userId: string
+  ): Promise<DocumentQuery<IUser, IUser>>;
+  unCount(
+    type: 'post' | 'follower' | 'following',
+    userId: string
+  ): Promise<DocumentQuery<IUser, IUser>>;
 }
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     email: String,
     password: String,
@@ -62,11 +72,17 @@ const userSchema = new Schema(
         accessToken: String,
       },
     },
+    info: {
+      post: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   { timestamps: true }
 );
 
-userSchema.statics.findByEmailOrUsername = function(
+UserSchema.statics.findByEmailOrUsername = function(
   type: 'email' | 'username',
   value: string
 ) {
@@ -74,12 +90,10 @@ userSchema.statics.findByEmailOrUsername = function(
 
   return this.findOne({
     [key]: value,
-  })
-    .lean()
-    .exec();
+  }).exec();
 };
 
-userSchema.statics.localRegister = function(
+UserSchema.statics.localRegister = function(
   username: string,
   email: string,
   password: string
@@ -95,12 +109,50 @@ userSchema.statics.localRegister = function(
   return user.save();
 };
 
-userSchema.methods.validatePassword = function(password: string): boolean {
+UserSchema.statics.Count = function(
+  type: 'post' | 'follower' | 'following',
+  userId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    userId,
+    {
+      $inc: {
+        [key]: 1,
+      },
+    },
+    { new: true }
+  )
+    .lean()
+    .exec();
+};
+
+UserSchema.statics.unCount = function(
+  type: 'post' | 'follower' | 'following',
+  userId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    userId,
+    {
+      $inc: {
+        [key]: -1,
+      },
+    },
+    { new: true }
+  )
+    .lean()
+    .exec();
+};
+
+UserSchema.methods.validatePassword = function(password: string): boolean {
   const hashed: string = hash(password);
   return this.password === hashed;
 };
 
-userSchema.methods.generate = function(): Promise<string> {
+UserSchema.methods.generate = function(): Promise<string> {
   const user = {
     _id: this._id,
     email: this.email,
@@ -109,6 +161,7 @@ userSchema.methods.generate = function(): Promise<string> {
 
   return generateToken(user);
 };
-const User = model<IUser, IUserModel>('User', userSchema);
+
+const User = model<IUser>('User', UserSchema) as IUserModel;
 
 export default User;

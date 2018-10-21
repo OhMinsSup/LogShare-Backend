@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import { decodeToken } from '../token';
+import { decodeToken, Token } from '../token';
 
 /**
  * @description JWT 미들웨어
@@ -16,10 +16,16 @@ export default async (ctx: Context, next: () => Promise<any>) => {
   }
 
   try {
-    const decoded: any = await decodeToken(token);
-    const { user, exp } = decoded;
+    const decoded = await decodeToken(token);
 
-    ctx['user'] = user;
+    const { _id, email, profile, exp } = decoded;
+    const user: Token = {
+      _id,
+      email,
+      profile,
+    };
+
+    (ctx['user'] as Token) = user;
     ctx['tokenExpire'] = new Date(exp * 1000);
   } catch (e) {
     ctx['user'] = null;

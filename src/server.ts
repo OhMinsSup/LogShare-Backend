@@ -5,6 +5,8 @@ import * as cors from 'koa-cors';
 import * as mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import routes from './routes';
+import corsMiddleware from './lib/middleware/corsMiddleware';
+import tokenMiddleware from './lib/middleware/tokenMiddleware';
 dotenv.config();
 
 class Server {
@@ -29,6 +31,8 @@ class Server {
       })
     );
     app.use(cors());
+    app.use(corsMiddleware);
+    app.use(tokenMiddleware);
     app.use(
       compress({
         filter: contentType => {

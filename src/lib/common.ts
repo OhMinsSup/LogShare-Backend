@@ -1,6 +1,57 @@
 import * as crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
+import removeMd from 'remove-markdown';
+
+/**
+ * @description 중복된 데이터 없에는 함수
+ * @param {string[]} array
+ * @returns {string[]} array
+ */
+export const filterUnique = (array: string[]): string[] => {
+  return [...new Set(array)];
+};
+
+/**
+ * @description 문자가 공백인지 아닌지 체크
+ * @param {string} text
+ * @returns {boolean}
+ */
+export function checkEmpty(text: string) {
+  if (!text) return true;
+  const replaced = text
+    .trim()
+    .replace(
+      /([\u3164\u115F\u1160\uFFA0\u200B\u0001-\u0008\u000B-\u000C\u000E-\u001F]+)/g,
+      ''
+    );
+  if (replaced === '') return true;
+  return false;
+}
+
+/**
+ * @description 마크다운 또는 일반 텍스트문자를 제거하고 글자수가 200자 이상이면  나머지 문자를 생략하고 ...으로 교체
+ * @param {string} markdown
+ * @param {string} type
+ * @returns {string}
+ */
+export function formatShortDescription(
+  value: string,
+  type: 'markdown' | 'text'
+): string {
+  let replaced = '';
+  if (type === 'markdown') {
+    replaced = value.replace(/\n/g, ' ').replace(/```(.*)```/g, '');
+    return (
+      removeMd(replaced)
+        .slice(0, 200)
+        .replace(/#/g, '') + (replaced.length > 200 ? '...' : '')
+    );
+  } else {
+    replaced = value.replace(/\n/g, ' ');
+    return replaced.slice(0, 200) + (replaced.length > 200 ? '...' : '');
+  }
+}
 
 /**
  * @description 패스워드를 해시값으로 변경
@@ -47,7 +98,7 @@ export const checkObjectId: Middleware = async (
  * @param {() => Promise<any>} next
  * @returns {() => Promise<any>} next()
  */
-export const needsAuth: Middleware = (
+export const needsAuth: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
 ) => {

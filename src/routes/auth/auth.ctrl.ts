@@ -1,6 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import User from '../../models/User';
+import { Token } from '../../lib/token';
 
 /**@return {void}
  * @description 로컬 회원가입 api
@@ -42,8 +43,8 @@ export const localRegister: Middleware = async (ctx: Context) => {
 
   try {
     const [emailExists, usernameExists] = await Promise.all([
-      await User.findByEmailOrUsername('email', email),
-      await User.findByEmailOrUsername('username', username),
+      User.findByEmailOrUsername('email', email),
+      User.findByEmailOrUsername('username', username),
     ]);
 
     if (emailExists || usernameExists) {
@@ -89,7 +90,6 @@ export const localRegister: Middleware = async (ctx: Context) => {
         thumbnail: user.profile.thumbnail,
         shortBio: user.profile.shortBio,
         email: user.email,
-        token,
       },
     };
   } catch (e) {
@@ -108,11 +108,6 @@ export const localLogin: Middleware = async (ctx: Context) => {
   };
 
   const schema = Joi.object().keys({
-    username: Joi.string()
-      .alphanum()
-      .min(4)
-      .max(15)
-      .required(),
     email: Joi.string()
       .email()
       .required(),
@@ -170,7 +165,6 @@ export const localLogin: Middleware = async (ctx: Context) => {
         thumbnail: user.profile.thumbnail,
         shortBio: user.profile.shortBio,
         email: user.email,
-        token,
       },
     };
   } catch (e) {
@@ -178,6 +172,10 @@ export const localLogin: Middleware = async (ctx: Context) => {
   }
 };
 
+/**@return {void}
+ * @description 로그아웃 api
+ * @param {Context} ctx koa Context
+ */
 export const logout: Middleware = async (ctx: Context) => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
@@ -187,6 +185,10 @@ export const logout: Middleware = async (ctx: Context) => {
   ctx.status = 204;
 };
 
+/**@return {void}
+ * @description 이메일 or 유저명 유효성 검사 api
+ * @param {Context} ctx koa Context
+ */
 export const checkExists: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     key: 'email' | 'username';
@@ -206,4 +208,21 @@ export const checkExists: Middleware = async (ctx: Context) => {
   } catch (e) {
     ctx.throw(500, e);
   }
+};
+
+/**@return {void}
+ * @description 유저가 로그인인 중인지 체크하는 api
+ * @param {Context} ctx koa Context
+ */
+export const checkUser: Middleware = async (ctx: Context) => {
+  const user: Token = ctx['user'];
+
+  if (!user) {
+    ctx.status = 403;
+    return;
+  }
+
+  ctx.body = {
+    user,
+  };
 };

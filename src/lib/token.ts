@@ -40,3 +40,16 @@ export function decodeToken(token: string): Promise<any> {
     });
   });
 }
+
+/**
+ * @description decoded한 토근의 값을 타입으로 선언
+ */
+export type Token = {
+  _id: string;
+  email: string;
+  profile: {
+    thumbnail: string;
+    shortBio: string;
+    username: string;
+  };
+};
