@@ -2,7 +2,7 @@ import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
 import { IUser } from './User';
 
 export interface IPost extends Document {
-  user: IUser | string;
+  user: IUser;
   post_thumbnail: string;
   title: string;
   body: string;
@@ -10,8 +10,8 @@ export interface IPost extends Document {
     likes: number;
     comments: number;
   };
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IPostModel extends Model<IPost> {

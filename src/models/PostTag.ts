@@ -1,17 +1,17 @@
-import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
+import { Document, Model, Schema, model, DocumentQuery, Query } from 'mongoose';
 import { IPost } from './Post';
-import { ITag } from './Tag';
+import Tag, { ITag } from './Tag';
 
 export interface IPostTag extends Document {
-  post: IPost | string;
-  tag: ITag | string;
+  post: IPost;
+  tag: ITag;
 }
 
 export interface IPostTagModel extends Model<IPostTag> {
-  Link(
-    postId: string,
-    tagIds: string[]
-  ): Promise<DocumentQuery<IPostTag, IPostTag>[]>;
+  Link(postId: string, tagIds: string[]): Promise<IPostTag[]>;
+  addTagsToPost(postId: string, tags: string[]): Promise<IPostTag>;
+  removeTagsPost(postId: string, tags: string[]): Promise<Query<IPostTag>>;
+  getTagNames(postId: string): Promise<IPostTag[]>;
 }
 
 const PostTagSchema = new Schema({
@@ -35,6 +35,59 @@ PostTagSchema.statics.Link = function(postId: string, tagIds: string[]) {
     })
   );
   return Promise.all(promises);
+};
+
+PostTagSchema.statics.addTagsToPost = async function(
+  postId: string,
+  tags: string[]
+) {
+  if (tags.length === 0) return;
+
+  try {
+    const tagIds: string[] = await Tag.bulkGetNewId(tags);
+
+    return await this.create(
+      tagIds.map(tagId => ({ post: postId, tag: tagId }))
+    );
+  } catch (e) {
+    throw e;
+  }
+};
+
+PostTagSchema.statics.removeTagsPost = async function(
+  postId: string,
+  tags: string[]
+) {
+  if (tags.length === 0) return;
+
+  try {
+    const tagIds: string[] = await Tag.bulkGetMissingId(tags);
+    return await this.deleteMany({
+      $and: [
+        {
+          $or: [{ post: postId }, { tag: tagIds }],
+        },
+      ],
+    })
+      .lean()
+      .exec();
+  } catch (e) {
+    throw e;
+  }
+};
+
+PostTagSchema.statics.getTagNames = function(postId: string) {
+  if (!postId) return;
+
+  return this.find({
+    post: postId,
+  })
+    .populate({
+      path: 'tag',
+      select: 'name',
+    })
+    .lean()
+    .exec();
 };
 
 const PostTag = model<IPostTag>('PostTag', PostTagSchema) as IPostTagModel;

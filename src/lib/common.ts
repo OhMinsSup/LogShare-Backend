@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
 import removeMd from 'remove-markdown';
+import { Token } from './token';
 
 /**
  * @description 중복된 데이터 없에는 함수
@@ -67,9 +68,8 @@ export const hash = (password: string): string => {
 
 /**
  * @description id값이 오브젝트 id값인지 체크
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
+ * @param {ctx} ctx koa Context
+ * @param {() => Promise<any>} next
  * @returns {NextFunction} next()
  */
 export const checkObjectId: Middleware = async (
@@ -102,10 +102,10 @@ export const needsAuth: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
 ) => {
-  const user = ctx['user'];
+  const user: Token = ctx['user'];
 
   if (!user) {
-    ctx.status = 409;
+    ctx.status = 403;
     return;
   }
 

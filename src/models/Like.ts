@@ -3,8 +3,8 @@ import { IUser } from './User';
 import { IPost } from './Post';
 
 export interface ILike extends Document {
-  user: IUser | string;
-  post: IPost | string;
+  user: IUser;
+  post: IPost;
 }
 
 export interface ILikeModel extends Model<ILike> {
