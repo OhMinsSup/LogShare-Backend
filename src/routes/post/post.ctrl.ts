@@ -4,7 +4,7 @@ import { diff } from 'json-diff';
 import { Token } from '../../lib/token';
 import { checkEmpty, filterUnique } from '../../lib/common';
 import Tag from '../../models/Tag';
-import Post from '../../models/Post';
+import Post, { IPost } from '../../models/Post';
 import PostTag from '../../models/PostTag';
 import User from '../../models/User';
 import Like from '../../models/Like';
@@ -154,7 +154,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
     await PostTag.removeTagsPost(postId, tagsToRemove);
     await PostTag.addTagsToPost(postId, tagsToAdd);
 
-    const post = await Post.findByIdAndUpdate(
+    const post: IPost = await Post.findByIdAndUpdate(
       postId,
       {
         title,

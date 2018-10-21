@@ -16,6 +16,7 @@ export interface IPost extends Document {
 
 export interface IPostModel extends Model<IPost> {
   readPostById(postId: string): Promise<DocumentQuery<IPost, IPost>>;
+  listPosts(userId: string | null, cursor: string | null): Promise<IPost[]>;
 }
 
 const PostSchema = new Schema(
@@ -45,6 +46,25 @@ const PostSchema = new Schema(
 PostSchema.statics.readPostById = function(postId: string) {
   return this.findById(postId)
     .populate('user')
+    .lean()
+    .exec();
+};
+
+PostSchema.statics.listPosts = function(
+  userId: string | null,
+  cursor: string | null
+) {
+  const query = Object.assign(
+    {},
+    cursor && !userId ? { _id: { $lt: cursor } } : {},
+    userId && !cursor ? { user: userId } : {},
+    userId && cursor ? { _id: { $lt: cursor }, user: userId } : {}
+  );
+
+  return this.find(query)
+    .populate('user')
+    .sort({ _id: -1 })
+    .limit(20)
     .lean()
     .exec();
 };
