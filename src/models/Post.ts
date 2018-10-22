@@ -70,7 +70,7 @@ PostSchema.statics.trendingPostList = function(cursor: string | null) {
   return this.find(query)
     .populate('user')
     .sort({ 'info.score': -1 })
-    .limit(20)
+    .limit(10)
     .lean()
     .exec();
 };
@@ -89,7 +89,7 @@ PostSchema.statics.listPosts = function(
   return this.find(query)
     .populate('user')
     .sort({ _id: -1 })
-    .limit(20)
+    .limit(10)
     .lean()
     .exec();
 };

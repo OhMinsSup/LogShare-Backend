@@ -7,7 +7,7 @@ import { Token } from '../../lib/token';
  * @description 로컬 회원가입 api
  * @param {Context} ctx koa Context
  */
-export const localRegister: Middleware = async (ctx: Context) => {
+export const localRegister: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     username: string;
     email: string;
@@ -101,7 +101,7 @@ export const localRegister: Middleware = async (ctx: Context) => {
  * @description 로컬 로그인 api
  * @param {Context} ctx koa Context
  */
-export const localLogin: Middleware = async (ctx: Context) => {
+export const localLogin: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     email: string;
     password: string;
@@ -176,7 +176,7 @@ export const localLogin: Middleware = async (ctx: Context) => {
  * @description 로그아웃 api
  * @param {Context} ctx koa Context
  */
-export const logout: Middleware = async (ctx: Context) => {
+export const logout: Middleware = async (ctx: Context): Promise<any> => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
     maxAge: 0,
@@ -189,7 +189,7 @@ export const logout: Middleware = async (ctx: Context) => {
  * @description 이메일 or 유저명 유효성 검사 api
  * @param {Context} ctx koa Context
  */
-export const checkExists: Middleware = async (ctx: Context) => {
+export const checkExists: Middleware = async (ctx: Context): Promise<any> => {
   type ParamsPayload = {
     key: 'email' | 'username';
     value: string;
@@ -214,7 +214,7 @@ export const checkExists: Middleware = async (ctx: Context) => {
  * @description 유저가 로그인인 중인지 체크하는 api
  * @param {Context} ctx koa Context
  */
-export const checkUser: Middleware = async (ctx: Context) => {
+export const checkUser: Middleware = async (ctx: Context): Promise<any> => {
   const user: Token = ctx['user'];
 
   if (!user) {

@@ -35,3 +35,53 @@ export const serializePost = (data: any) => {
     },
   };
 };
+
+/**
+ * @description 태그정보를 필터링
+ * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
+ * @returns {Object<any>} tagId, name, count
+ */
+export const serializeTag = (data: any) => {
+  const {
+    count,
+    tag_docs: { _id: tagId, name },
+  } = data;
+  return {
+    tagId,
+    name,
+    count,
+  };
+};
+
+/**
+ * @description 포스트 데이터에서 필요한 데이터만 필터링
+ * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
+ * @returns {Object<any>} _id, post_thumbnail, title, body, createdAt, tags, user, info
+ */
+export const serializeTagPost = (data: any) => {
+  const {
+    post: {
+      _id: postId,
+      likes,
+      comments,
+      relationUrl,
+      body,
+      user,
+      urls,
+      createdAt,
+    },
+  } = data;
+  return {
+    postId,
+    body,
+    relationUrl,
+    createdAt,
+    urls: urls.map(url => url),
+    likes,
+    comments,
+    user: {
+      ...pick(user, ['_id', 'username']),
+      ...pick(user.profile, ['displayName', 'thumbnail']),
+    },
+  };
+};

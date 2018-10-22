@@ -10,14 +10,13 @@ import User from '../../models/User';
 import Like from '../../models/Like';
 import { serializePost } from '../../lib/serialized';
 import PostRead from '../../models/PostRead';
-import PostScore, { Types } from '../../models/PostScore';
 
 /**
  * @description 포스트를 작성하기 위한 api
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const writePost: Middleware = async (ctx: Context) => {
+export const writePost: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     title: string;
     body: string;
@@ -94,7 +93,7 @@ export const writePost: Middleware = async (ctx: Context) => {
   }
 };
 
-export const updatePost: Middleware = async (ctx: Context) => {
+export const updatePost: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     title: string;
     body: string;
@@ -193,7 +192,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const deletePost: Middleware = async (ctx: Context) => {
+export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
   type ParamsPayload = {
     id: string;
   };
@@ -224,7 +223,7 @@ export const deletePost: Middleware = async (ctx: Context) => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const readPost: Middleware = async (ctx: Context) => {
+export const readPost: Middleware = async (ctx: Context): Promise<any> => {
   type ParamsPayload = {
     id: string;
   };
@@ -274,7 +273,7 @@ export const readPost: Middleware = async (ctx: Context) => {
         $and: [{ user: post.user }, { _id: post._id }],
       },
       {
-        $inc: { score: 1 },
+        $inc: { 'info.score': 1 },
       },
       {
         new: true,
@@ -282,13 +281,6 @@ export const readPost: Middleware = async (ctx: Context) => {
     )
       .lean()
       .exec();
-
-    await new PostScore({
-      user: user._id,
-      post: post._id,
-      type: Types.READ,
-      score: 1.0,
-    }).save();
   } catch (e) {
     ctx.throw(500, e);
   }

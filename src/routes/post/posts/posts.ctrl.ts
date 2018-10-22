@@ -9,7 +9,7 @@ import { Types } from 'mongoose';
  * @description 포스트 리스트(유저 | Public) API
  * @param {Context} ctx koa Context
  */
-export const listPosts: Middleware = async (ctx: Context) => {
+export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
   type ParamPayload = {
     username: string | null;
   };
@@ -60,7 +60,9 @@ export const listPosts: Middleware = async (ctx: Context) => {
   }
 };
 
-export const trendingPostList: Middleware = async (ctx: Context) => {
+export const trendingPostList: Middleware = async (
+  ctx: Context
+): Promise<any> => {
   type QueryPayload = {
     cursor: string | null;
   };
@@ -102,7 +104,7 @@ export const trendingPostList: Middleware = async (ctx: Context) => {
   }
 };
 
-export const listSequences: Middleware = async (ctx: Context) => {
+export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
   type QueryPayload = {
     postId: string;
   };
@@ -145,7 +147,6 @@ export const listSequences: Middleware = async (ctx: Context) => {
     );
 
     const [before, after] = await Promise.all(promises);
-    delete post.user;
 
     const beforeCount = after.length < 2 ? 4 - after.length : 2;
     const afterCount = before.length < 2 ? 4 - before.length : 2;
