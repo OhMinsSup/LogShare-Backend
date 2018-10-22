@@ -21,7 +21,7 @@ export const listPosts: Middleware = async (ctx: Context) => {
   const { username }: ParamPayload = ctx.params;
   const { cursor }: QueryPayload = ctx.query;
 
-  let userId: string = '';
+  let userId = '';
 
   try {
     if (username) {
@@ -60,7 +60,47 @@ export const listPosts: Middleware = async (ctx: Context) => {
   }
 };
 
-export const trendingPostList: Middleware = async (ctx: Context) => {};
+export const trendingPostList: Middleware = async (ctx: Context) => {
+  type QueryPayload = {
+    cursor: string | null;
+  };
+
+  const { cursor }: QueryPayload = ctx.query;
+
+  if (!Types.ObjectId.isValid(cursor) && cursor) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+
+  try {
+    const post = await Post.trendingPostList(cursor);
+
+    if (post.length === 0 || !post) {
+      ctx.body = {
+        next: '',
+        postWithData: [],
+      };
+    }
+
+    const next =
+      post.length === 20 ? `/post/list/trending?cursor=${post[19]._id}` : null;
+
+    const postWithData = post.map(serializePost).map(post => ({
+      ...post,
+      body: formatShortDescription(post.body, 'text'),
+    }));
+
+    ctx.body = {
+      next,
+      postWithData,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
 
 export const listSequences: Middleware = async (ctx: Context) => {
   type QueryPayload = {

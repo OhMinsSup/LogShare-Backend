@@ -18,6 +18,7 @@ export interface IPost extends Document {
 export interface IPostModel extends Model<IPost> {
   readPostById(postId: string): Promise<DocumentQuery<IPost, IPost>>;
   listPosts(userId: string | null, cursor: string | null): Promise<IPost[]>;
+  trendingPostList(cursor: string | null): Promise<IPost[]>;
   Count(
     type: 'likes' | 'comments',
     postId: string
@@ -59,6 +60,17 @@ const PostSchema = new Schema(
 PostSchema.statics.readPostById = function(postId: string) {
   return this.findById(postId)
     .populate('user')
+    .lean()
+    .exec();
+};
+
+PostSchema.statics.trendingPostList = function(cursor: string | null) {
+  const query = Object.assign({}, cursor ? { _id: { $lt: cursor } } : {});
+
+  return this.find(query)
+    .populate('user')
+    .sort({ 'info.score': -1 })
+    .limit(20)
     .lean()
     .exec();
 };
