@@ -9,6 +9,7 @@ export interface IPost extends Document {
   info: {
     likes: number;
     comments: number;
+    score: number;
   };
   createdAt: string;
   updatedAt: string;
@@ -17,6 +18,14 @@ export interface IPost extends Document {
 export interface IPostModel extends Model<IPost> {
   readPostById(postId: string): Promise<DocumentQuery<IPost, IPost>>;
   listPosts(userId: string | null, cursor: string | null): Promise<IPost[]>;
+  Count(
+    type: 'likes' | 'comments',
+    postId: string
+  ): Promise<DocumentQuery<IPost, IPost>>;
+  unCount(
+    type: 'likes' | 'comments',
+    postId: string
+  ): Promise<DocumentQuery<IPost, IPost>>;
 }
 
 const PostSchema = new Schema(
@@ -35,6 +44,10 @@ const PostSchema = new Schema(
         default: 0,
       },
       comments: {
+        type: Number,
+        default: 0,
+      },
+      score: {
         type: Number,
         default: 0,
       },
@@ -65,6 +78,44 @@ PostSchema.statics.listPosts = function(
     .populate('user')
     .sort({ _id: -1 })
     .limit(20)
+    .lean()
+    .exec();
+};
+
+PostSchema.statics.Count = function(
+  type: 'likes' | 'comments',
+  postId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    postId,
+    {
+      $inc: {
+        [key]: 1,
+      },
+    },
+    { new: true }
+  )
+    .lean()
+    .exec();
+};
+
+PostSchema.statics.unCount = function(
+  type: 'likes' | 'comments',
+  postId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    postId,
+    {
+      $inc: {
+        [key]: -1,
+      },
+    },
+    { new: true }
+  )
     .lean()
     .exec();
 };

@@ -10,7 +10,7 @@ export interface ILike extends Document {
 export interface ILikeModel extends Model<ILike> {
   checkExists(
     userId: string,
-    pinId: string
+    postId: string
   ): Promise<DocumentQuery<ILike, ILike>>;
 }
 

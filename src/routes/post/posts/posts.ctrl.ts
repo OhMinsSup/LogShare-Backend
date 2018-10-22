@@ -60,6 +60,8 @@ export const listPosts: Middleware = async (ctx: Context) => {
   }
 };
 
+export const trendingPostList: Middleware = async (ctx: Context) => {};
+
 export const listSequences: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     postId: string;

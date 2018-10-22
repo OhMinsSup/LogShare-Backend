@@ -2,13 +2,15 @@ import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import { diff } from 'json-diff';
 import { Token } from '../../lib/token';
-import { checkEmpty, filterUnique } from '../../lib/common';
+import { checkEmpty, filterUnique, hash } from '../../lib/common';
 import Tag from '../../models/Tag';
 import Post, { IPost } from '../../models/Post';
 import PostTag from '../../models/PostTag';
 import User from '../../models/User';
 import Like from '../../models/Like';
 import { serializePost } from '../../lib/serialized';
+import PostRead from '../../models/PostRead';
+import PostScore, { Types } from '../../models/PostScore';
 
 /**
  * @description 포스트를 작성하기 위한 api
@@ -210,6 +212,8 @@ export const deletePost: Middleware = async (ctx: Context) => {
 
     await Post.deleteOne({ _id: postId });
     await User.unCount('post', ctx['user']._id);
+
+    ctx.status = 204;
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -249,6 +253,42 @@ export const readPost: Middleware = async (ctx: Context) => {
       name: tag.map(tag => tag.tag.name),
       liked,
     });
+
+    const hashIp = hash(ctx.request.ip);
+    const postRead = await PostRead.findOne({
+      $and: [{ ip: hashIp }, { post: post._id }],
+    })
+      .lean()
+      .exec();
+
+    if (postRead) return;
+
+    await new PostRead({
+      ip: hashIp,
+      post: post._id,
+      user: user._id,
+    }).save();
+
+    await Post.findOneAndUpdate(
+      {
+        $and: [{ user: post.user }, { _id: post._id }],
+      },
+      {
+        $inc: { score: 1 },
+      },
+      {
+        new: true,
+      }
+    )
+      .lean()
+      .exec();
+
+    await new PostScore({
+      user: user._id,
+      post: post._id,
+      type: Types.READ,
+      score: 1.0,
+    }).save();
   } catch (e) {
     ctx.throw(500, e);
   }

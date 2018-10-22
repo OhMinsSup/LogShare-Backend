@@ -9,4 +9,5 @@ auth.post('/logout', authCtrl.logout);
 
 auth.get('/check', authCtrl.checkUser);
 auth.get('/exists/:key(email|username)/:value', authCtrl.checkExists);
+
 export default auth;

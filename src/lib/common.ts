@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
 import removeMd from 'remove-markdown';
 import { Token } from './token';
+import Post from '../models/Post';
 
 /**
  * @description 중복된 데이터 없에는 함수
@@ -56,13 +57,13 @@ export function formatShortDescription(
 
 /**
  * @description 패스워드를 해시값으로 변경
- * @param {string} password
- * @returns {string} password
+ * @param {string} value
+ * @returns {string} value
  */
-export const hash = (password: string): string => {
+export const hash = (value: string): string => {
   return crypto
     .createHmac('sha256', 'ds')
-    .update(password)
+    .update(value)
     .digest('hex');
 };
 
@@ -109,5 +110,37 @@ export const needsAuth: Middleware = async (
     return;
   }
 
+  return next();
+};
+
+/**
+ * @description 포스트가 존재하는지 체크하는 미들웨어
+ * @param {Context} ctx
+ * @param {() => Promise<any>} next
+ * @returns {() => Promise<any>} next()
+ */
+export const checkPostExistancy = async (
+  ctx: Context,
+  next: () => Promise<any>
+) => {
+  const { id } = ctx.params;
+
+  try {
+    const post = await Post.findById(id)
+      .lean()
+      .exec();
+
+    if (!post) {
+      ctx.status = 404;
+      ctx.body = {
+        name: '포스트',
+        payload: '포스트가 존재하지 않습니다',
+      };
+    }
+
+    ctx['post'] = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
   return next();
 };
