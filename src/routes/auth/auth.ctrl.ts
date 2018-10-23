@@ -1,7 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import User from '../../models/User';
-import { Token } from '../../lib/token';
+import { TokenPayload } from '../../lib/token';
 
 /**@return {void}
  * @description 로컬 회원가입 api
@@ -215,7 +215,7 @@ export const checkExists: Middleware = async (ctx: Context): Promise<any> => {
  * @param {Context} ctx koa Context
  */
 export const checkUser: Middleware = async (ctx: Context): Promise<any> => {
-  const user: Token = ctx['user'];
+  const user: TokenPayload = ctx['user'];
 
   if (!user) {
     ctx.status = 403;

@@ -1,5 +1,5 @@
 import { Context, Middleware } from 'koa';
-import { Token } from '../../../lib/token';
+import { TokenPayload } from '../../../lib/token';
 import User from '../../../models/User';
 import Follow from '../../../models/Follow';
 
@@ -8,7 +8,7 @@ export const getFollow: Middleware = async (ctx: Context): Promise<any> => {
     name: string;
   };
 
-  const { _id: userId }: Token = ctx['user'];
+  const { _id: userId }: TokenPayload = ctx['user'];
   const { name }: ParamsPayload = ctx.params;
 
   let follow = false;
@@ -50,7 +50,7 @@ export const follow: Middleware = async (ctx: Context): Promise<any> => {
   const {
     _id: userId,
     profile: { username },
-  }: Token = ctx['user'];
+  }: TokenPayload = ctx['user'];
 
   if (name === username) {
     ctx.status = 400;
@@ -111,7 +111,7 @@ export const unfollow: Middleware = async (ctx: Context): Promise<any> => {
   const {
     _id: userId,
     profile: { username },
-  }: Token = ctx['user'];
+  }: TokenPayload = ctx['user'];
 
   if (name === username) {
     ctx.status = 400;

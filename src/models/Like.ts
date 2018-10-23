@@ -14,18 +14,23 @@ export interface ILikeModel extends Model<ILike> {
   ): Promise<DocumentQuery<ILike, ILike>>;
 }
 
-const LikeSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    index: true,
+const LikeSchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
+    post: {
+      type: Schema.Types.ObjectId,
+      ref: 'Post',
+      index: true,
+    },
   },
-  post: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
-    index: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 LikeSchema.statics.checkExists = function(
   userId: string,

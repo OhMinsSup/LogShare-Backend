@@ -2,8 +2,9 @@ import * as crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
 import removeMd from 'remove-markdown';
-import { Token } from './token';
+import { TokenPayload } from './token';
 import Post from '../models/Post';
+import { IUser } from '../models/User';
 
 /**
  * @description 중복된 데이터 없에는 함수
@@ -103,7 +104,7 @@ export const needsAuth: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
 ) => {
-  const user: Token = ctx['user'];
+  const user: TokenPayload = ctx['user'];
 
   if (!user) {
     ctx.status = 403;
@@ -143,4 +144,22 @@ export const checkPostExistancy = async (
     ctx.throw(500, e);
   }
   return next();
+};
+
+/**
+ * @description 포스트의 타입을 가져온다
+ */
+export type PostPayload = {
+  _id: string;
+  user: IUser;
+  post_thumbnail: string;
+  title: string;
+  body: string;
+  info: {
+    likes: number;
+    comments: number;
+    score: number;
+  };
+  createdAt: string;
+  updatedAt: string;
 };

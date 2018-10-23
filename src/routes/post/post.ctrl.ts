@@ -1,7 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import { diff } from 'json-diff';
-import { Token } from '../../lib/token';
+import { TokenPayload } from '../../lib/token';
 import { checkEmpty, filterUnique, hash } from '../../lib/common';
 import Tag from '../../models/Tag';
 import Post, { IPost } from '../../models/Post';
@@ -46,7 +46,7 @@ export const writePost: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   const { title, body, post_thumbnail, tags }: BodySchema = ctx.request.body;
-  const user: Token = ctx['user'];
+  const user: TokenPayload = ctx['user'];
 
   const stringsToCheck = [title, body, ...tags];
 
@@ -229,7 +229,7 @@ export const readPost: Middleware = async (ctx: Context): Promise<any> => {
   };
 
   const { id }: ParamsPayload = ctx.params;
-  const user: Token = ctx['user'];
+  const user: TokenPayload = ctx['user'];
 
   try {
     const post = await Post.readPostById(id);

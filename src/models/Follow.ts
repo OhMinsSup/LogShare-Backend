@@ -13,18 +13,23 @@ export interface IFollowModel extends Model<IFollow> {
   ): Promise<DocumentQuery<IFollow, IFollow>>;
 }
 
-const FollowSchema = new Schema({
-  following: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    index: true,
+const FollowSchema = new Schema(
+  {
+    following: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
+    follower: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
   },
-  follower: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    index: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 FollowSchema.statics.checkExists = function(
   userId: string,

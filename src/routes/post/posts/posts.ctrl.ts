@@ -40,9 +40,9 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     const next =
-      post.length === 20
+      post.length === 10
         ? `/post/list/${username ? `@${username}` : `public`}?cursor=${
-            post[19]._id
+            post[9]._id
           }`
         : null;
 
@@ -88,7 +88,7 @@ export const trendingPostList: Middleware = async (
     }
 
     const next =
-      post.length === 20 ? `/post/list/trending?cursor=${post[19]._id}` : null;
+      post.length === 10 ? `/post/list/trending?cursor=${post[9]._id}` : null;
 
     const postWithData = post.map(serializePost).map(post => ({
       ...post,

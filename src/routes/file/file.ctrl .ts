@@ -1,7 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-import { Token } from '../../lib/token';
+import { TokenPayload } from '../../lib/token';
 dotenv.config();
 
 const {
@@ -21,7 +21,7 @@ export const createPostImageSignedUrl: Middleware = async (
   ctx: Context
 ): Promise<any> => {
   const { image } = ctx.request.files;
-  const user: Token = ctx['user'];
+  const user: TokenPayload = ctx['user'];
 
   if (!user) {
     ctx.status = 401;
@@ -79,7 +79,7 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
   ctx: Context
 ): Promise<any> => {
   const { thumbnail } = ctx.request.files;
-  const user: Token = ctx['user'].profile;
+  const user: TokenPayload = ctx['user'].profile;
 
   if (!user) {
     ctx.status = 401;
