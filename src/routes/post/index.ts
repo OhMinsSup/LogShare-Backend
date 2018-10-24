@@ -14,14 +14,14 @@ post.get('/:id', needsAuth, checkObjectId, postCtrl.readPost);
 
 post.use('/list', needsAuth, posts.routes());
 post.use(
-  '/like/:id',
+  '/:id/like',
   needsAuth,
   checkObjectId,
   checkPostExistancy,
   like.routes()
 );
 post.use(
-  '/comment/:id',
+  '/:id/comment',
   needsAuth,
   checkObjectId,
   checkPostExistancy,

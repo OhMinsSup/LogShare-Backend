@@ -32,6 +32,10 @@ export interface IUserModel extends Model<IUser> {
     type: 'email' | 'username',
     value: string
   ): Promise<DocumentQuery<IUser, IUser>>;
+  findBySocial(
+    provider: string,
+    socialId: string | number
+  ): Promise<DocumentQuery<IUser, IUser>>;
   localRegister(
     username: string,
     email: string,
@@ -99,6 +103,19 @@ UserSchema.statics.findByEmailOrUsername = function(
   return this.findOne({
     [key]: value,
   }).exec();
+};
+
+UserSchema.statics.findBySocial = function(
+  provider: string,
+  socialId: string | number
+) {
+  const key = `social.${provider}.id`;
+
+  return this.findOne({
+    [key]: socialId,
+  })
+    .lean()
+    .exec();
 };
 
 UserSchema.statics.localRegister = function(

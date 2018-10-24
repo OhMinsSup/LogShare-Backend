@@ -3,13 +3,13 @@ import User from '../../../models/User';
 
 export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
   type ParamPayload = {
-    username: string;
+    name: string;
   };
 
-  const { username }: ParamPayload = ctx.params;
+  const { name }: ParamPayload = ctx.params;
 
   try {
-    const user = await User.findByEmailOrUsername('username', username);
+    const user = await User.findByEmailOrUsername('username', name);
 
     if (!user) {
       ctx.status = 404;

@@ -60,28 +60,21 @@ export const serializeTag = (data: any) => {
  */
 export const serializeTagPost = (data: any) => {
   const {
-    post: {
-      _id: postId,
-      likes,
-      comments,
-      relationUrl,
-      body,
-      user,
-      urls,
-      createdAt,
-    },
+    post: { _id: postId, post_thumbnail, info, title, body, user, createdAt },
   } = data;
+
   return {
     postId,
+    title,
     body,
-    relationUrl,
+    post_thumbnail,
     createdAt,
-    urls: urls.map(url => url),
-    likes,
-    comments,
+    info: {
+      ...pick(info, ['likes', 'comments']),
+    },
     user: {
-      ...pick(user, ['_id', 'username']),
-      ...pick(user.profile, ['displayName', 'thumbnail']),
+      ...pick(user, ['_id']),
+      ...pick(user.profile, ['username', 'thumbnail']),
     },
   };
 };

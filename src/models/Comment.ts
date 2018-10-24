@@ -8,6 +8,7 @@ export interface IComment extends Document {
   reply: IComment;
   level: number;
   text: string;
+  visible: boolean;
 }
 
 export interface ICommentModel extends Model<IComment> {}
@@ -30,6 +31,10 @@ const CommentSchema = new Schema(
     level: {
       type: Number,
       default: 0,
+    },
+    visible: {
+      type: Boolean,
+      default: true,
     },
     text: String,
   },

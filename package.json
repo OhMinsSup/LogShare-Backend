@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
+    "@types/fb": "0.0.23",
     "@types/joi": "^13.6.1",
     "@types/jsonwebtoken": "^7.2.8",
     "@types/koa": "^2.0.46",
@@ -30,6 +31,8 @@
   "dependencies": {
     "cloudinary": "^1.11.0",
     "dotenv": "^6.1.0",
+    "fb": "^2.0.0",
+    "googleapis": "^34.0.0",
     "joi": "^14.0.0",
     "json-diff": "^0.5.3",
     "jsonwebtoken": "^8.3.0",

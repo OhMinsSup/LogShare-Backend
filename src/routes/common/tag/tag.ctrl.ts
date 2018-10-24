@@ -60,19 +60,32 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
           }
     );
 
-    const postData = await PostTag.find(query)
+    const post = await PostTag.find(query)
+      .select('post')
       .populate({
         path: 'post',
         populate: {
           path: 'user',
+          select: 'profile',
         },
       })
       .limit(10)
-      .lean()
       .exec();
 
+    if (post.length === 0 || !post) {
+      ctx.body = {
+        next: '',
+        postWithData: [],
+      };
+      return;
+    }
+
+    const next =
+      post.length === 10 ? `/common/tags/${name}?cursor=${post[9]._id}` : null;
+
     ctx.body = {
-      postWithData: postData.map(serializeTagPost).map(post => ({
+      next,
+      postWithData: post.map(serializeTagPost).map(post => ({
         ...post,
         body: formatShortDescription(post.body, 'text'),
       })),

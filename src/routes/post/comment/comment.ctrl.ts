@@ -4,6 +4,7 @@ import { checkEmpty, PostPayload } from '../../../lib/common';
 import { Types } from 'mongoose';
 import { TokenPayload } from '../../../lib/token';
 import Comment from '../../../models/Comment';
+import Post from '../../../models/Post';
 
 export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
@@ -46,7 +47,7 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
     }
   }
 
-  const { _id: postId }: PostPayload = ctx['post'];
+  const { _id: postId, user }: PostPayload = ctx['post'];
   const { _id: userId }: TokenPayload = ctx['user'];
   let level = 0;
   let reply_to;
@@ -93,11 +94,27 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
       return;
     }
 
+    await Post.Count('comments', postId);
+
     const commentWithData = await Comment.findById(comment._id)
       .lean()
       .exec();
 
     ctx.body = commentWithData;
+
+    await Post.findOneAndUpdate(
+      {
+        $and: [{ user }, { _id: postId }],
+      },
+      {
+        $inc: { 'info.score': 2 },
+      },
+      {
+        new: true,
+      }
+    )
+      .lean()
+      .exec();
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -190,40 +207,39 @@ export const deleteComment: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   try {
-    const c = await Comment.findById(commentId).exec();
+    const c = await Comment.findById(commentId)
+      .lean()
+      .exec();
 
-    if (c.reply) {
-      await Comment.deleteOne({
-        $and: [
-          {
-            post: post._id,
-            _id: commentId,
-          },
-        ],
-      })
-        .lean()
-        .exec();
-      await Comment.deleteMany({
-        $and: [
-          {
-            post: post._id,
-            reply: commentId,
-          },
-        ],
-      })
-        .lean()
-        .exec();
-    } else {
-      await Comment.deleteOne({
-        $and: [
-          {
-            post: post._id,
-            _id: commentId,
-          },
-        ],
-      });
+    if (!c) {
+      ctx.status = 404;
+      ctx.body = {
+        name: 'Comment',
+        payload: '댓글이 존재하지 않습니다.',
+      };
+      return;
     }
 
+    await Comment.findOneAndUpdate(
+      {
+        $and: [
+          {
+            post: post._id,
+            _id: c._id,
+          },
+        ],
+      },
+      {
+        visible: false,
+      },
+      {
+        new: true,
+      }
+    )
+      .lean()
+      .exec();
+
+    await Post.unCount('comments', post._id);
     ctx.status = 204;
   } catch (e) {
     ctx.throw(500, e);

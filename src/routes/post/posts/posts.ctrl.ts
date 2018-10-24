@@ -37,6 +37,7 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
         next: '',
         postWithData: [],
       };
+      return;
     }
 
     const next =
@@ -85,6 +86,7 @@ export const trendingPostList: Middleware = async (
         next: '',
         postWithData: [],
       };
+      return;
     }
 
     const next =
