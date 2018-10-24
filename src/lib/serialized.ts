@@ -78,3 +78,20 @@ export const serializeTagPost = (data: any) => {
     },
   };
 };
+
+/**
+ * @description 알리방정보를 필터링
+ * @param {any} Data
+ * @returns {Object<any>} noticeId, creator
+ */
+export const serializeNoticeRoom = (data: any) => {
+  const { _id: noticeId, creator } = data;
+
+  return {
+    noticeId,
+    creator: {
+      ...pick(creator, ['_id', 'username']),
+      ...pick(creator.profile, ['displayName', 'thumbnail']),
+    },
+  };
+};
