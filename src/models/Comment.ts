@@ -9,6 +9,8 @@ export interface IComment extends Document {
   level: number;
   text: string;
   visible: boolean;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface ICommentModel extends Model<IComment> {}
@@ -42,13 +44,6 @@ const CommentSchema = new Schema(
     timestamps: true,
   }
 );
-
-CommentSchema.statics.readComment = function(commentId: string) {
-  return this.findById(commentId)
-    .populate('reply')
-    .lean()
-    .exec();
-};
 
 const Comment = model<IComment>('Comment', CommentSchema) as ICommentModel;
 

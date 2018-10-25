@@ -146,6 +146,17 @@ export const checkPostExistancy = async (
   return next();
 };
 
+export const normalize = (array: any[], key: string) => {
+  const byId = {};
+  const allIds = [];
+  array.forEach(item => {
+    byId[item[key]] = item;
+    allIds.push(byId[item[key]]);
+  });
+
+  return allIds;
+};
+
 /**
  * @description 포스트의 타입을 가져온다
  */

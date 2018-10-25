@@ -4,6 +4,8 @@ import { IUser } from './User';
 export interface IFollow extends Document {
   following: IUser;
   follower: IUser;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface IFollowModel extends Model<IFollow> {

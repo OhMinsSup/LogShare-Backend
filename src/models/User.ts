@@ -23,6 +23,9 @@ export interface IUser extends Document {
   info: {
     post: number;
   };
+  createdAt: string | Date;
+  updatedAt: string | Date;
+
   validatePassword(password: string): boolean;
   generate(): Promise<string>;
 }

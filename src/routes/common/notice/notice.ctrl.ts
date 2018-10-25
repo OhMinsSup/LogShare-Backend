@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import Follow from '../../../models/Follow';
 import { filterUnique } from '../../../lib/common';
 import NoticeMessage from '../../../models/NoticeMessage';
+import { Types } from 'mongoose';
 
 export const checkNoticeRoom: Middleware = async (
   ctx: Context
@@ -96,11 +97,15 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     // 팔로우, 팔로잉 유저의 아이디를 가져와 userIds에 저장
-
     following.map(user => userIds.push(user.following));
     follower.map(user => userIds.push(user.follower));
 
     const uniqueUserIds = filterUnique(userIds);
+
+    if (!uniqueUserIds || uniqueUserIds.length === 0) {
+      ctx.status = 204;
+      return;
+    }
 
     // 각 아이디의 notice를 찾아서 온다
     const notice = await Promise.all(
@@ -114,6 +119,11 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
           .exec();
       })
     );
+
+    if (notice.length === 0 || !notice) {
+      ctx.status = 204;
+      return;
+    }
 
     await Promise.all(
       notice.map(notice => {
@@ -141,6 +151,14 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
   const { _id: userId }: TokenPayload = ctx['user'];
   const { cursor }: QueryPayload = ctx.query;
 
+  if (!Types.ObjectId.isValid(cursor) && cursor) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+
   try {
     const notice = await Notice.findOne({ creator: userId })
       .lean()
@@ -164,11 +182,23 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
 
     const message = await NoticeMessage.find(query)
       .populate('sender')
-      .sort({ _id: -1 })
+      .limit(10)
       .lean()
       .exec();
 
+    if (message.length === 0 || !message) {
+      ctx.body = {
+        next: '',
+        message: [],
+      };
+      return;
+    }
+
+    const next =
+      message.length === 10 ? `/common/notice?cursor=${message[9]._id}` : null;
+
     ctx.body = {
+      next,
       message: message.map(m => {
         const { message, sender } = m;
         return {

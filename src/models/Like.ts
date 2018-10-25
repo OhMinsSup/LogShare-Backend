@@ -5,6 +5,8 @@ import { IPost } from './Post';
 export interface ILike extends Document {
   user: IUser;
   post: IPost;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface ILikeModel extends Model<ILike> {
