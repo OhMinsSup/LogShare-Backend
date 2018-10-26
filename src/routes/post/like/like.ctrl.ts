@@ -132,3 +132,7 @@ export const getLike: Middleware = async (ctx: Context): Promise<any> => {
     ctx.throw(500, e);
   }
 };
+
+export const getLikePostList: Middleware = async (
+  ctx: Context
+): Promise<any> => {};

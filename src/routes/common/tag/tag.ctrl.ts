@@ -4,6 +4,11 @@ import { serializeTag, serializeTagPost } from '../../../lib/serialized';
 import Tag from '../../../models/Tag';
 import { formatShortDescription } from '../../../lib/common';
 
+/**
+ * @description 태그를 가져오는 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
 export const getTags: Middleware = async (ctx: Context): Promise<any> => {
   try {
     const tagData = await PostTag.aggregate([
@@ -31,6 +36,11 @@ export const getTags: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
+/**
+ * @description 태그에 속한 포스트를 리스팅하는 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
 export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
   type ParamsPayload = {
     tag: string;

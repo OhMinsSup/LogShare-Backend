@@ -5,9 +5,12 @@ import Comment from '../../../models/Comment';
 import Follow from '../../../models/Follow';
 import { normalize } from '../../../lib/common';
 
-export const activityRecord: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+/**
+ * @description 유저가 활동한 기록을 보여주는 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
+export const userHistory: Middleware = async (ctx: Context): Promise<any> => {
   type ParamsPayload = {
     name: string;
   };
@@ -66,9 +69,11 @@ export const activityRecord: Middleware = async (
     normalized.likes.map(like => serialized.push(like));
     normalized.comments.map(comment => serialized.push(comment));
 
-    ctx.body = serialized.sort((a, b) => {
-      return b['createdAt'] - a['createdAt'];
-    });
+    ctx.body = {
+      history: serialized.sort((a, b) => {
+        return b['createdAt'] - a['createdAt'];
+      }),
+    };
   } catch (e) {
     ctx.throw(500, e);
   }

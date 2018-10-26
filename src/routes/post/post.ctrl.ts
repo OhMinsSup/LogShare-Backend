@@ -10,6 +10,7 @@ import User from '../../models/User';
 import Like from '../../models/Like';
 import { serializePost } from '../../lib/serialized';
 import PostRead from '../../models/PostRead';
+import Comment from '../../models/Comment';
 
 /**
  * @description 포스트를 작성하기 위한 api
@@ -93,6 +94,11 @@ export const writePost: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
+/**
+ * @description 포스트를 수정하기 위한 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
 export const updatePost: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     title: string;
@@ -205,6 +211,12 @@ export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
         .lean()
         .exec(),
       Like.deleteMany({ post: postId })
+        .lean()
+        .exec(),
+      PostRead.deleteOne({ post: postId })
+        .lean()
+        .exec(),
+      Comment.deleteMany({ post: postId })
         .lean()
         .exec(),
     ]);

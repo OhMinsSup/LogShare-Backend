@@ -61,6 +61,11 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
+/**
+ * @description 트렌딩 포스트를 보여주는 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
 export const trendingPostList: Middleware = async (
   ctx: Context
 ): Promise<any> => {

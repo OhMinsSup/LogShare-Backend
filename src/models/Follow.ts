@@ -13,6 +13,14 @@ export interface IFollowModel extends Model<IFollow> {
     userId: string,
     followId: string
   ): Promise<DocumentQuery<IFollow, IFollow>>;
+  getfollowingList(
+    followerId: string,
+    cursor: string | null
+  ): Promise<IFollow[]>;
+  getfollowerList(
+    followingId: string,
+    cursor: string | null
+  ): Promise<IFollow[]>;
 }
 
 const FollowSchema = new Schema(
@@ -40,6 +48,52 @@ FollowSchema.statics.checkExists = function(
   return this.findOne({
     $and: [{ following: followId }, { follower: userId }],
   })
+    .lean()
+    .exec();
+};
+
+FollowSchema.statics.getfollowingList = function(
+  followerId: string,
+  cursor: string | null
+) {
+  const query = Object.assign(
+    {},
+    cursor
+      ? {
+          _id: { $lt: cursor },
+          follower: followerId,
+        }
+      : {
+          follower: followerId,
+        }
+  );
+
+  return this.find(query)
+    .populate('user')
+    .limit(10)
+    .lean()
+    .exec();
+};
+
+FollowSchema.statics.getfollowerList = function(
+  followingId: string,
+  cursor: string | null
+) {
+  const query = Object.assign(
+    {},
+    cursor
+      ? {
+          _id: { $lt: cursor },
+          following: followingId,
+        }
+      : {
+          following: followingId,
+        }
+  );
+
+  return this.find(query)
+    .populate('user')
+    .limit(10)
     .lean()
     .exec();
 };

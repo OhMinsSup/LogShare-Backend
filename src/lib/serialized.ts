@@ -90,8 +90,34 @@ export const serializeNoticeRoom = (data: any) => {
   return {
     noticeId,
     creator: {
-      ...pick(creator, ['_id', 'username']),
-      ...pick(creator.profile, ['displayName', 'thumbnail']),
+      ...pick(creator, ['_id']),
+      ...pick(creator.profile, ['username', 'thumbnail']),
     },
+  };
+};
+
+/**
+ * @description 팔로워를 필터링
+ * @param {any} Data
+ * @returns {Object<any>} noticeId, creator
+ */
+export const serializeFollower = (data: any) => {
+  const { follower } = data;
+  return {
+    ...pick(follower, ['_id', 'username']),
+    ...pick(follower.profile, ['username', 'thumbnail', 'shortBio']),
+  };
+};
+
+/**
+ * @description 팔로잉을 필터링
+ * @param {any} Data
+ * @returns {Object<any>} following: { _id, thumb }
+ */
+export const serializeFollowing = (data: any) => {
+  const { following } = data;
+  return {
+    ...pick(following, ['_id']),
+    ...pick(following.profile, ['username', 'thumbnail', 'shortBio']),
   };
 };

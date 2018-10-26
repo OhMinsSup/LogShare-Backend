@@ -7,4 +7,6 @@ like.get('/', likeCtrl.getLike);
 like.post('/', likeCtrl.like);
 like.delete('/', likeCtrl.unlike);
 
+like.get('/:name', likeCtrl.getLikePostList);
+
 export default like;
