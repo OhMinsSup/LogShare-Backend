@@ -69,6 +69,7 @@ FollowSchema.statics.getfollowingList = function(
   );
 
   return this.find(query)
+    .sort({ _id: -1 })
     .populate('user')
     .limit(10)
     .lean()
@@ -92,6 +93,7 @@ FollowSchema.statics.getfollowerList = function(
   );
 
   return this.find(query)
+    .sort({ _id: -1 })
     .populate('user')
     .limit(10)
     .lean()

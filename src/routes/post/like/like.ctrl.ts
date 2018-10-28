@@ -1,6 +1,8 @@
 import { Middleware, Context } from 'koa';
 import Like from '../../../models/Like';
 import Post from '../../../models/Post';
+import { Types } from 'mongoose';
+import User from '../../../models/User';
 
 /**@return {void}
  * @description 좋아요 api
@@ -132,7 +134,3 @@ export const getLike: Middleware = async (ctx: Context): Promise<any> => {
     ctx.throw(500, e);
   }
 };
-
-export const getLikePostList: Middleware = async (
-  ctx: Context
-): Promise<any> => {};

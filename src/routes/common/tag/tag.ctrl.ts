@@ -79,6 +79,7 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
           select: 'profile',
         },
       })
+      .sort({ _id: -1 })
       .limit(10)
       .exec();
 
@@ -91,7 +92,7 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     const next =
-      post.length === 10 ? `/common/tags/${name}?cursor=${post[9]._id}` : null;
+      post.length === 10 ? `/common/tags/${tag}?cursor=${post[9]._id}` : null;
 
     ctx.body = {
       next,

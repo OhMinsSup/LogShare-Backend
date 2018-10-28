@@ -213,10 +213,10 @@ export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
       Like.deleteMany({ post: postId })
         .lean()
         .exec(),
-      PostRead.deleteOne({ post: postId })
+      Comment.deleteMany({ post: postId })
         .lean()
         .exec(),
-      Comment.deleteMany({ post: postId })
+      PostRead.deleteOne({ post: postId })
         .lean()
         .exec(),
     ]);

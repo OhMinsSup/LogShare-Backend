@@ -123,7 +123,7 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
         return Notice.findOne({ creator: userId })
           .populate({
             path: 'creator',
-            select: 'username profile.displayName profile.thumbnail',
+            select: 'profile.username profile.thumbnail',
           })
           .lean()
           .exec();
@@ -198,6 +198,7 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
     const message = await NoticeMessage.find(query)
       .populate('sender')
       .limit(10)
+      .sort({ _id: -1 })
       .lean()
       .exec();
 

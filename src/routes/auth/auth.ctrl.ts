@@ -228,6 +228,10 @@ export const checkUser: Middleware = async (ctx: Context): Promise<any> => {
   };
 };
 
+/**@return {void}
+ * @description 소셜 회원가입 api
+ * @param {Context} ctx koa Context
+ */
 export const socialRegister: Middleware = async (
   ctx: Context
 ): Promise<any> => {
@@ -356,6 +360,10 @@ export const socialRegister: Middleware = async (
   }
 };
 
+/**@return {void}
+ * @description 소셜 로그인 api
+ * @param {Context} ctx koa Context
+ */
 export const socialLogin: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     accessToken: string;

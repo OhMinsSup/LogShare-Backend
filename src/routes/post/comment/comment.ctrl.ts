@@ -157,6 +157,14 @@ export const updateComment: Middleware = async (ctx: Context): Promise<any> => {
   const { text }: BodySchema = ctx.request.body;
   const { commentId }: ParamsPayload = ctx.params;
 
+  if (checkEmpty(text)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_TEXT',
+    };
+    return;
+  }
+
   if (!Types.ObjectId.isValid(commentId)) {
     ctx.status = 400;
     ctx.body = {
@@ -277,6 +285,7 @@ export const getCommentList: Middleware = async (
       level: 0,
     })
       .populate('user', 'profile')
+      .sort({ _id: -1 })
       .lean()
       .exec();
 
@@ -315,6 +324,7 @@ export const getReplyComment: Middleware = async (
       reply: commentId,
     })
       .populate('user', 'profile')
+      .sort({ _id: -1 })
       .lean()
       .exec();
 

@@ -111,6 +111,11 @@ export const trendingPostList: Middleware = async (
   }
 };
 
+/**
+ * @description 포스트를 작성한 순서대로 리스트를 출력하는 api
+ * @return {Promise<any>}
+ * @param {Context} ctx koa Context
+ */
 export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
   type QueryPayload = {
     postId: string;
@@ -140,6 +145,7 @@ export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
         $and: [{ user }, { _id: { $lt: postId } }],
       })
         .limit(4)
+        .sort({ _id: 1 })
         .lean()
         .exec()
     );

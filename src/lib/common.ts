@@ -171,6 +171,6 @@ export type PostPayload = {
     comments: number;
     score: number;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 };
