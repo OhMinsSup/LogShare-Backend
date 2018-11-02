@@ -1,9 +1,10 @@
 import { Context, Middleware } from 'koa';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
-import { serializePost } from '../../../lib/serialized';
+import { serializePost, serializePoplatePost } from '../../../lib/serialized';
 import { formatShortDescription } from '../../../lib/common';
 import { Types } from 'mongoose';
+import Like from '../../../models/Like';
 
 /**@return {void}
  * @description 포스트 리스트(유저 | Public) API
@@ -172,6 +173,60 @@ export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
       ...post,
       body: formatShortDescription(post.body, 'text'),
     }));
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
+  type QueryPayload = {
+    cursor: string | null;
+  };
+
+  type ParamsPayload = {
+    username: string;
+  };
+
+  const { cursor }: QueryPayload = ctx.query;
+  const { username }: ParamsPayload = ctx.params;
+
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+
+  try {
+    const user = await User.findByEmailOrUsername('username', username);
+
+    if (!user) {
+      ctx.throw(500, 'Invalid User');
+    }
+
+    const post = await Like.likePosts(user._id, cursor);
+
+    if (post.length === 0 || !post) {
+      ctx.body = {
+        next: '',
+        postWithData: [],
+      };
+      return;
+    }
+
+    const next =
+      post.length === 10
+        ? `/post/list/likes/${username}?cursor=${post[9]._id}`
+        : null;
+
+    ctx.body = {
+      next,
+      postWithData: post.map(serializePoplatePost).map(post => ({
+        ...post,
+        body: formatShortDescription(post.body, 'text'),
+      })),
+    };
   } catch (e) {
     ctx.throw(500, e);
   }

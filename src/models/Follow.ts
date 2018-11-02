@@ -70,7 +70,8 @@ FollowSchema.statics.getfollowingList = function(
 
   return this.find(query)
     .sort({ _id: -1 })
-    .populate('user')
+    .select('following')
+    .populate('following')
     .limit(10)
     .lean()
     .exec();
@@ -94,7 +95,8 @@ FollowSchema.statics.getfollowerList = function(
 
   return this.find(query)
     .sort({ _id: -1 })
-    .populate('user')
+    .select('follower')
+    .populate('follower')
     .limit(10)
     .lean()
     .exec();

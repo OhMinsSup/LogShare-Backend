@@ -14,6 +14,7 @@ export interface ILikeModel extends Model<ILike> {
     userId: string,
     postId: string
   ): Promise<DocumentQuery<ILike, ILike>>;
+  likePosts(userId: string, cursor: string | null): Promise<ILike[]>;
 }
 
 const LikeSchema = new Schema(
@@ -41,6 +42,27 @@ LikeSchema.statics.checkExists = function(
   return this.findOne({
     $and: [{ user: userId }, { post: postId }],
   })
+    .lean()
+    .exec();
+};
+
+LikeSchema.statics.likePosts = function(userId: string, cursor: string | null) {
+  const query = Object.assign(
+    {},
+    cursor ? { _id: { $lt: cursor }, user: userId } : { user: userId }
+  );
+
+  return this.find(query)
+    .populate({
+      path: 'post',
+      populate: {
+        path: 'user',
+        select: 'profile',
+      },
+    })
+    .select('post')
+    .sort({ _id: -1 })
+    .limit(10)
     .lean()
     .exec();
 };

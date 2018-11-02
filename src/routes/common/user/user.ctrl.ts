@@ -33,7 +33,7 @@ export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const profileUpdate = async (ctx: Context): Promise<any> => {
+export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
   type BodySchema = {
     username: string;
     thumbnail: string;

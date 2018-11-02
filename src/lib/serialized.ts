@@ -54,11 +54,11 @@ export const serializeTag = (data: any) => {
 };
 
 /**
- * @description 포스트 데이터에서 필요한 데이터만 필터링
+ * @description Poplate해서 가져온 포스트 데이터에서 필요한 데이터만 필터링
  * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
  * @returns {Object<any>} _id, post_thumbnail, title, body, createdAt, tags, user, info
  */
-export const serializeTagPost = (data: any) => {
+export const serializePoplatePost = (data: any) => {
   const {
     post: { _id: postId, post_thumbnail, info, title, body, user, createdAt },
   } = data;

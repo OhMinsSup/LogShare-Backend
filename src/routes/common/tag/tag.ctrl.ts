@@ -1,6 +1,6 @@
 import { Context, Middleware } from 'koa';
 import PostTag from '../../../models/PostTag';
-import { serializeTag, serializeTagPost } from '../../../lib/serialized';
+import { serializeTag, serializePoplatePost } from '../../../lib/serialized';
 import Tag from '../../../models/Tag';
 import { formatShortDescription } from '../../../lib/common';
 
@@ -96,7 +96,7 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       next,
-      postWithData: post.map(serializeTagPost).map(post => ({
+      postWithData: post.map(serializePoplatePost).map(post => ({
         ...post,
         body: formatShortDescription(post.body, 'text'),
       })),
