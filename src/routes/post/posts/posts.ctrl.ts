@@ -2,7 +2,7 @@ import { Context, Middleware } from 'koa';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
 import { serializePost } from '../../../lib/serialized';
-import { formatShortDescription, checkObjectId } from '../../../lib/common';
+import { formatShortDescription } from '../../../lib/common';
 import { Types } from 'mongoose';
 
 /**@return {void}

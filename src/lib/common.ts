@@ -78,11 +78,11 @@ export const checkObjectId: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
 ) => {
-  type ParamPayload = {
+  type ParamsPayload = {
     id: string;
   };
 
-  const { id }: ParamPayload = ctx.params;
+  const { id }: ParamsPayload = ctx.params;
 
   if (!Types.ObjectId.isValid(id)) {
     ctx.status = 400;
@@ -124,7 +124,10 @@ export const checkPostExistancy = async (
   ctx: Context,
   next: () => Promise<any>
 ) => {
-  const { id } = ctx.params;
+  type ParamsPayload = {
+    id: string;
+  };
+  const { id }: ParamsPayload = ctx.params;
 
   try {
     const post = await Post.findById(id)

@@ -5,5 +5,6 @@ import { needsAuth } from '../../../lib/common';
 const user = new Router();
 
 user.get('/info/:name', needsAuth, userCtrl.getUserInfo);
+user.post('/profile', needsAuth, userCtrl.profileUpdate);
 
 export default user;

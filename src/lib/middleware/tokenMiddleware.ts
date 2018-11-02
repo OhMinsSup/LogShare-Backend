@@ -26,7 +26,7 @@ export default async (ctx: Context, next: () => Promise<any>) => {
     };
 
     (ctx['user'] as TokenPayload) = user;
-    ctx['tokenExpire'] = new Date(exp * 1000);
+    (ctx['tokenExpire'] as Date) = new Date(exp * 1000);
   } catch (e) {
     ctx['user'] = null;
   }

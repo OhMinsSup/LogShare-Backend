@@ -81,7 +81,6 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
   const { message }: BodySchema = ctx.request.body;
   const {
     _id: userId,
-    profile: { username },
   }: TokenPayload = ctx['user'];
   let userIds: string[] = [];
 
