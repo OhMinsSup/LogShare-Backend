@@ -36,8 +36,11 @@ const NoticeMessageSchema = new Schema(
   },
   {
     timestamps: true,
+    autoIndex: false,
   }
 );
+
+NoticeMessageSchema.index({ _id: -1 });
 
 const NoticeMessage = model<INoticeMessage>(
   'NoticeMessage',

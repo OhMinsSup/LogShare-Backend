@@ -22,7 +22,7 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
   const { username }: ParamPayload = ctx.params;
   const { cursor }: QueryPayload = ctx.query;
 
-  let userId = '';
+  let userId: string;
 
   try {
     if (username) {
@@ -76,7 +76,7 @@ export const trendingPostList: Middleware = async (
 
   const { cursor }: QueryPayload = ctx.query;
 
-  if (!Types.ObjectId.isValid(cursor) && cursor) {
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',

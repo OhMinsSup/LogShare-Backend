@@ -19,6 +19,7 @@ const NoticeSchema = new Schema(
   },
   {
     timestamps: true,
+    autoIndex: false,
   }
 );
 

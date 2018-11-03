@@ -32,8 +32,11 @@ const LikeSchema = new Schema(
   },
   {
     timestamps: true,
+    autoIndex: false,
   }
 );
+
+LikeSchema.index({ _id: -1 });
 
 LikeSchema.statics.checkExists = function(
   userId: string,

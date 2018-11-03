@@ -85,7 +85,7 @@ export const follow: Middleware = async (ctx: Context): Promise<any> => {
       return;
     }
 
-    const followId = user._id;
+    const followId: string = user._id;
 
     const exists = await Follow.checkExists(userId, followId);
 
@@ -151,7 +151,7 @@ export const unfollow: Middleware = async (ctx: Context): Promise<any> => {
       return;
     }
 
-    const followId = user._id;
+    const followId: string = user._id;
 
     const exists = await Follow.checkExists(userId, followId);
 

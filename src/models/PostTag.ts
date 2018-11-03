@@ -14,18 +14,23 @@ export interface IPostTagModel extends Model<IPostTag> {
   getTagNames(postId: string): Promise<IPostTag[]>;
 }
 
-const PostTagSchema = new Schema({
-  post: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
-    index: true,
+const PostTagSchema = new Schema(
+  {
+    post: {
+      type: Schema.Types.ObjectId,
+      ref: 'Post',
+      index: true,
+    },
+    tag: {
+      type: Schema.Types.ObjectId,
+      ref: 'Tag',
+      index: true,
+    },
   },
-  tag: {
-    type: Schema.Types.ObjectId,
-    ref: 'Tag',
-    index: true,
-  },
-});
+  { autoIndex: false }
+);
+
+PostTagSchema.index({ _id: -1 });
 
 PostTagSchema.statics.Link = function(postId: string, tagIds: string[]) {
   const promises = tagIds.map(tagId =>

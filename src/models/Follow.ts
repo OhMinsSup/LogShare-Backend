@@ -38,8 +38,11 @@ const FollowSchema = new Schema(
   },
   {
     timestamps: true,
+    autoIndex: false,
   }
 );
+
+FollowSchema.index({ _id: -1 });
 
 FollowSchema.statics.checkExists = function(
   userId: string,

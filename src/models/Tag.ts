@@ -2,6 +2,8 @@ import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
 
 export interface ITag extends Document {
   name: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface ITagModel extends Model<ITag> {
@@ -11,12 +13,15 @@ export interface ITagModel extends Model<ITag> {
   findByTagName(name: string): Promise<DocumentQuery<ITag, ITag>>;
 }
 
-const TagSchema = new Schema({
-  name: {
-    type: String,
-    lowercase: true,
+const TagSchema = new Schema(
+  {
+    name: {
+      type: String,
+      lowercase: true,
+    },
   },
-});
+  { autoIndex: false, timestamps: true }
+);
 
 TagSchema.statics.getTagId = async function(name: string) {
   try {

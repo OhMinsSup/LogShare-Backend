@@ -54,8 +54,10 @@ const PostSchema = new Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, autoIndex: false }
 );
+
+PostSchema.index({ _id: -1 });
 
 PostSchema.statics.readPostById = function(postId: string) {
   return this.findById(postId)

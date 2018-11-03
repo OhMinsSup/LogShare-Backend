@@ -2,6 +2,7 @@ import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as compress from 'koa-compress';
 import * as cors from 'koa-cors';
+import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import routes from './routes';
@@ -30,6 +31,7 @@ class Server {
         },
       })
     );
+    app.use(helmet());
     app.use(cors());
     app.use(corsMiddleware);
     app.use(tokenMiddleware);

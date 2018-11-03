@@ -94,7 +94,7 @@ const UserSchema = new Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, autoIndex: false }
 );
 
 UserSchema.statics.findByEmailOrUsername = function(
@@ -105,7 +105,9 @@ UserSchema.statics.findByEmailOrUsername = function(
 
   return this.findOne({
     [key]: value,
-  }).exec();
+  })
+    .lean()
+    .exec();
 };
 
 UserSchema.statics.findBySocial = function(

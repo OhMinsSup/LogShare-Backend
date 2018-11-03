@@ -3,7 +3,7 @@ import * as Joi from 'joi';
 import { checkEmpty, PostPayload } from '../../../lib/common';
 import { Types } from 'mongoose';
 import { TokenPayload } from '../../../lib/token';
-import Comment from '../../../models/Comment';
+import Comment, { IComment } from '../../../models/Comment';
 import Post from '../../../models/Post';
 
 /**
@@ -55,7 +55,7 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
   const { _id: postId, user }: PostPayload = ctx['post'];
   const { _id: userId }: TokenPayload = ctx['user'];
   let level = 0;
-  let reply_to;
+  let reply_to: IComment | string;
 
   try {
     if (reply) {

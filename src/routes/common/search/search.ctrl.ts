@@ -1,6 +1,5 @@
 import { Context, Middleware } from 'koa';
 import Post from '../../../models/Post';
-import { checkEmpty } from '../../../lib/common';
 import User from '../../../models/User';
 
 export const searchPostList: Middleware = async (
@@ -11,14 +10,6 @@ export const searchPostList: Middleware = async (
   };
 
   const { value }: ParamsPayload = ctx.params;
-
-  if (checkEmpty(value)) {
-    ctx.status = 400;
-    ctx.body = {
-      name: 'INVALID_TEXT',
-    };
-    return;
-  }
 
   const regex = new RegExp('^' + value);
 
@@ -60,14 +51,6 @@ export const searchUserList: Middleware = async (
   };
 
   const { value }: ParamsPayload = ctx.params;
-
-  if (checkEmpty(value)) {
-    ctx.status = 400;
-    ctx.body = {
-      name: 'INVALID_TEXT',
-    };
-    return;
-  }
 
   const regex = new RegExp('^' + value);
 
