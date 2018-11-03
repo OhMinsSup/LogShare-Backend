@@ -34,24 +34,21 @@ export interface IUserModel extends Model<IUser> {
   findByEmailOrUsername(
     type: 'email' | 'username',
     value: string
-  ): Promise<DocumentQuery<IUser, IUser>>;
-  findBySocial(
-    provider: string,
-    socialId: string | number
-  ): Promise<DocumentQuery<IUser, IUser>>;
+  ): Promise<IUser>;
+  findBySocial(provider: string, socialId: string | number): Promise<IUser>;
   localRegister(
     username: string,
     email: string,
     password: string
-  ): Promise<DocumentQuery<IUser, IUser>>;
+  ): Promise<IUser>;
   Count(
     type: 'post' | 'follower' | 'following',
     userId: string
-  ): Promise<DocumentQuery<IUser, IUser>>;
+  ): Promise<IUser>;
   unCount(
     type: 'post' | 'follower' | 'following',
     userId: string
-  ): Promise<DocumentQuery<IUser, IUser>>;
+  ): Promise<IUser>;
 }
 
 const UserSchema = new Schema(

@@ -22,6 +22,14 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
   const { username }: ParamPayload = ctx.params;
   const { cursor }: QueryPayload = ctx.query;
 
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+
   let userId: string;
 
   try {

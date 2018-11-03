@@ -9,10 +9,7 @@ export interface IFollow extends Document {
 }
 
 export interface IFollowModel extends Model<IFollow> {
-  checkExists(
-    userId: string,
-    followId: string
-  ): Promise<DocumentQuery<IFollow, IFollow>>;
+  checkExists(userId: string, followId: string): Promise<IFollow>;
   getfollowingList(
     followerId: string,
     cursor: string | null

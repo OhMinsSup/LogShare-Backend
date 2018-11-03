@@ -1,6 +1,6 @@
 import { Context, Middleware } from 'koa';
-import Post from '../../../models/Post';
-import User from '../../../models/User';
+import Post, { IPost } from '../../../models/Post';
+import User, { IUser } from '../../../models/User';
 
 export const searchPostList: Middleware = async (
   ctx: Context
@@ -14,7 +14,7 @@ export const searchPostList: Middleware = async (
   const regex = new RegExp('^' + value);
 
   try {
-    const post = await Post.find(
+    const post: IPost[] = await Post.find(
       {
         $or: [
           {
@@ -55,7 +55,7 @@ export const searchUserList: Middleware = async (
   const regex = new RegExp('^' + value);
 
   try {
-    const user = await User.find(
+    const user: IUser[] = await User.find(
       {
         'profile.username': { $regex: regex },
       },

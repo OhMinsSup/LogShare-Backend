@@ -10,7 +10,7 @@ export interface ITagModel extends Model<ITag> {
   getTagId(name: string): Promise<string>;
   bulkGetNewId(names: string[]): Promise<string[]>;
   bulkGetMissingId(names: string[]): Promise<string[]>;
-  findByTagName(name: string): Promise<DocumentQuery<ITag, ITag>>;
+  findByTagName(name: string): Promise<ITag>;
 }
 
 const TagSchema = new Schema(

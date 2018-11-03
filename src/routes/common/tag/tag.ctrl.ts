@@ -1,5 +1,5 @@
 import { Context, Middleware } from 'koa';
-import PostTag from '../../../models/PostTag';
+import PostTag, { IPostTag } from '../../../models/PostTag';
 import { serializeTag, serializePoplatePost } from '../../../lib/serialized';
 import Tag from '../../../models/Tag';
 import { formatShortDescription } from '../../../lib/common';
@@ -11,7 +11,7 @@ import { formatShortDescription } from '../../../lib/common';
  */
 export const getTags: Middleware = async (ctx: Context): Promise<any> => {
   try {
-    const tagData = await PostTag.aggregate([
+    const tagData: IPostTag[] = await PostTag.aggregate([
       {
         $group: {
           _id: '$tag',
@@ -56,6 +56,15 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
   try {
     const tagName = await Tag.findByTagName(tag);
 
+    if (!tagName) {
+      ctx.status = 404;
+      ctx.body = {
+        name: 'Tag',
+        payload: '태그가 존재하지 않습니다',
+      };
+      return;
+    }
+
     const query = Object.assign(
       {},
       cursor
@@ -70,7 +79,7 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
           }
     );
 
-    const post = await PostTag.find(query)
+    const post: IPostTag[] = await PostTag.find(query)
       .select('post')
       .populate({
         path: 'post',

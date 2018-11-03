@@ -16,17 +16,11 @@ export interface IPost extends Document {
 }
 
 export interface IPostModel extends Model<IPost> {
-  readPostById(postId: string): Promise<DocumentQuery<IPost, IPost>>;
+  readPostById(postId: string): Promise<IPost>;
   listPosts(userId: string | null, cursor: string | null): Promise<IPost[]>;
   trendingPostList(cursor: string | null): Promise<IPost[]>;
-  Count(
-    type: 'likes' | 'comments',
-    postId: string
-  ): Promise<DocumentQuery<IPost, IPost>>;
-  unCount(
-    type: 'likes' | 'comments',
-    postId: string
-  ): Promise<DocumentQuery<IPost, IPost>>;
+  Count(type: 'likes' | 'comments', postId: string): Promise<IPost>;
+  unCount(type: 'likes' | 'comments', postId: string): Promise<IPost>;
 }
 
 const PostSchema = new Schema(

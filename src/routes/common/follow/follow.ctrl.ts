@@ -198,7 +198,7 @@ export const getFollowingList: Middleware = async (
   const { name }: BodySchema = ctx.request.body;
   const { cursor }: QueryPayload = ctx.params;
 
-  if (!Types.ObjectId.isValid(cursor) && cursor) {
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',
@@ -261,7 +261,7 @@ export const getFollowerList: Middleware = async (
   const { name }: BodySchema = ctx.request.body;
   const { cursor }: QueryPayload = ctx.params;
 
-  if (!Types.ObjectId.isValid(cursor) && cursor) {
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',

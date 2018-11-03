@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
 import removeMd from 'remove-markdown';
 import { TokenPayload } from './token';
-import Post from '../models/Post';
+import Post, { IPost } from '../models/Post';
 import { IUser } from '../models/User';
 
 /**
@@ -57,7 +57,7 @@ export function formatShortDescription(
 }
 
 /**
- * @description 패스워드를 해시값으로 변경
+ * @description 데이터 값을 해시값으로 변경
  * @param {string} value
  * @returns {string} value
  */
@@ -130,7 +130,7 @@ export const checkPostExistancy = async (
   const { id }: ParamsPayload = ctx.params;
 
   try {
-    const post = await Post.findById(id)
+    const post: IPost = await Post.findById(id)
       .lean()
       .exec();
 
@@ -142,7 +142,7 @@ export const checkPostExistancy = async (
       };
     }
 
-    ctx['post'] = post;
+    (ctx['post'] as IPost) = post;
   } catch (e) {
     ctx.throw(500, e);
   }

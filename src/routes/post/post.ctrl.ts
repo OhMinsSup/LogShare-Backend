@@ -9,7 +9,7 @@ import PostTag from '../../models/PostTag';
 import User from '../../models/User';
 import Like from '../../models/Like';
 import { serializePost } from '../../lib/serialized';
-import PostRead from '../../models/PostRead';
+import PostRead, { IPostRead } from '../../models/PostRead';
 import Comment from '../../models/Comment';
 
 /**
@@ -221,7 +221,9 @@ export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
         .exec(),
     ]);
 
-    await Post.deleteOne({ _id: postId });
+    await Post.deleteOne({ _id: postId })
+      .lean()
+      .exec();
     await User.unCount('post', ctx['user']._id);
 
     ctx.status = 204;
@@ -266,7 +268,7 @@ export const readPost: Middleware = async (ctx: Context): Promise<any> => {
     });
 
     const hashIp = hash(ctx.request.ip);
-    const postRead = await PostRead.findOne({
+    const postRead: IPostRead = await PostRead.findOne({
       $and: [{ ip: hashIp }, { post: post._id }],
     })
       .lean()

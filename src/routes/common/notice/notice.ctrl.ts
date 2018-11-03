@@ -1,11 +1,11 @@
 import { Middleware, Context } from 'koa';
 import { TokenPayload } from '../../../lib/token';
-import Notice from '../../../models/Notice';
+import Notice, { INotice } from '../../../models/Notice';
 import { serializeNoticeRoom } from '../../../lib/serialized';
 import * as Joi from 'joi';
-import Follow from '../../../models/Follow';
+import Follow, { IFollow } from '../../../models/Follow';
 import { filterUnique } from '../../../lib/common';
-import NoticeMessage from '../../../models/NoticeMessage';
+import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
 import { Types } from 'mongoose';
 
 /**
@@ -19,7 +19,7 @@ export const checkNoticeRoom: Middleware = async (
   const userId: TokenPayload = ctx['user'];
 
   try {
-    const exists = await Notice.findOne({
+    const exists: INotice = await Notice.findOne({
       creator: userId,
     })
       .populate({
@@ -40,7 +40,7 @@ export const checkNoticeRoom: Middleware = async (
       creator: userId,
     }).save();
 
-    const noticeData = await Notice.findById(notice._id)
+    const noticeData: INotice = await Notice.findById(notice._id)
       .populate({
         path: 'creator',
         select: 'username profile.displayName profile.thumbnail',
@@ -79,19 +79,17 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   const { message }: BodySchema = ctx.request.body;
-  const {
-    _id: userId,
-  }: TokenPayload = ctx['user'];
+  const { _id: userId }: TokenPayload = ctx['user'];
   let userIds: string[] = [];
 
   try {
-    const following = await Follow.find({
+    const following: IFollow[] = await Follow.find({
       follower: userId,
     })
       .lean()
       .exec();
 
-    const follower = await Follow.find({
+    const follower: IFollow[] = await Follow.find({
       following: userId,
     })
       .lean()
@@ -106,8 +104,8 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     // 팔로우, 팔로잉 유저의 아이디를 가져와 userIds에 저장
-    following.map(user => userIds.push(user.following));
-    follower.map(user => userIds.push(user.follower));
+    following.map(user => userIds.push(user.following as any));
+    follower.map(user => userIds.push(user.follower as any));
 
     const uniqueUserIds = filterUnique(userIds);
 
@@ -117,7 +115,7 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     // 각 아이디의 notice를 찾아서 온다
-    const notice = await Promise.all(
+    const notice: INotice[] = await Promise.all(
       uniqueUserIds.map(userId => {
         return Notice.findOne({ creator: userId })
           .populate({
@@ -174,7 +172,7 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   try {
-    const notice = await Notice.findOne({ creator: userId })
+    const notice: INotice = await Notice.findOne({ creator: userId })
       .lean()
       .exec();
 
@@ -194,9 +192,9 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
         : { notice: notice._id }
     );
 
-    const message = await NoticeMessage.find(query)
+    const message: INoticeMessage[] = await NoticeMessage.find(query)
       .populate('sender')
-      .limit(10)
+      .limit(20)
       .sort({ _id: -1 })
       .lean()
       .exec();
@@ -210,7 +208,7 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     const next =
-      message.length === 10 ? `/common/notice?cursor=${message[9]._id}` : null;
+      message.length === 20 ? `/common/notice?cursor=${message[19]._id}` : null;
 
     ctx.body = {
       next,

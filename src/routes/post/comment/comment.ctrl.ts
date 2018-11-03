@@ -42,14 +42,12 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
     return;
   }
 
-  if (reply) {
-    if (!Types.ObjectId.isValid(reply)) {
-      ctx.status = 400;
-      ctx.body = {
-        name: 'Not ObjectId',
-      };
-      return; // 400 Bad Request
-    }
+  if (reply && !Types.ObjectId.isValid(reply)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return; // 400 Bad Request
   }
 
   const { _id: postId, user }: PostPayload = ctx['post'];
@@ -59,7 +57,9 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
 
   try {
     if (reply) {
-      const c = await Comment.findById(reply).exec();
+      const c: IComment = await Comment.findById(reply)
+        .lean()
+        .exec();
 
       if (!c) {
         ctx.status = 404;
@@ -101,7 +101,7 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
 
     await Post.Count('comments', postId);
 
-    const commentWithData = await Comment.findById(comment._id)
+    const commentWithData: IComment = await Comment.findById(comment._id)
       .lean()
       .exec();
 
@@ -174,7 +174,7 @@ export const updateComment: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   try {
-    const comment = await Comment.findOneAndUpdate(
+    const comment: IComment = await Comment.findOneAndUpdate(
       {
         $and: [
           {
@@ -230,7 +230,7 @@ export const deleteComment: Middleware = async (ctx: Context): Promise<any> => {
   }
 
   try {
-    const c = await Comment.findById(commentId)
+    const c: IComment = await Comment.findById(commentId)
       .lean()
       .exec();
 
@@ -280,7 +280,7 @@ export const getCommentList: Middleware = async (
   const post: PostPayload = ctx['post'];
 
   try {
-    const comments = await Comment.find({
+    const comments: IComment[] = await Comment.find({
       post: post._id,
       level: 0,
     })
@@ -319,7 +319,7 @@ export const getReplyComment: Middleware = async (
   }
 
   try {
-    const comments = await Comment.find({
+    const comments: IComment[] = await Comment.find({
       post: post._id,
       reply: commentId,
     })

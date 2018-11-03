@@ -1,6 +1,6 @@
 import { Context, Middleware } from 'koa';
 import * as Joi from 'joi';
-import User from '../../../models/User';
+import User, { IUser } from '../../../models/User';
 import { checkEmpty } from '../../../lib/common';
 import { TokenPayload } from '../../../lib/token';
 
@@ -74,7 +74,9 @@ export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
   const { _id: userId }: TokenPayload = ctx['user'];
 
   try {
-    const profile = await User.findById(userId);
+    const profile: IUser = await User.findById(userId)
+      .lean()
+      .exec();
 
     if (!profile) {
       ctx.throw(500, 'Invalid Profile');
