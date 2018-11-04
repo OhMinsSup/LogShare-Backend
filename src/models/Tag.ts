@@ -25,7 +25,7 @@ const TagSchema = new Schema(
 
 TagSchema.statics.getTagId = async function(name: string) {
   try {
-    let tag = await this.findOne({
+    let tag: ITag = await this.findOne({
       $and: [
         {
           $or: [{ name: name.toLowerCase() }, { name }],
@@ -67,7 +67,7 @@ TagSchema.statics.bulkGetNewId = async function(names: string[]) {
   if (names.length === 0) return;
 
   try {
-    const tagData = await this.find({
+    const tagData: ITag[] = await this.find({
       name: names,
     })
       .lean()
@@ -90,7 +90,7 @@ TagSchema.statics.bulkGetMissingId = async function(names: string[]) {
   if (names.length === 0) return;
 
   try {
-    const tagData = await this.find({
+    const tagData: ITag[] = await this.find({
       $and: [
         {
           name: names,

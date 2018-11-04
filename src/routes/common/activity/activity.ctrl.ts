@@ -3,7 +3,7 @@ import User from '../../../models/User';
 import Like from '../../../models/Like';
 import Comment from '../../../models/Comment';
 import Follow from '../../../models/Follow';
-import { normalize } from '../../../lib/common';
+import { normalize, checkEmpty } from '../../../lib/common';
 
 /**
  * @description 유저가 활동한 기록을 보여주는 api
@@ -16,6 +16,14 @@ export const userHistory: Middleware = async (ctx: Context): Promise<any> => {
   };
 
   const { name }: ParamsPayload = ctx.params;
+
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
 
   try {
     const user = await User.findByEmailOrUsername('username', name);

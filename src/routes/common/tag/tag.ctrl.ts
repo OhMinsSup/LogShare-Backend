@@ -2,7 +2,7 @@ import { Context, Middleware } from 'koa';
 import PostTag, { IPostTag } from '../../../models/PostTag';
 import { serializeTag, serializePoplatePost } from '../../../lib/serialized';
 import Tag from '../../../models/Tag';
-import { formatShortDescription } from '../../../lib/common';
+import { formatShortDescription, checkEmpty } from '../../../lib/common';
 
 /**
  * @description 태그를 가져오는 api
@@ -51,6 +51,15 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
   };
 
   const { tag }: ParamsPayload = ctx.params;
+
+  if (checkEmpty(tag)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_TAG',
+    };
+    return;
+  }
+
   const { cursor }: QueryPayload = ctx.query;
 
   try {

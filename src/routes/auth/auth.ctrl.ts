@@ -266,7 +266,7 @@ export const socialRegister: Middleware = async (
   const { provider }: ParamsPayload = ctx.params;
   const { username, accessToken }: BodySchema = ctx.request.body;
 
-  let profile: Profile = null;
+  let profile: Profile;
 
   try {
     profile = await Social(provider, accessToken);
@@ -376,7 +376,7 @@ export const socialLogin: Middleware = async (ctx: Context): Promise<any> => {
   const { accessToken }: BodySchema = ctx.request.body;
   const { provider }: ParamsPayload = ctx.params;
 
-  let profile: Profile = null;
+  let profile: Profile;
 
   try {
     profile = await Social(provider, accessToken);
@@ -458,7 +458,7 @@ export const verifySocial: Middleware = async (ctx: Context): Promise<any> => {
   const { accessToken }: BodySchema = ctx.request.body;
   const { provider }: ParamsPayload = ctx.params;
 
-  let profile: Profile = null;
+  let profile: Profile;
 
   try {
     profile = await Social(provider, accessToken);

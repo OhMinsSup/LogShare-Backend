@@ -16,6 +16,14 @@ export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
 
   const { name }: ParamPayload = ctx.params;
 
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
+
   try {
     const user = await User.findByEmailOrUsername('username', name);
 

@@ -63,7 +63,7 @@ const UserSchema = new Schema(
       },
       shortBio: {
         type: String,
-        default: '',
+        default: 'LogShare에 자신을 소개해 주세요',
       },
     },
     social: {

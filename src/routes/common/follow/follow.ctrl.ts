@@ -4,6 +4,7 @@ import User from '../../../models/User';
 import Follow from '../../../models/Follow';
 import { serializeFollowing, serializeFollower } from '../../../lib/serialized';
 import { Types } from 'mongoose';
+import { checkEmpty } from '../../../lib/common';
 
 /**
  * @description 팔로우를 체크하는 api
@@ -17,6 +18,14 @@ export const getFollow: Middleware = async (ctx: Context): Promise<any> => {
 
   const { _id: userId }: TokenPayload = ctx['user'];
   const { name }: ParamsPayload = ctx.params;
+
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
 
   let follow = false;
 
@@ -63,6 +72,14 @@ export const follow: Middleware = async (ctx: Context): Promise<any> => {
     _id: userId,
     profile: { username },
   }: TokenPayload = ctx['user'];
+
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
 
   if (name === username) {
     ctx.status = 400;
@@ -130,6 +147,14 @@ export const unfollow: Middleware = async (ctx: Context): Promise<any> => {
     profile: { username },
   }: TokenPayload = ctx['user'];
 
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
+
   if (name === username) {
     ctx.status = 400;
     ctx.body = {
@@ -196,6 +221,15 @@ export const getFollowingList: Middleware = async (
   };
 
   const { name }: BodySchema = ctx.request.body;
+
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
+
   const { cursor }: QueryPayload = ctx.params;
 
   if (cursor && !Types.ObjectId.isValid(cursor)) {
@@ -259,6 +293,15 @@ export const getFollowerList: Middleware = async (
   };
 
   const { name }: BodySchema = ctx.request.body;
+
+  if (checkEmpty(name)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_NAME',
+    };
+    return;
+  }
+
   const { cursor }: QueryPayload = ctx.params;
 
   if (cursor && !Types.ObjectId.isValid(cursor)) {

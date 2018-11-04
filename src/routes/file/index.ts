@@ -1,5 +1,5 @@
 import * as Router from 'koa-router';
-import * as fileCtrl from './file.ctrl ';
+import * as fileCtrl from './file.ctrl';
 import { needsAuth } from '../../lib/common';
 
 const file = new Router();

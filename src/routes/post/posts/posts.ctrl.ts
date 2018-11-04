@@ -2,7 +2,7 @@ import { Context, Middleware } from 'koa';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
 import { serializePost, serializePoplatePost } from '../../../lib/serialized';
-import { formatShortDescription } from '../../../lib/common';
+import { formatShortDescription, checkEmpty } from '../../../lib/common';
 import { Types } from 'mongoose';
 import Like from '../../../models/Like';
 
@@ -33,8 +33,17 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
   let userId: string;
 
   try {
-    if (username) {
+    if (username && !checkEmpty(username)) {
       let user = await User.findByEmailOrUsername('username', username);
+
+      if (!user) {
+        ctx.status = 404;
+        ctx.body = {
+          name: 'User',
+          payload: '유저가 존재하지 않습니다.',
+        };
+        return;
+      }
 
       userId = user._id;
     }
@@ -198,6 +207,14 @@ export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
   const { cursor }: QueryPayload = ctx.query;
   const { username }: ParamsPayload = ctx.params;
 
+  if (username && checkEmpty(username)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'INVALID_USER_NAME',
+    };
+    return;
+  }
+
   if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
@@ -210,7 +227,12 @@ export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
     const user = await User.findByEmailOrUsername('username', username);
 
     if (!user) {
-      ctx.throw(500, 'Invalid User');
+      ctx.status = 404;
+      ctx.body = {
+        name: 'User',
+        payload: '유저가 존재하지 않습니다.',
+      };
+      return;
     }
 
     const post = await Like.likePosts(user._id, cursor);

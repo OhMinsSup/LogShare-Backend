@@ -163,7 +163,7 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
   const { _id: userId }: TokenPayload = ctx['user'];
   const { cursor }: QueryPayload = ctx.query;
 
-  if (!Types.ObjectId.isValid(cursor) && cursor) {
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',

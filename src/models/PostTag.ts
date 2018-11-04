@@ -33,7 +33,7 @@ const PostTagSchema = new Schema(
 PostTagSchema.index({ _id: -1 });
 
 PostTagSchema.statics.Link = function(postId: string, tagIds: string[]) {
-  const promises = tagIds.map(tagId =>
+  const promises: IPostTag[] = tagIds.map(tagId =>
     this.create({
       post: postId,
       tag: tagId,
