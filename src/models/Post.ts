@@ -48,7 +48,10 @@ const PostSchema = new Schema(
       },
     },
   },
-  { timestamps: true, autoIndex: false }
+  {
+    timestamps: true,
+    autoIndex: false,
+  }
 );
 
 PostSchema.index({ _id: -1 });

@@ -24,7 +24,10 @@ const PostReadSchema = new Schema(
     },
     ip: String,
   },
-  { autoIndex: false, timestamps: true }
+  {
+    autoIndex: false,
+    timestamps: true,
+  }
 );
 
 const PostRead: IPostReadModel = model<IPostRead>(

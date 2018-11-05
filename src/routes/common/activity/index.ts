@@ -4,6 +4,6 @@ import { needsAuth } from '../../../lib/common';
 
 const activity = new Router();
 
-activity.get('/history/:name', needsAuth, activityCtrl.userHistory);
+activity.get('/history/@:name', needsAuth, activityCtrl.userHistory);
 
 export default activity;

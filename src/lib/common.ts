@@ -5,6 +5,7 @@ import removeMd from 'remove-markdown';
 import { TokenPayload } from './token';
 import Post, { IPost } from '../models/Post';
 import { IUser } from '../models/User';
+import PostSave, { IPostSave } from '../models/PostSave';
 
 /**
  * @description 중복된 데이터 없에는 함수
@@ -140,6 +141,7 @@ export const checkPostExistancy = async (
         name: '포스트',
         payload: '포스트가 존재하지 않습니다',
       };
+      return;
     }
 
     (ctx['post'] as IPost) = post;
@@ -149,6 +151,48 @@ export const checkPostExistancy = async (
   return next();
 };
 
+/**
+ * @description 임시 저장 포스트가 존재하는지 체크하는 미들웨어
+ * @param {Context} ctx
+ * @param {() => Promise<any>} next
+ * @returns {() => Promise<any>} next()
+ */
+export const checktemporaryPostExistancy = async (
+  ctx: Context,
+  next: () => Promise<any>
+) => {
+  type ParamsPayload = {
+    id: string;
+  };
+  const { id }: ParamsPayload = ctx.params;
+
+  try {
+    const temp = await PostSave.findById(id)
+      .lean()
+      .exec();
+
+    if (!temp) {
+      ctx.status = 404;
+      ctx.body = {
+        name: 'Temp',
+        payload: '임시 저장 포스트가 존재하지 않습니다',
+      };
+      return;
+    }
+
+    (ctx['temp'] as IPostSave) = temp;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+  return next();
+};
+
+/**
+ * @description 데이터를 맵 배열 형태로 반환
+ * @param {any[]} array
+ * @param {string} key
+ * @returns {any[]} allIds
+ */
 export const normalize = (array: any[], key: string) => {
   const byId = {};
   const allIds = [];

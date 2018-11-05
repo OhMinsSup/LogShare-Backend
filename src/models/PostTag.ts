@@ -27,7 +27,9 @@ const PostTagSchema = new Schema(
       index: true,
     },
   },
-  { autoIndex: false }
+  {
+    autoIndex: false,
+  }
 );
 
 PostTagSchema.index({ _id: -1 });

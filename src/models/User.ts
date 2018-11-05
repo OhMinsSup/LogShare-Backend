@@ -91,7 +91,10 @@ const UserSchema = new Schema(
       },
     },
   },
-  { timestamps: true, autoIndex: false }
+  {
+    timestamps: true,
+    autoIndex: false,
+  }
 );
 
 UserSchema.statics.findByEmailOrUsername = function(

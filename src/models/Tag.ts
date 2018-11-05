@@ -20,7 +20,10 @@ const TagSchema = new Schema(
       lowercase: true,
     },
   },
-  { autoIndex: false, timestamps: true }
+  {
+    autoIndex: false,
+    timestamps: true,
+  }
 );
 
 TagSchema.statics.getTagId = async function(name: string) {
