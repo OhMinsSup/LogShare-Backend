@@ -17,6 +17,21 @@ export const filterUnique = (array: string[]): string[] => {
 };
 
 /**
+ * @param {string} text
+ * @returns {string} text
+ */
+export const escapeForUrl = (text: string): string => {
+  if (!text) return null;
+  return text
+    .replace(
+      /[^0-9a-zA-Zㄱ-힣.\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf -]/g,
+      ''
+    )
+    .replace(/ /g, '-')
+    .replace(/--+/g, '-');
+};
+
+/**
  * @description 문자가 공백인지 아닌지 체크
  * @param {string} text
  * @returns {boolean}
@@ -63,6 +78,7 @@ export function formatShortDescription(
  * @returns {string} value
  */
 export const hash = (value: string): string => {
+  if (!value) return null;
   return crypto
     .createHmac('sha256', 'ds')
     .update(value)

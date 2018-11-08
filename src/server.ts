@@ -48,6 +48,9 @@ class Server {
 
   private initializeDb(): void {
     const { MONGO_URL_WEB } = process.env;
+
+    if (!MONGO_URL_WEB) return null;
+
     const MONGO_URL: string = MONGO_URL_WEB;
     (<any>mongoose).Promise = global.Promise;
     mongoose

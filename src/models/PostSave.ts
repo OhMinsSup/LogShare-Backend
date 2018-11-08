@@ -1,39 +1,43 @@
 import { Document, Model, Schema, model } from 'mongoose';
-import { IPost } from './Post';
 import { IUser } from './User';
 
 export interface IPostSave extends Document {
   user: IUser;
-  post: IPost;
   title: string;
   body: string;
-  tags: string[];
   createdAt: string | Date;
   updatedAt: string | Date;
 }
 
-export interface IPostSaveModel extends Model<IPostSave> {}
+export interface IPostSaveModel extends Model<IPostSave> {
+  temporaryPostsList(cursor: string | null): Promise<IPostSave[]>;
+}
 
 const PostSaveSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-    },
-    post: {
-      type: Schema.Types.ObjectId,
-      ref: 'Post',
       index: true,
     },
     title: String,
     body: String,
-    tags: [String],
   },
   {
     timestamps: true,
     autoIndex: false,
   }
 );
+
+PostSaveSchema.statics.temporaryPostsList = function(cursor: string | null) {
+  const query = Object.assign({}, cursor ? { _id: { $lt: cursor } } : {});
+
+  return this.find(query)
+    .sort({ _id: -1 })
+    .limit(10)
+    .lean()
+    .exec();
+};
 
 const PostSave = model<IPostSave>('PostSave', PostSaveSchema) as IPostSaveModel;
 

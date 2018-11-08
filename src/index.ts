@@ -5,7 +5,7 @@ dotenv.config();
 
 const { PORT } = process.env;
 
-const port = normalizePort(PORT || 3000);
+const port = normalizePort(PORT || 4000);
 const server = http.createServer(Server.callback());
 
 server.listen(port, () => {
