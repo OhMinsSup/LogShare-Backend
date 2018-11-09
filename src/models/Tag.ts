@@ -2,8 +2,8 @@ import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
 
 export interface ITag extends Document {
   name: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ITagModel extends Model<ITag> {

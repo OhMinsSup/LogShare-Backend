@@ -238,6 +238,10 @@ export type PostPayload = {
   updatedAt: string;
 };
 
+/**
+ * @description Rss에서 포스트의 내용을 rss에 필요한 값을 넘겨준다
+ * @param {IPost} post
+ */
 export const convertToFeed = (post: IPost) => {
   const {
     profile: { username },

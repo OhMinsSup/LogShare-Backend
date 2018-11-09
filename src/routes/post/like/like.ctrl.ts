@@ -31,7 +31,7 @@ export const like: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       liked: true,
-      likes: ctx['post'].info.likes + 1,
+      likes: (ctx['post'].info.likes + 1) as number,
     };
 
     await Post.findOneAndUpdate(
@@ -87,7 +87,7 @@ export const unlike: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       liked: false,
-      likes: ctx['post'].info.likes - 1,
+      likes: (ctx['post'].info.likes - 1) as number,
     };
 
     await Post.findOneAndUpdate(
@@ -126,7 +126,7 @@ export const getLike: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       liked,
-      likes: ctx['post'].info.likes,
+      likes: ctx['post'].info.likes as number,
     };
   } catch (e) {
     ctx.throw(500, e);

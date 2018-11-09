@@ -5,8 +5,8 @@ export interface IPostSave extends Document {
   user: IUser;
   title: string;
   body: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IPostSaveModel extends Model<IPostSave> {

@@ -3,8 +3,8 @@ import { IUser } from './User';
 
 export interface INotice extends Document {
   creator: IUser;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface INoticeModel extends Model<INotice> {}

@@ -17,6 +17,7 @@ export const getEntireRSS: Middleware = async (ctx: Context): Promise<any> => {
       id: 'http://localhost:4000',
       title: 'LogShare',
       description: '블로그 서비스',
+      link: 'http://localhost:4000',
       feed: 'http://localhost:4000',
       feedLinks: {
         json: 'http://localhost:4000/json',
@@ -76,6 +77,7 @@ export const getUserRSS: Middleware = async (ctx: Context): Promise<any> => {
       id: `http://localhost:4000/@${user.profile.username}`,
       title: `LogShare/@${user.profile.username}`,
       description: `${user.profile.shortBio}`,
+      link: `http://localhost:4000/@${user.profile.username}`,
       feed: `http://localhost:4000/@${user.profile.username}`,
       feedLinks: {
         json: `http://localhost:4000/@${user.profile.username}/json`,

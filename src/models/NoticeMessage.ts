@@ -7,8 +7,8 @@ export interface INoticeMessage extends Document {
   recipient: IUser;
   notice: INotice;
   message: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface INoticeMessageModel extends Model<INoticeMessage> {}

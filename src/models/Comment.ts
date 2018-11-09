@@ -9,8 +9,8 @@ export interface IComment extends Document {
   level: number;
   text: string;
   visible: boolean;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ICommentModel extends Model<IComment> {}

@@ -99,6 +99,7 @@ export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
       })
       .sort({ _id: -1 })
       .limit(10)
+      .lean()
       .exec();
 
     if (post.length === 0 || !post) {

@@ -6,8 +6,8 @@ export interface IPostRead extends Document {
   user: IUser;
   post: IPost;
   ip: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IPostReadModel extends Model<IPostRead> {}
