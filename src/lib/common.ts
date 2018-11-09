@@ -234,6 +234,27 @@ export type PostPayload = {
     comments: number;
     score: number;
   };
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const convertToFeed = (post: IPost) => {
+  const {
+    profile: { username },
+  } = post.user;
+  const link = `http://localhost:4000/${post.id}`;
+  return {
+    link,
+    title: post.title,
+    description: post.body || formatShortDescription(post.body, 'text'),
+    id: link,
+    image: post.post_thumbnail,
+    date: post.createdAt,
+    author: [
+      {
+        name: post.user.profile.username,
+        link: `http://localhost:4000/@${username}`,
+      },
+    ],
+  };
 };

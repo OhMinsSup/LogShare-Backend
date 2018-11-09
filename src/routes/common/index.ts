@@ -5,6 +5,7 @@ import user from './user';
 import activity from './activity';
 import notice from './notice';
 import search from './search';
+import rss from './rss';
 
 const common = new Router();
 
@@ -14,5 +15,6 @@ common.use('/search', search.routes());
 common.use('/user', user.routes());
 common.use('/activity', activity.routes());
 common.use('/notice', notice.routes());
+common.use('/rss', rss.routes());
 
 export default common;

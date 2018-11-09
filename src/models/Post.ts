@@ -11,8 +11,8 @@ export interface IPost extends Document {
     comments: number;
     score: number;
   };
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IPostModel extends Model<IPost> {

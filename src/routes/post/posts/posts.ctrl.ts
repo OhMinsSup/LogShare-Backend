@@ -261,5 +261,3 @@ export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
     ctx.throw(500, e);
   }
 };
-
-export const rss: Middleware = async (ctx: Context): Promise<any> => {};
