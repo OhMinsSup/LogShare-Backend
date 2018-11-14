@@ -1,5 +1,7 @@
-const GoogleAPI = require('googleapis');
+import { google } from 'googleapis';
 const FacebookAPI = require('fb');
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export type Profile = {
   id: number | string;
@@ -23,19 +25,22 @@ const profileGetter = {
     });
   },
   google(accessToken: string): Promise<Profile> {
-    const plus = GoogleAPI.plus('v1');
+    const plus = google.plus({
+      version: 'v1',
+      auth: process.env.GOOGLE_SECRET,
+    });
     return new Promise((resolve, reject) => {
       plus.people.get(
         {
           userId: 'me',
-          access_token: accessToken,
+          auth: accessToken,
         },
         (err, auth) => {
           if (err) {
             reject(err);
             return;
           }
-          const { id, image, emails, displayName } = auth;
+          const { id, image, emails, displayName } = auth.data;
 
           const profile = {
             id,

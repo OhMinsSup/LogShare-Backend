@@ -105,9 +105,7 @@ UserSchema.statics.findByEmailOrUsername = function(
 
   return this.findOne({
     [key]: value,
-  })
-    .lean()
-    .exec();
+  }).exec();
 };
 
 UserSchema.statics.findBySocial = function(
@@ -118,9 +116,7 @@ UserSchema.statics.findBySocial = function(
 
   return this.findOne({
     [key]: socialId,
-  })
-    .lean()
-    .exec();
+  }).exec();
 };
 
 UserSchema.statics.localRegister = function(
@@ -177,12 +173,12 @@ UserSchema.statics.unCount = function(
     .exec();
 };
 
-UserSchema.methods.validatePassword = function(password: string): boolean {
+UserSchema.methods.validatePassword = function(password: string) {
   const hashed: string = hash(password);
   return this.password === hashed;
 };
 
-UserSchema.methods.generate = function(): Promise<string> {
+UserSchema.methods.generate = function() {
   const user = {
     _id: this._id,
     email: this.email,

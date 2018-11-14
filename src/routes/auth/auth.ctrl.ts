@@ -87,10 +87,13 @@ export const localRegister: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       user: {
-        username: user.profile.username,
-        thumbnail: user.profile.thumbnail,
-        shortBio: user.profile.shortBio,
+        _id: user._id,
         email: user.email,
+        profile: {
+          username: user.profile.username,
+          thumbnail: user.profile.thumbnail,
+          shortBio: user.profile.shortBio,
+        },
       },
     };
   } catch (e) {
@@ -113,8 +116,8 @@ export const localLogin: Middleware = async (ctx: Context): Promise<any> => {
       .email()
       .required(),
     password: Joi.string()
-      .required()
-      .min(6),
+      .min(6)
+      .required(),
   });
 
   const result = Joi.validate(ctx.request.body, schema);
@@ -162,10 +165,13 @@ export const localLogin: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       user: {
-        username: user.profile.username,
-        thumbnail: user.profile.thumbnail,
-        shortBio: user.profile.shortBio,
+        _id: user._id,
         email: user.email,
+        profile: {
+          username: user.profile.username,
+          thumbnail: user.profile.thumbnail,
+          shortBio: user.profile.shortBio,
+        },
       },
     };
   } catch (e) {
@@ -349,10 +355,13 @@ export const socialRegister: Middleware = async (
 
     ctx.body = {
       user: {
-        username: user.profile.username,
-        thumbnail: user.profile.thumbnail,
-        shortBio: user.profile.shortBio,
+        _id: user._id,
         email: user.email,
+        profile: {
+          username: user.profile.username,
+          thumbnail: user.profile.thumbnail,
+          shortBio: user.profile.shortBio,
+        },
       },
     };
   } catch (e) {
@@ -435,10 +444,13 @@ export const socialLogin: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       user: {
-        username: user.profile.username,
-        thumbnail: user.profile.thumbnail,
-        shortBio: user.profile.shortBio,
+        _id: user._id,
         email: user.email,
+        profile: {
+          username: user.profile.username,
+          thumbnail: user.profile.thumbnail,
+          shortBio: user.profile.shortBio,
+        },
       },
     };
   } catch (e) {

@@ -246,7 +246,7 @@ export const convertToFeed = (post: IPost) => {
   const {
     profile: { username },
   } = post.user;
-  const link = `http://localhost:4000/${post.id}`;
+  const link = `http://localhost:4000/${post._id}`;
   return {
     link,
     title: post.title,
@@ -256,7 +256,7 @@ export const convertToFeed = (post: IPost) => {
     date: post.createdAt,
     author: [
       {
-        name: post.user.profile.username,
+        name: username,
         link: `http://localhost:4000/@${username}`,
       },
     ],
