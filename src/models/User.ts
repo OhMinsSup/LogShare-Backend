@@ -22,6 +22,8 @@ export interface IUser extends Document {
   };
   info: {
     post: number;
+    follower: number;
+    following: number;
   };
   createdAt: Date;
   updatedAt: Date;

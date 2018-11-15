@@ -5,8 +5,7 @@ const callback = new Router();
 
 callback.get('/google/login', callbackCtrl.redirectGoogleLogin);
 callback.get('/google', callbackCtrl.googleCallback);
-
-callback.delete('/token', callbackCtrl.deleteToken);
 callback.post('/token', callbackCtrl.getToken);
+callback.delete('/token', callbackCtrl.deleteToken);
 
 export default callback;

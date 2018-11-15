@@ -489,6 +489,9 @@ export const verifySocial: Middleware = async (ctx: Context): Promise<any> => {
       User.findByEmailOrUsername('email', profile.email),
     ]);
 
+    console.log(socialAuth);
+    console.log(user);
+
     ctx.body = {
       profile,
       exists: !!(socialAuth || user),

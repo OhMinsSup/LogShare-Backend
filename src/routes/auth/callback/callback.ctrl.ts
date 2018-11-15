@@ -26,11 +26,9 @@ export const redirectGoogleLogin: Middleware = (ctx: Context) => {
   );
 
   const url = oauth2Client.generateAuthUrl({
-    scope: ['https://www.googleapis.com/auth/userinfo.email'],
+    scope: ['https://www.googleapis.com/auth/plus.me'],
     state: JSON.stringify({ next: next || '/recent' }),
   });
-
-  console.log(url);
 
   ctx.redirect(url);
 };
@@ -101,7 +99,7 @@ export const deleteToken: Middleware = (ctx: Context) => {
 
 export const getToken: Middleware = (ctx: Context) => {
   try {
-    const token: string | void = ctx.cookies.get('access_token');
+    const token: string | void = ctx.cookies.get('social_token');
 
     if (!token) {
       ctx.status = 400;
