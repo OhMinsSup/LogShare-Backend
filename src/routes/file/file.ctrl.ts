@@ -127,8 +127,8 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
 
   const response = await cloudinary.v2.uploader.upload(thumbnail.path, {
     public_id: `LogShare/common-thumbnail/${user.profile.username}/${filename}`,
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
   });
 
   if (!response) {
