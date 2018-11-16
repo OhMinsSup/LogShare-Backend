@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/dotenv": "^4.0.3",
     "@types/fb": "0.0.23",
     "@types/joi": "^13.6.3",
@@ -24,6 +25,7 @@
     "@types/lodash": "^4.14.118",
     "@types/mongoose": "^5.3.1",
     "@types/node": "^10.12.8",
+    "@types/qs": "^6.5.1",
     "ts-node": "^7.0.1",
     "tsc-watch": "^1.0.30",
     "tslint": "^5.11.0",
@@ -31,6 +33,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "cloudinary": "^1.13.2",
     "connect-mongo": "^2.0.1",
     "dotenv": "^6.1.0",
@@ -49,6 +52,7 @@
     "koa-session": "^5.10.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.3.12",
+    "qs": "^6.5.2",
     "remove-markdown": "^0.3.0"
   }
 }

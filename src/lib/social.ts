@@ -11,7 +11,7 @@ export type Profile = {
 };
 
 const profileGetter = {
-  async facebook(accessToken: string): Promise<Profile> {
+  facebook(accessToken: string): Promise<Profile> {
     return Facebook.api('me', {
       fields: ['name', 'email', 'picture'],
       access_token: accessToken,
@@ -27,17 +27,18 @@ const profileGetter = {
   google(accessToken: string): Promise<Profile> {
     const plus = google.plus({
       version: 'v1',
-      // auth: process.env.GOOGLE_SECRET,
+      url: 'https://www.googleapis.com/plus/v1/people/',
+      params: {
+        access_token: accessToken,
+      },
     });
     return new Promise((resolve, reject) => {
       plus.people.get(
         {
           userId: 'me',
-          // auth: accessToken,
         },
         (err, auth) => {
           if (err) {
-            console.log(err);
             reject(err);
             return;
           }

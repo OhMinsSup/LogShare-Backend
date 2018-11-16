@@ -4,6 +4,7 @@ import * as compress from 'koa-compress';
 import * as cors from 'koa-cors';
 import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
+import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
 import routes from './routes';
 import corsMiddleware from './lib/middleware/corsMiddleware';
@@ -23,6 +24,8 @@ class Server {
   private middleware(): void {
     const { app } = this;
 
+    app.keys = ['social_token'];
+
     app.use(
       koaBody({
         multipart: true,
@@ -31,6 +34,7 @@ class Server {
         },
       })
     );
+    app.use(session(app));
     app.use(helmet());
     app.use(cors());
     app.use(corsMiddleware);
