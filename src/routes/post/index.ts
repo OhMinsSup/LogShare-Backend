@@ -11,7 +11,7 @@ const post = new Router();
 post.post('/', needsAuth, postCtrl.writePost);
 post.put('/:id', needsAuth, checkObjectId, postCtrl.updatePost);
 post.delete('/:id', needsAuth, checkObjectId, postCtrl.deletePost);
-post.get('/:id', needsAuth, checkObjectId, postCtrl.readPost);
+post.get('/:id', checkObjectId, postCtrl.readPost);
 
 post.use('/save', needsAuth, save.routes());
 post.use('/list', needsAuth, posts.routes());

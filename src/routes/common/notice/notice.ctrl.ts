@@ -127,11 +127,6 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
       })
     );
 
-    if (notice.length === 0 || !notice) {
-      ctx.status = 204;
-      return;
-    }
-
     await Promise.all(
       notice.map(notice => {
         const m = new NoticeMessage({
