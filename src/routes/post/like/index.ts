@@ -3,7 +3,6 @@ import * as likeCtrl from './like.ctrl';
 
 const like = new Router();
 
-like.get('/', likeCtrl.getLike);
 like.post('/', likeCtrl.like);
 like.delete('/', likeCtrl.unlike);
 

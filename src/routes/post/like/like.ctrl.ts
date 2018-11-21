@@ -107,28 +107,3 @@ export const unlike: Middleware = async (ctx: Context): Promise<any> => {
     ctx.throw(500, e);
   }
 };
-
-/**@return {void}
- * @description 좋아요 체크 api
- * @param {Context} ctx Koa Context
- */
-export const getLike: Middleware = async (ctx: Context): Promise<any> => {
-  const postId: string = ctx['post']._id;
-  const userId: string = ctx['user']._id;
-
-  let liked = false;
-
-  try {
-    if (userId) {
-      const exists = await Like.checkExists(userId, postId);
-      liked = !!exists;
-    }
-
-    ctx.body = {
-      liked,
-      likes: ctx['post'].info.likes as number,
-    };
-  } catch (e) {
-    ctx.throw(500, e);
-  }
-};
