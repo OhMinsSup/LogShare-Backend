@@ -101,11 +101,7 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
 
     await Post.Count('comments', postId);
 
-    const commentWithData: IComment = await Comment.findById(comment._id)
-      .lean()
-      .exec();
-
-    ctx.body = commentWithData;
+    ctx.status = 204;
 
     await Post.findOneAndUpdate(
       {
@@ -202,7 +198,7 @@ export const updateComment: Middleware = async (ctx: Context): Promise<any> => {
       return;
     }
 
-    ctx.body = comment;
+    ctx.status = 204;
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -253,7 +249,7 @@ export const deleteComment: Middleware = async (ctx: Context): Promise<any> => {
         ],
       },
       {
-        visible: false,
+        visible: true,
       },
       {
         new: true,
@@ -280,10 +276,19 @@ export const getCommentList: Middleware = async (
   const post: PostPayload = ctx['post'];
 
   try {
-    const comments: IComment[] = await Comment.find({
-      post: post._id,
-      level: 0,
-    })
+    const comments: IComment[] = await Comment.find(
+      {
+        post: post._id,
+        level: 0,
+      },
+      {
+        text: true,
+        level: true,
+        visible: true,
+        createdAt: true,
+        user: true,
+      }
+    )
       .populate('user', 'profile')
       .sort({ _id: -1 })
       .lean()
@@ -319,10 +324,19 @@ export const getReplyComment: Middleware = async (
   }
 
   try {
-    const comments: IComment[] = await Comment.find({
-      post: post._id,
-      reply: commentId,
-    })
+    const comments: IComment[] = await Comment.find(
+      {
+        post: post._id,
+        reply: commentId,
+      },
+      {
+        text: true,
+        level: true,
+        visible: true,
+        createdAt: true,
+        user: true,
+      }
+    )
       .populate('user', 'profile')
       .sort({ _id: -1 })
       .lean()

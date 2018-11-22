@@ -36,7 +36,7 @@ const CommentSchema = new Schema(
     },
     visible: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     text: String,
   },

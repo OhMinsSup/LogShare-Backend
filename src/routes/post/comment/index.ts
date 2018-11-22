@@ -7,6 +7,6 @@ comment.post('/', commentCtrl.writeComment);
 comment.put('/:commentId', commentCtrl.updateComment);
 comment.delete('/:commentId', commentCtrl.deleteComment);
 comment.get('/', commentCtrl.getCommentList);
-comment.get('/reply/:commentId', commentCtrl.getReplyComment);
+comment.get('/:commentId/reply', commentCtrl.getReplyComment);
 
 export default comment;
