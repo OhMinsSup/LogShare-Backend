@@ -67,7 +67,7 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
 
     const postWithData = post.map(serializePost).map(post => ({
       ...post,
-      body: formatShortDescription(post.body, 'text'),
+      body: formatShortDescription(post.body, 'markdown'),
     }));
 
     ctx.body = {
@@ -254,7 +254,7 @@ export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
       next,
       postWithData: post.map(serializePoplatePost).map(post => ({
         ...post,
-        body: formatShortDescription(post.body, 'text'),
+        body: formatShortDescription(post.body, 'markdown'),
       })),
     };
   } catch (e) {

@@ -1,12 +1,11 @@
 import * as crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
-import removeMd from 'remove-markdown';
 import { TokenPayload } from './token';
 import Post, { IPost } from '../models/Post';
 import { IUser } from '../models/User';
 import PostSave, { IPostSave } from '../models/PostSave';
-
+const removeMd = require('remove-markdown');
 /**
  * @description 중복된 데이터 없에는 함수
  * @param {string[]} array
