@@ -285,6 +285,7 @@ export const getCommentList: Middleware = async (
         text: true,
         level: true,
         visible: true,
+        reply: true,
         createdAt: true,
         user: true,
       }
@@ -332,6 +333,7 @@ export const getReplyComment: Middleware = async (
       {
         text: true,
         level: true,
+        reply: true,
         visible: true,
         createdAt: true,
         user: true,
