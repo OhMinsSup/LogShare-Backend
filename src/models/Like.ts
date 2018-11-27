@@ -19,12 +19,10 @@ const LikeSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     post: {
       type: Schema.Types.ObjectId,
       ref: 'Post',
-      index: true,
     },
   },
   {
@@ -32,8 +30,6 @@ const LikeSchema = new Schema(
     autoIndex: false,
   }
 );
-
-LikeSchema.index({ _id: -1 });
 
 LikeSchema.statics.checkExists = function(
   userId: string,

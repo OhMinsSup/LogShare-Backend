@@ -25,21 +25,16 @@ const FollowSchema = new Schema(
     following: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     follower: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
-
-FollowSchema.index({ _id: -1 });
 
 FollowSchema.statics.checkExists = function(
   userId: string,

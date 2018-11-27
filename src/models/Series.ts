@@ -17,7 +17,6 @@ const SeriesSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     series_thumbnail: String,
     title: String,
@@ -25,7 +24,6 @@ const SeriesSchema = new Schema(
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
 

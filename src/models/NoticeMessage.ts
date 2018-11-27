@@ -30,17 +30,13 @@ const NoticeMessageSchema = new Schema(
     notice: {
       type: Schema.Types.ObjectId,
       ref: 'Notice',
-      index: true,
     },
     message: String,
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
-
-NoticeMessageSchema.index({ _id: -1 });
 
 const NoticeMessage = model<INoticeMessage>(
   'NoticeMessage',

@@ -28,7 +28,6 @@ const CommentSchema = new Schema(
     reply: {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
-      index: true,
     },
     level: {
       type: Number,
@@ -42,11 +41,8 @@ const CommentSchema = new Schema(
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
-
-CommentSchema.index({ _id: -1 });
 
 const Comment = model<IComment>('Comment', CommentSchema) as ICommentModel;
 

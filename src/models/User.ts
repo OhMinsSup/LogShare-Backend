@@ -95,7 +95,6 @@ const UserSchema = new Schema(
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
 

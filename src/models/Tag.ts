@@ -21,7 +21,6 @@ const TagSchema = new Schema(
     },
   },
   {
-    autoIndex: false,
     timestamps: true,
   }
 );

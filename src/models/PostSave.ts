@@ -18,14 +18,12 @@ const PostSaveSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     title: String,
     body: String,
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
 

@@ -25,7 +25,6 @@ const PostReadSchema = new Schema(
     ip: String,
   },
   {
-    autoIndex: false,
     timestamps: true,
   }
 );

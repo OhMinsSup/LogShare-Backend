@@ -28,7 +28,6 @@ const PostSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     post_thumbnail: String,
     title: String,
@@ -50,11 +49,8 @@ const PostSchema = new Schema(
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
-
-PostSchema.index({ _id: -1 });
 
 PostSchema.statics.readPostById = function(postId: string) {
   return this.findById(postId)

@@ -16,17 +16,14 @@ const SeriesPostSchema = new Schema(
     series: {
       type: Schema.Types.ObjectId,
       ref: 'Series',
-      index: true,
     },
     post: {
       type: Schema.Types.ObjectId,
       ref: 'Post',
-      index: true,
     },
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
 
