@@ -4,7 +4,6 @@ import { needsAuth, checkObjectId, checkPostExistancy } from '../../lib/common';
 import posts from './posts';
 import like from './like';
 import comment from './comment';
-import save from './save';
 
 const post = new Router();
 
@@ -13,7 +12,6 @@ post.put('/:id', needsAuth, checkObjectId, postCtrl.updatePost);
 post.delete('/:id', needsAuth, checkObjectId, postCtrl.deletePost);
 post.get('/:id', checkObjectId, postCtrl.readPost);
 
-post.use('/save', needsAuth, save.routes());
 post.use('/list', posts.routes());
 post.use(
   '/:id/like',

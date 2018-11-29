@@ -33,8 +33,10 @@ export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
     }
 
     ctx.body = {
+      email: user.email,
       profile: user.profile,
       info: user.info,
+      createdAt: user.createdAt,
     };
   } catch (e) {
     ctx.throw(500, e);
