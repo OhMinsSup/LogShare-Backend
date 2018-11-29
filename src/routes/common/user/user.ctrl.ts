@@ -3,6 +3,8 @@ import * as Joi from 'joi';
 import User, { IUser } from '../../../models/User';
 import { checkEmpty } from '../../../lib/common';
 import { TokenPayload } from '../../../lib/token';
+import { Types } from 'mongoose';
+import { serializeUsers } from '../../../lib/serialized';
 
 /**
  * @description 유저 정보를 보여주는 api
@@ -102,6 +104,51 @@ export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
 
     ctx.body = {
       profile,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const usersList: Middleware = async (ctx: Context): Promise<any> => {
+  type QueryPayload = {
+    cursor: string | null;
+  };
+
+  const { cursor }: QueryPayload = ctx.query;
+
+  if (cursor && !Types.ObjectId.isValid(cursor)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+
+  const query = Object.assign({}, cursor ? { _id: { $lt: cursor } } : {});
+
+  try {
+    const users: IUser[] = await User.find(query)
+      .select('profile')
+      .sort({ _id: -1 })
+      .limit(10)
+      .lean()
+      .exec();
+
+    if (users.length === 0 || !users) {
+      ctx.body = {
+        next: '',
+        usersWithData: [],
+      };
+      return;
+    }
+
+    const next =
+      users.length === 10 ? `/common/user?cursor=${users[9]._id}` : null;
+
+    ctx.body = {
+      next,
+      usersWithData: users.map(serializeUsers),
     };
   } catch (e) {
     ctx.throw(500, e);

@@ -6,5 +6,6 @@ const user = new Router();
 
 user.get('/info/@:name', needsAuth, userCtrl.getUserInfo);
 user.post('/profile', needsAuth, userCtrl.profileUpdate);
+user.get('/', userCtrl.usersList);
 
 export default user;

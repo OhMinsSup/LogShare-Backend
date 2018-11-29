@@ -121,3 +121,21 @@ export const serializeFollowing = (data: any) => {
     ...pick(following.profile, ['username', 'thumbnail', 'shortBio']),
   };
 };
+
+/**
+ * @description 팔로잉을 필터링
+ * @param {any} Data
+ * @returns {Object<any>} following: { _id, thumb }
+ */
+export const serializeUsers = (data: any) => {
+  const {
+    _id,
+    profile: { username, thumbnail, shortBio },
+  } = data;
+  return {
+    _id,
+    username,
+    thumbnail,
+    shortBio,
+  };
+};

@@ -212,7 +212,7 @@ export const unfollow: Middleware = async (ctx: Context): Promise<any> => {
 export const getFollowingList: Middleware = async (
   ctx: Context
 ): Promise<any> => {
-  type BodySchema = {
+  type ParamsPayload = {
     name: string;
   };
 
@@ -220,7 +220,7 @@ export const getFollowingList: Middleware = async (
     cursor: string | null;
   };
 
-  const { name }: BodySchema = ctx.request.body;
+  const { name }: ParamsPayload = ctx.params;
 
   if (checkEmpty(name)) {
     ctx.status = 400;
@@ -284,7 +284,7 @@ export const getFollowingList: Middleware = async (
 export const getFollowerList: Middleware = async (
   ctx: Context
 ): Promise<any> => {
-  type BodySchema = {
+  type ParamsPayload = {
     name: string;
   };
 
@@ -292,7 +292,7 @@ export const getFollowerList: Middleware = async (
     cursor: string | null;
   };
 
-  const { name }: BodySchema = ctx.request.body;
+  const { name }: ParamsPayload = ctx.params;
 
   if (checkEmpty(name)) {
     ctx.status = 400;
