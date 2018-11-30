@@ -81,6 +81,68 @@ export const createPostImageSignedUrl: Middleware = async (
   };
 };
 
+export const createCommonUserCoverBgSignedUrl: Middleware = async (
+  ctx: Context
+): Promise<any> => {
+  const { cover } = ctx.request.files;
+  const user: TokenPayload = ctx['user'];
+
+  if (!user) {
+    ctx.status = 401;
+    return;
+  }
+
+  if (!cover) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'File',
+      payload: '파일을 전달해 줘야합니다',
+    };
+    return;
+  }
+
+  const stats = fs.statSync(cover.path);
+
+  if (!stats) {
+    ctx.throw(500, 'failed to load stats');
+    return;
+  }
+
+  if (stats.size > 1024 * 1024 * 8) {
+    ctx.status = 403;
+    ctx.body = {
+      name: 'FILE_SIZE_EXCEEDS',
+      payload: '8MB',
+    };
+    return;
+  }
+
+  const splitFileName: string[] = cover.name.split('.');
+  const filename: string = splitFileName[0];
+
+  const response = await cloudinary.v2.uploader.upload(cover.path, {
+    public_id: `LogShare/common-cover-background/${
+      user.profile.username
+    }/${filename}`,
+    width: 800,
+    height: 533,
+  });
+
+  if (!response) {
+    ctx.status = 418;
+    ctx.body = {
+      name: 'UPLOAD',
+      payload: '파일 업로드에 실패하였습니다',
+    };
+  }
+
+  ctx.body = {
+    url: response.url,
+    path: `LogShare/common-thumbnail/${user.profile.username}/${filename}`,
+    name: filename,
+  };
+};
+
 /**
  * @description 유저 이미지 썸네일 url를 만드는 api
  * @return {Promise<any>}
@@ -90,7 +152,7 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
   ctx: Context
 ): Promise<any> => {
   const { thumbnail } = ctx.request.files;
-  const user: TokenPayload = ctx['user'].profile;
+  const user: TokenPayload = ctx['user'];
 
   if (!user) {
     ctx.status = 401;
@@ -127,8 +189,8 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
 
   const response = await cloudinary.v2.uploader.upload(thumbnail.path, {
     public_id: `LogShare/common-thumbnail/${user.profile.username}/${filename}`,
-    width: 100,
-    height: 100,
+    width: 128,
+    height: 128,
   });
 
   if (!response) {

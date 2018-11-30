@@ -11,6 +11,12 @@ file.post(
 );
 
 file.post(
+  '/create-url/common-cover-background',
+  needsAuth,
+  fileCtrl.createCommonUserCoverBgSignedUrl
+);
+
+file.post(
   '/create-url/common-thumbnail',
   needsAuth,
   fileCtrl.createCommonThumbnailSignedUrl

@@ -9,6 +9,7 @@ export interface IUser extends Document {
     username: string;
     thumbnail: string;
     shortBio: string;
+    cover: string;
   };
   social: {
     facebook: {
@@ -66,6 +67,11 @@ const UserSchema = new Schema(
       shortBio: {
         type: String,
         default: 'LogShare에 자신을 소개해 주세요',
+      },
+      cover: {
+        type: String,
+        default:
+          'https://cdn.hashnode.com/res/hashnode/image/hashnode-assets/misc/upload/w_700,h_240,c_thumb/v1520405545406/S1-4hZadG.jpeg',
       },
     },
     social: {

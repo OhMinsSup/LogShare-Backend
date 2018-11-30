@@ -17,7 +17,6 @@ export const localRegister: Middleware = async (ctx: Context): Promise<any> => {
 
   const schema = Joi.object().keys({
     username: Joi.string()
-      .alphanum()
       .min(4)
       .max(15)
       .required(),

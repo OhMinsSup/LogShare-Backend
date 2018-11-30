@@ -130,12 +130,13 @@ export const serializeFollowing = (data: any) => {
 export const serializeUsers = (data: any) => {
   const {
     _id,
-    profile: { username, thumbnail, shortBio },
+    profile: { username, thumbnail, shortBio, cover },
   } = data;
   return {
     _id,
     username,
     thumbnail,
     shortBio,
+    cover,
   };
 };

@@ -54,11 +54,11 @@ export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
 
   const schema = Joi.object().keys({
     username: Joi.string()
-      .alphanum()
-      .min(4)
+      .min(2)
       .max(15),
-    thumbnail: Joi.string(),
+    thumbnail: Joi.string().uri(),
     shortBio: Joi.string().max(140),
+    cover: Joi.string().uri(),
   });
 
   const result = Joi.validate(ctx.request.body, schema);
@@ -86,15 +86,13 @@ export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
   const { _id: userId }: TokenPayload = ctx['user'];
 
   try {
-    const profile: IUser = await User.findById(userId)
-      .lean()
-      .exec();
+    const profile: IUser = await User.findById(userId).exec();
 
     if (!profile) {
       ctx.throw(500, 'Invalid Profile');
     }
 
-    ['username', 'shortBio', 'thumbnail'].forEach(key => {
+    ['username', 'shortBio', 'thumbnail', 'cover'].forEach(key => {
       if (body[key]) {
         profile.profile[key] = body[key];
       }
