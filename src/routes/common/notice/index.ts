@@ -5,6 +5,7 @@ import { needsAuth } from '../../../lib/common';
 const notice = new Router();
 
 notice.get('/', needsAuth, noticeCtrl.listNotice);
+notice.get('/simple', needsAuth, noticeCtrl.simpleListNotice);
 notice.post('/', needsAuth, noticeCtrl.checkNoticeRoom);
 notice.post('/send-message', needsAuth, noticeCtrl.sendMessage);
 

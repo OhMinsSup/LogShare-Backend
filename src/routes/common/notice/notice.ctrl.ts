@@ -4,7 +4,7 @@ import Notice, { INotice } from '../../../models/Notice';
 import { serializeNoticeRoom } from '../../../lib/serialized';
 import * as Joi from 'joi';
 import Follow, { IFollow } from '../../../models/Follow';
-import { filterUnique } from '../../../lib/common';
+import { filterUnique, getToDayDate } from '../../../lib/common';
 import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
 import { Types } from 'mongoose';
 
@@ -43,7 +43,8 @@ export const checkNoticeRoom: Middleware = async (
     const noticeData: INotice = await Notice.findById(notice._id)
       .populate({
         path: 'creator',
-        select: 'username profile.displayName profile.thumbnail',
+        select:
+          'username profile.displayName profile.thumbnail profile.shortBio',
       })
       .lean()
       .exec();
@@ -51,6 +52,13 @@ export const checkNoticeRoom: Middleware = async (
     ctx.body = {
       noticeWithData: serializeNoticeRoom(noticeData),
     };
+
+    await new NoticeMessage({
+      sender: userId,
+      recipient: userId,
+      notice: notice._id,
+      message: '가입해 주셔서 감사합니다',
+    }).save();
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -145,6 +153,66 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
+export const simpleListNotice: Middleware = async (
+  ctx: Context
+): Promise<any> => {
+  const { _id: userId }: TokenPayload = ctx['user'];
+
+  try {
+    const notice: INotice = await Notice.findOne({
+      creator: userId,
+    })
+      .lean()
+      .exec();
+
+    if (!notice) {
+      ctx.status = 404;
+      ctx.body = {
+        name: 'Notice',
+        payload: '알림방이 존재하지 않습니다',
+      };
+      return;
+    }
+
+    const { startDate, endDate } = getToDayDate();
+
+    const message: INoticeMessage[] = await NoticeMessage.find({
+      $and: [
+        { notice: notice._id },
+        {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+        },
+      ],
+    })
+      .populate('sender')
+      .lean()
+      .exec();
+
+    if (message.length === 0 || !message) {
+      ctx.body = {
+        message: [],
+      };
+      return;
+    }
+
+    ctx.body = {
+      message: message.map(m => {
+        const { message, sender, createdAt } = m;
+        return {
+          message,
+          thumbnail: sender.profile.thumbnail,
+          createdAt,
+        };
+      }),
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
 /**
  * @description 알림방에 속한 메세지를 리스팅해주는 api
  * @return {Promise<any>}
@@ -208,10 +276,11 @@ export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
     ctx.body = {
       next,
       message: message.map(m => {
-        const { message, sender } = m;
+        const { message, sender, createdAt } = m;
         return {
           message,
           thumbnail: sender.profile.thumbnail,
+          createdAt,
         };
       }),
     };

@@ -231,3 +231,29 @@ export const convertToFeed = (post: IPost) => {
     ],
   };
 };
+
+export const getToDayDate = () => {
+  let today: any = new Date();
+
+  let month: any = today.getUTCMonth() + 1;
+  let day: any = today.getUTCDate();
+  let year: any = today.getUTCFullYear();
+
+  if (day < 10) {
+    day = `0${day}`;
+  }
+
+  if (month < 10) {
+    month = `0${month}`;
+  }
+
+  today = year + '-' + month + '-' + day;
+
+  let startDate = today + 'T00:00:00.000Z';
+  let endDate = today + 'T23:59:59.999Z';
+
+  return {
+    startDate,
+    endDate,
+  };
+};
