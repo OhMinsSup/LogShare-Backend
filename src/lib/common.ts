@@ -5,6 +5,7 @@ import { TokenPayload } from './token';
 import Post, { IPost } from '../models/Post';
 import { IUser } from '../models/User';
 const removeMd = require('remove-markdown');
+
 /**
  * @description 중복된 데이터 없에는 함수
  * @param {string[]} array
@@ -233,11 +234,13 @@ export const convertToFeed = (post: IPost) => {
 };
 
 export const getToDayDate = () => {
-  let today: any = new Date();
+  type TupleDateType = string | number;
 
-  let month: any = today.getUTCMonth() + 1;
-  let day: any = today.getUTCDate();
-  let year: any = today.getUTCFullYear();
+  let today: string | Date = new Date();
+
+  let month: TupleDateType = today.getUTCMonth() + 1;
+  let day: TupleDateType = today.getUTCDate();
+  let year: TupleDateType = today.getUTCFullYear();
 
   if (day < 10) {
     day = `0${day}`;

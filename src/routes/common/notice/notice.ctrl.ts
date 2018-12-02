@@ -57,7 +57,7 @@ export const checkNoticeRoom: Middleware = async (
       sender: userId,
       recipient: userId,
       notice: notice._id,
-      message: '가입해 주셔서 감사합니다',
+      message: 'LogShare에 가입한 것을 환영합니다.',
     }).save();
   } catch (e) {
     ctx.throw(500, e);

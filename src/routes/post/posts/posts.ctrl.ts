@@ -117,7 +117,7 @@ export const trendingPostList: Middleware = async (
 
     const postWithData = post.map(serializePost).map(post => ({
       ...post,
-      body: formatShortDescription(post.body, 'text'),
+      body: formatShortDescription(post.body, 'markdown'),
     }));
 
     ctx.body = {
