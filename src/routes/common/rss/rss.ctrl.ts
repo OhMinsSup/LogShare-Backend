@@ -9,7 +9,7 @@ export const getEntireRSS: Middleware = async (ctx: Context): Promise<any> => {
     const posts: IPost[] = await Post.find()
       .limit(20)
       .sort({ _id: -1 })
-      .populate('user.profile')
+      .populate('user')
       .lean()
       .exec();
 
@@ -44,7 +44,7 @@ export const getUserRSS: Middleware = async (ctx: Context): Promise<any> => {
 
   const { username }: ParamsPayload = ctx.params;
 
-  if (checkEmpty(name)) {
+  if (checkEmpty(username)) {
     ctx.status = 400;
     ctx.body = {
       name: 'INVALID_NAME',
@@ -69,7 +69,7 @@ export const getUserRSS: Middleware = async (ctx: Context): Promise<any> => {
     })
       .limit(20)
       .sort({ _id: -1 })
-      .populate('user.profile')
+      .populate('user')
       .lean()
       .exec();
 

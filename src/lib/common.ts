@@ -174,23 +174,6 @@ export const checkPostExistancy = async (
  */
 
 /**
- * @description 데이터를 맵 배열 형태로 반환
- * @param {any[]} array
- * @param {string} key
- * @returns {any[]} allIds
- */
-export const normalize = (array: any[], key: string) => {
-  const byId = {};
-  const allIds = [];
-  array.forEach(item => {
-    byId[item[key]] = item;
-    allIds.push(byId[item[key]]);
-  });
-
-  return allIds;
-};
-
-/**
  * @description 포스트의 타입을 가져온다
  */
 export type PostPayload = {
@@ -220,7 +203,7 @@ export const convertToFeed = (post: IPost) => {
   return {
     link,
     title: post.title,
-    description: post.body || formatShortDescription(post.body, 'text'),
+    description: post.body || formatShortDescription(post.body, 'markdown'),
     id: link,
     image: post.post_thumbnail,
     date: post.createdAt,
