@@ -22,4 +22,10 @@ file.post(
   fileCtrl.createCommonThumbnailSignedUrl
 );
 
+file.post(
+  '/create-url/video-upload',
+  needsAuth,
+  fileCtrl.createVideoUploadSignedUrl
+);
+
 export default file;

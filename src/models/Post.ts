@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
+import { Document, Model, Schema, model } from 'mongoose';
 import { IUser } from './User';
 
 export interface IPost extends Document {

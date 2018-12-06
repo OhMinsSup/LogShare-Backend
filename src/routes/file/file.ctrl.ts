@@ -207,3 +207,7 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
     name: filename,
   };
 };
+
+export const createVideoUploadSignedUrl = async (
+  ctx: Context
+): Promise<any> => {};
