@@ -27,7 +27,6 @@ const LikeSchema = new Schema(
   },
   {
     timestamps: true,
-    autoIndex: false,
   }
 );
 

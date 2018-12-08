@@ -243,3 +243,17 @@ export const getToDayDate = () => {
     endDate,
   };
 };
+
+export const parseTime = (time: number) => {
+  const time_hours = time / 60 / 60;
+  const time_mins = time / 60;
+
+  let hours = parseInt(time_hours.toString()),
+    mins = Math.abs(parseInt(time_mins.toString()) - hours * 60),
+    seconds = Math.round(time % 60);
+  return isNaN(hours) || isNaN(mins) || isNaN(seconds)
+    ? `00:00:00`
+    : `${hours > 9 ? Math.max(hours, 0) : '0' + Math.max(hours, 0)}:${
+        mins > 9 ? Math.max(mins, 0) : '0' + Math.max(0, mins)
+      }:${seconds > 9 ? Math.max(0, seconds) : '0' + Math.max(0, seconds)}`;
+};

@@ -1,12 +1,12 @@
 import { Middleware, Context } from 'koa';
+import * as Joi from 'joi';
+import { Types } from 'mongoose';
 import { TokenPayload } from '../../../lib/token';
 import Notice, { INotice } from '../../../models/Notice';
 import { serializeNoticeRoom } from '../../../lib/serialized';
-import * as Joi from 'joi';
 import Follow, { IFollow } from '../../../models/Follow';
 import { filterUnique, getToDayDate } from '../../../lib/common';
 import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
-import { Types } from 'mongoose';
 
 /**
  * @description 알림방을 만들거나, 알림방을 체크하는 api

@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model } from 'mongoose';
+import { Document, Model, Schema, model, DocumentQuery } from 'mongoose';
 import { IUser } from './User';
 
 export interface IPost extends Document {
@@ -21,6 +21,10 @@ export interface IPostModel extends Model<IPost> {
   trendingPostList(cursor: string | null): Promise<IPost[]>;
   Count(type: 'likes' | 'comments', postId: string): Promise<IPost>;
   unCount(type: 'likes' | 'comments', postId: string): Promise<IPost>;
+  score(
+    userId: IUser,
+    postId: string
+  ): Promise<DocumentQuery<IPost, IPost, {}>>;
 }
 
 const PostSchema = new Schema(
@@ -122,6 +126,22 @@ PostSchema.statics.unCount = function(
       },
     },
     { new: true }
+  )
+    .lean()
+    .exec();
+};
+
+PostSchema.statics.score = function(userId: IUser, postId: string) {
+  return this.findOneAndUpdate(
+    {
+      $and: [{ user: userId }, { _id: postId }],
+    },
+    {
+      $inc: { 'info.score': 1 },
+    },
+    {
+      new: true,
+    }
   )
     .lean()
     .exec();

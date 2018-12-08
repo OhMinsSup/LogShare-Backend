@@ -10,7 +10,9 @@ export interface IPostRead extends Document {
   updatedAt: Date;
 }
 
-export interface IPostReadModel extends Model<IPostRead> {}
+export interface IPostReadModel extends Model<IPostRead> {
+  view(hashIp: string, postId: string): Promise<IPostRead>;
+}
 
 const PostReadSchema = new Schema(
   {
@@ -28,6 +30,14 @@ const PostReadSchema = new Schema(
     timestamps: true,
   }
 );
+
+PostReadSchema.statics.view = function(hashIp: string, postId: string) {
+  return this.findOne({
+    $and: [{ ip: hashIp }, { post: postId }],
+  })
+    .lean()
+    .exec();
+};
 
 const PostRead: IPostReadModel = model<IPostRead>(
   'PostRead',

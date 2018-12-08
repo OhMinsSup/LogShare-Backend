@@ -2,6 +2,7 @@ import { Middleware, Context } from 'koa';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { TokenPayload } from '../../lib/token';
+import { parseTime } from '../../lib/common';
 dotenv.config();
 
 const {
@@ -210,4 +211,58 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
 
 export const createVideoUploadSignedUrl = async (
   ctx: Context
-): Promise<any> => {};
+): Promise<any> => {
+  const { video } = ctx.request.files;
+  const user: TokenPayload = ctx['user'];
+
+  if (!user) {
+    ctx.status = 401;
+    return;
+  }
+
+  if (!video) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'File',
+      payload: '파일을 전달해 줘야합니다',
+    };
+    return;
+  }
+
+  const stats = fs.statSync(video.path);
+
+  if (!stats) {
+    ctx.throw(500, 'failed to load stats');
+    return;
+  }
+
+  const splitFileName: string[] = video.name.split('.');
+  const filename: string = splitFileName[0];
+
+  try {
+    const response = await cloudinary.v2.uploader.upload(video.path, {
+      resource_type: 'video',
+      public_id: `LogShare/video-upload/${user.profile.username}/${filename}`,
+    });
+
+    ctx.body = response;
+
+    if (!response) {
+      ctx.status = 418;
+      ctx.body = {
+        name: 'UPLOAD',
+        payload: '파일 업로드에 실패하였습니다',
+      };
+    }
+
+    ctx.body = {
+      path: `LogShare/video-upload/${user.profile.username}/${filename}`,
+      name: filename,
+      url: response.url,
+      time: parseTime(response.duration),
+      duration: response.duration,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};

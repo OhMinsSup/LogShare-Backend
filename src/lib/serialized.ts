@@ -36,6 +36,37 @@ export const serializePost = (data: any) => {
   };
 };
 
+export const serializeVideo = (data: any) => {
+  const {
+    _id: videoId,
+    title,
+    description,
+    category,
+    video_thumbnail,
+    video_url,
+    liked,
+    info,
+    user,
+  } = data;
+
+  return {
+    videoId,
+    title,
+    description,
+    category,
+    video_thumbnail,
+    video_url,
+    liked,
+    info: {
+      ...pick(info, ['likes', 'comments', 'views']),
+    },
+    user: {
+      ...pick(user, ['_id']),
+      ...pick(user.profile, ['username', 'thumbnail', 'shortBio']),
+    },
+  };
+};
+
 /**
  * @description 태그정보를 필터링
  * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파

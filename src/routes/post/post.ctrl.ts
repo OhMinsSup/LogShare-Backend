@@ -9,7 +9,7 @@ import PostTag from '../../models/PostTag';
 import User from '../../models/User';
 import Like from '../../models/Like';
 import { serializePost } from '../../lib/serialized';
-import PostRead, { IPostRead } from '../../models/PostRead';
+import PostRead from '../../models/PostRead';
 import Comment from '../../models/Comment';
 
 /**
@@ -268,11 +268,7 @@ export const readPost: Middleware = async (ctx: Context): Promise<any> => {
     });
 
     const hashIp = hash(ctx.request.ip);
-    const postRead: IPostRead = await PostRead.findOne({
-      $and: [{ ip: hashIp }, { post: post._id }],
-    })
-      .lean()
-      .exec();
+    const postRead = await PostRead.view(hashIp, post._id);
 
     if (postRead) return;
 
@@ -282,19 +278,7 @@ export const readPost: Middleware = async (ctx: Context): Promise<any> => {
       user: user._id,
     }).save();
 
-    await Post.findOneAndUpdate(
-      {
-        $and: [{ user: post.user }, { _id: post._id }],
-      },
-      {
-        $inc: { 'info.score': 1 },
-      },
-      {
-        new: true,
-      }
-    )
-      .lean()
-      .exec();
+    await Post.score(post.user, post._id);
   } catch (e) {
     ctx.throw(500, e);
   }
