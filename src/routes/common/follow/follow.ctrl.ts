@@ -11,7 +11,7 @@ import { checkEmpty } from '../../../lib/common';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const getFollow: Middleware = async (ctx: Context): Promise<any> => {
+export const getFollow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
   };
@@ -62,7 +62,7 @@ export const getFollow: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const follow: Middleware = async (ctx: Context): Promise<any> => {
+export const follow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
   };
@@ -136,7 +136,7 @@ export const follow: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const unfollow: Middleware = async (ctx: Context): Promise<any> => {
+export const unfollow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
   };

@@ -17,7 +17,7 @@ import Comment from '../../models/Comment';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const writePost: Middleware = async (ctx: Context): Promise<any> => {
+export const writePost: Middleware = async (ctx: Context) => {
   type BodySchema = {
     title: string;
     body: string;
@@ -99,7 +99,7 @@ export const writePost: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const updatePost: Middleware = async (ctx: Context): Promise<any> => {
+export const updatePost: Middleware = async (ctx: Context) => {
   type BodySchema = {
     title: string;
     body: string;
@@ -198,7 +198,7 @@ export const updatePost: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
+export const deletePost: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     id: string;
   };
@@ -237,7 +237,7 @@ export const deletePost: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const readPost: Middleware = async (ctx: Context): Promise<any> => {
+export const readPost: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     id: string;
   };

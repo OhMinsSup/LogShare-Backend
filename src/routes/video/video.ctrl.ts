@@ -103,7 +103,15 @@ export const createVideo: Middleware = async (ctx: Context) => {
   }
 };
 
-export const viewVideo: Middleware = async (ctx: Context): Promise<any> => {
+export const updateVideo: Middleware = async (ctx: Context) => {
+  type ParamsPayload = {
+    id: string;
+  };
+
+  type BodySchema = {};
+};
+
+export const viewVideo: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     id: string;
   };

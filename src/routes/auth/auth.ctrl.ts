@@ -8,7 +8,7 @@ import Social, { Profile } from '../../lib/social';
  * @description 로컬 회원가입 api
  * @param {Context} ctx koa Context
  */
-export const localRegister: Middleware = async (ctx: Context): Promise<any> => {
+export const localRegister: Middleware = async (ctx: Context) => {
   type BodySchema = {
     username: string;
     email: string;
@@ -104,7 +104,7 @@ export const localRegister: Middleware = async (ctx: Context): Promise<any> => {
  * @description 로컬 로그인 api
  * @param {Context} ctx koa Context
  */
-export const localLogin: Middleware = async (ctx: Context): Promise<any> => {
+export const localLogin: Middleware = async (ctx: Context) => {
   type BodySchema = {
     email: string;
     password: string;
@@ -182,7 +182,7 @@ export const localLogin: Middleware = async (ctx: Context): Promise<any> => {
  * @description 로그아웃 api
  * @param {Context} ctx koa Context
  */
-export const logout: Middleware = async (ctx: Context): Promise<any> => {
+export const logout: Middleware = async (ctx: Context) => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
     maxAge: 0,
@@ -195,7 +195,7 @@ export const logout: Middleware = async (ctx: Context): Promise<any> => {
  * @description 이메일 or 유저명 유효성 검사 api
  * @param {Context} ctx koa Context
  */
-export const checkExists: Middleware = async (ctx: Context): Promise<any> => {
+export const checkExists: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     key: 'email' | 'username';
     value: string;
@@ -220,7 +220,7 @@ export const checkExists: Middleware = async (ctx: Context): Promise<any> => {
  * @description 유저가 로그인인 중인지 체크하는 api
  * @param {Context} ctx koa Context
  */
-export const checkUser: Middleware = async (ctx: Context): Promise<any> => {
+export const checkUser: Middleware = async (ctx: Context) => {
   const user: TokenPayload = ctx['user'];
 
   if (!user) {
@@ -372,7 +372,7 @@ export const socialRegister: Middleware = async (
  * @description 소셜 로그인 api
  * @param {Context} ctx koa Context
  */
-export const socialLogin: Middleware = async (ctx: Context): Promise<any> => {
+export const socialLogin: Middleware = async (ctx: Context) => {
   type BodySchema = {
     accessToken: string;
   };
@@ -457,7 +457,7 @@ export const socialLogin: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const verifySocial: Middleware = async (ctx: Context): Promise<any> => {
+export const verifySocial: Middleware = async (ctx: Context) => {
   type BodySchema = {
     accessToken: string;
   };

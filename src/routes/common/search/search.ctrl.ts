@@ -4,9 +4,7 @@ import User, { IUser } from '../../../models/User';
 import { serializePost, serializeUsers } from '../../../lib/serialized';
 import { formatShortDescription } from '../../../lib/common';
 
-export const searchPostList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const searchPostList: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     value: string;
   };
@@ -40,9 +38,7 @@ export const searchPostList: Middleware = async (
   }
 };
 
-export const searchUserList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const searchUserList: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     value: string;
   };

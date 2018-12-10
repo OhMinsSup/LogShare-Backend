@@ -11,7 +11,7 @@ import Post from '../../../models/Post';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
+export const writeComment: Middleware = async (ctx: Context) => {
   type BodySchema = {
     text: string;
     reply: string | null;
@@ -126,7 +126,7 @@ export const writeComment: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const updateComment: Middleware = async (ctx: Context): Promise<any> => {
+export const updateComment: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     commentId: string;
   };
@@ -209,7 +209,7 @@ export const updateComment: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const deleteComment: Middleware = async (ctx: Context): Promise<any> => {
+export const deleteComment: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     commentId: string;
   };
@@ -270,9 +270,7 @@ export const deleteComment: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const getCommentList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const getCommentList: Middleware = async (ctx: Context) => {
   const post: PostPayload = ctx['post'];
 
   try {

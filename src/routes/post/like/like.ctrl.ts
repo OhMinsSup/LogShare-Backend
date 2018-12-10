@@ -6,7 +6,7 @@ import Post from '../../../models/Post';
  * @description 좋아요 api
  * @param {Context} ctx koa Context
  */
-export const like: Middleware = async (ctx: Context): Promise<any> => {
+export const like: Middleware = async (ctx: Context) => {
   const postId: string = ctx['post']._id;
   const userId: string = ctx['user']._id;
 
@@ -56,7 +56,7 @@ export const like: Middleware = async (ctx: Context): Promise<any> => {
  * @description 안 좋아요 api
  * @param {Context} ctx koa Context
  */
-export const unlike: Middleware = async (ctx: Context): Promise<any> => {
+export const unlike: Middleware = async (ctx: Context) => {
   const postId: string = ctx['post']._id;
   const userId: string = ctx['user']._id;
 

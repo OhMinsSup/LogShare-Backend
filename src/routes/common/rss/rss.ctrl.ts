@@ -4,7 +4,7 @@ import Post, { IPost } from '../../../models/Post';
 import { convertToFeed, checkEmpty } from '../../../lib/common';
 import User from '../../../models/User';
 
-export const getEntireRSS: Middleware = async (ctx: Context): Promise<any> => {
+export const getEntireRSS: Middleware = async (ctx: Context) => {
   try {
     const posts: IPost[] = await Post.find()
       .limit(20)
@@ -37,7 +37,7 @@ export const getEntireRSS: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const getUserRSS: Middleware = async (ctx: Context): Promise<any> => {
+export const getUserRSS: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     username: string;
   };

@@ -13,9 +13,7 @@ import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const checkNoticeRoom: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const checkNoticeRoom: Middleware = async (ctx: Context) => {
   const userId: TokenPayload = ctx['user'];
 
   try {
@@ -69,7 +67,7 @@ export const checkNoticeRoom: Middleware = async (
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
+export const sendMessage: Middleware = async (ctx: Context) => {
   type BodySchema = {
     message: string;
   };
@@ -153,9 +151,7 @@ export const sendMessage: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const simpleListNotice: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const simpleListNotice: Middleware = async (ctx: Context) => {
   const { _id: userId }: TokenPayload = ctx['user'];
 
   try {

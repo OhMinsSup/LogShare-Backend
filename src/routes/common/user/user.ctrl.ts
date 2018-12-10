@@ -11,7 +11,7 @@ import { serializeUsers } from '../../../lib/serialized';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
+export const getUserInfo: Middleware = async (ctx: Context) => {
   type ParamPayload = {
     name: string;
   };
@@ -45,7 +45,7 @@ export const getUserInfo: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
+export const profileUpdate: Middleware = async (ctx: Context) => {
   type BodySchema = {
     username: string;
     thumbnail: string;
@@ -108,7 +108,7 @@ export const profileUpdate: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const usersList: Middleware = async (ctx: Context): Promise<any> => {
+export const usersList: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     cursor: string | null;
   };

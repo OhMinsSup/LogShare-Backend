@@ -9,7 +9,7 @@ import { formatShortDescription, checkEmpty } from '../../../lib/common';
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const getTags: Middleware = async (ctx: Context): Promise<any> => {
+export const getTags: Middleware = async (ctx: Context) => {
   try {
     const tagData: IPostTag[] = await PostTag.aggregate([
       {
@@ -41,7 +41,7 @@ export const getTags: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const getTagInfo: Middleware = async (ctx: Context): Promise<any> => {
+export const getTagInfo: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     tag: string;
   };

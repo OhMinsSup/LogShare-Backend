@@ -10,7 +10,7 @@ import Like from '../../../models/Like';
  * @description 포스트 리스트(유저 | Public) API
  * @param {Context} ctx koa Context
  */
-export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
+export const listPosts: Middleware = async (ctx: Context) => {
   type ParamPayload = {
     username: string | null;
   };
@@ -84,9 +84,7 @@ export const listPosts: Middleware = async (ctx: Context): Promise<any> => {
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const trendingPostList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const trendingPostList: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     cursor: string | null;
   };
@@ -134,7 +132,7 @@ export const trendingPostList: Middleware = async (
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
+export const listSequences: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     postId: string;
   };
@@ -195,7 +193,7 @@ export const listSequences: Middleware = async (ctx: Context): Promise<any> => {
   }
 };
 
-export const likePostsList: Middleware = async (ctx: Context): Promise<any> => {
+export const likePostsList: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     cursor: string | null;
   };

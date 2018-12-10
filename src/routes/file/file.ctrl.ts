@@ -24,9 +24,7 @@ cloudinary.config({
  * @return {Promise<any>}
  * @param {Context} ctx koa Context
  */
-export const createPostImageSignedUrl: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
   const { image } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -84,7 +82,7 @@ export const createPostImageSignedUrl: Middleware = async (
 
 export const createCommonUserCoverBgSignedUrl: Middleware = async (
   ctx: Context
-): Promise<any> => {
+) => {
   const { cover } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -151,7 +149,7 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (
  */
 export const createCommonThumbnailSignedUrl: Middleware = async (
   ctx: Context
-): Promise<any> => {
+) => {
   const { thumbnail } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -209,9 +207,7 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
   };
 };
 
-export const createVideoUploadSignedUrl = async (
-  ctx: Context
-): Promise<any> => {
+export const createVideoUploadSignedUrl: Middleware = async (ctx: Context) => {
   const { video } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -260,7 +256,6 @@ export const createVideoUploadSignedUrl = async (
       name: filename,
       url: response.url,
       time: parseTime(response.duration),
-      duration: response.duration,
     };
   } catch (e) {
     ctx.throw(500, e);
