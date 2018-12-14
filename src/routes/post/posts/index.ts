@@ -8,5 +8,6 @@ posts.get('/public', postsCtrl.listPosts);
 posts.get('/trending', postsCtrl.trendingPostList);
 posts.get('/sequences', postsCtrl.listSequences);
 posts.get('/likes/@:username', postsCtrl.likePostsList);
+posts.get('/featured', postsCtrl.featuredPost);
 
 export default posts;

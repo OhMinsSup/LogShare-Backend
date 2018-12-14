@@ -4,7 +4,7 @@ import { needsAuth } from '../../../lib/common';
 
 const tag = new Router();
 
-tag.get('/', needsAuth, tagCtrl.getTags);
+tag.get('/', tagCtrl.getTags);
 tag.get('/:tag', needsAuth, tagCtrl.getTagInfo);
 
 export default tag;

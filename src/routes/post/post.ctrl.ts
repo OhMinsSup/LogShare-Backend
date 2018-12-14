@@ -186,7 +186,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
     }
 
     ctx.body = {
-      postId: post._id as string,
+      postId: post._id,
     };
   } catch (e) {
     ctx.throw(500, e);

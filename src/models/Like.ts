@@ -7,6 +7,7 @@ export interface ILike extends Document {
   post: IPost;
   createdAt: Date;
   updatedAt: Date;
+  user_docs?: IUser;
 }
 
 export interface ILikeModel extends Model<ILike> {

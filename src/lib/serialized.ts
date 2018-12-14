@@ -47,6 +47,7 @@ export const serializeVideo = (data: any) => {
     liked,
     info,
     user,
+    play_time,
   } = data;
 
   return {
@@ -57,6 +58,7 @@ export const serializeVideo = (data: any) => {
     video_thumbnail,
     video_url,
     liked,
+    play_time,
     info: {
       ...pick(info, ['likes', 'comments', 'views']),
     },

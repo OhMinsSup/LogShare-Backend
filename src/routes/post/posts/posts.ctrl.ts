@@ -2,9 +2,15 @@ import { Context, Middleware } from 'koa';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
 import { serializePost, serializePoplatePost } from '../../../lib/serialized';
-import { formatShortDescription, checkEmpty } from '../../../lib/common';
+import {
+  formatShortDescription,
+  checkEmpty,
+  filterUnique,
+} from '../../../lib/common';
 import { Types } from 'mongoose';
 import Like from '../../../models/Like';
+import { TokenPayload } from '../../../lib/token';
+import PostTag from '../../../models/PostTag';
 
 /**@return {void}
  * @description 포스트 리스트(유저 | Public) API
@@ -186,7 +192,7 @@ export const listSequences: Middleware = async (ctx: Context) => {
       ...after.slice(0, afterCount),
     ].map(post => ({
       ...post,
-      body: formatShortDescription(post.body, 'text'),
+      body: formatShortDescription(post.body, 'markdown'),
     }));
   } catch (e) {
     ctx.throw(500, e);
@@ -254,6 +260,76 @@ export const likePostsList: Middleware = async (ctx: Context) => {
         ...post,
         body: formatShortDescription(post.body, 'markdown'),
       })),
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const featuredPost: Middleware = async (ctx: Context) => {
+  const user: TokenPayload = ctx['user'];
+
+  if (!user) {
+    ctx.body = {
+      posts: [],
+    };
+    return;
+  }
+
+  try {
+    const posts = await Post.aggregate([
+      {
+        $lookup: {
+          from: 'posttags',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'post_tags_docs',
+        },
+      },
+      { $unwind: '$post_tags_docs' },
+      {
+        $lookup: {
+          from: 'posts',
+          localField: 'post_tags_docs.post',
+          foreignField: '_id',
+          as: 'post_tags_docs.posts_docs',
+        },
+      },
+      { $unwind: '$post_tags_docs.posts_docs' },
+      {
+        $project: {
+          'post_tags_docs.posts_docs._id': 1,
+          'post_tags_docs.posts_docs.user': 1,
+          'post_tags_docs.posts_docs.title': 1,
+          'post_tags_docs.posts_docs.info': 1,
+        },
+      },
+      {
+        $group: {
+          _id: '$post_tags_docs.posts_docs._id',
+          posts: { $first: '$post_tags_docs' },
+        },
+      },
+      {
+        $match: {
+          'posts.posts_docs.user': { $ne: Types.ObjectId(user._id) },
+        },
+      },
+    ])
+      .sample(10)
+      .limit(10)
+      .exec();
+
+    const serialized = posts.map(post => {
+      const {
+        posts: { posts_docs },
+      } = post;
+
+      return posts_docs;
+    });
+
+    ctx.body = {
+      posts: serialized,
     };
   } catch (e) {
     ctx.throw(500, e);

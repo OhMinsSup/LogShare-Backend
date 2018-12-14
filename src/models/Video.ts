@@ -20,6 +20,7 @@ export interface IVideo extends Document {
 }
 
 export interface IVideoModel extends Model<IVideo> {
+  listVideos(userId: string | null, cursor: string | null): Promise<IVideo[]>;
   viewVideoById(videoId: string): Promise<IVideo>;
   score(
     userId: IUser,
@@ -75,6 +76,25 @@ const VideoSchema = new Schema(
   },
   { timestamps: true }
 );
+
+VideoSchema.statics.listVideos = function(
+  userId: string | null,
+  cursor: string | null
+) {
+  const query = Object.assign(
+    {},
+    cursor && !userId ? { _id: { $lt: cursor } } : {},
+    userId && !cursor ? { user: userId } : {},
+    userId && cursor ? { _id: { $lt: cursor }, user: userId } : {}
+  );
+
+  return this.find(query)
+    .populate('user', 'profile')
+    .sort({ _id: -1 })
+    .limit(10)
+    .lean()
+    .exec();
+};
 
 VideoSchema.statics.viewVideoById = function(videoId: string) {
   return this.findById(videoId)

@@ -257,3 +257,23 @@ export const parseTime = (time: number) => {
         mins > 9 ? Math.max(mins, 0) : '0' + Math.max(0, mins)
       }:${seconds > 9 ? Math.max(0, seconds) : '0' + Math.max(0, seconds)}`;
 };
+
+export const normalize = (array: any[], key: string) => {
+  const byId = {};
+  const allIds = [];
+  array.forEach(item => {
+    byId[item[key]] = item;
+    allIds.push(byId[item[key]]);
+  });
+
+  return allIds;
+};
+
+export const parserImage = (
+  src: string,
+  video_type: string,
+  img_type: string
+) => {
+  let splitUrl = src.split(video_type).concat(img_type);
+  return splitUrl[0] + splitUrl[1] + splitUrl[2];
+};

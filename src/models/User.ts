@@ -1,6 +1,7 @@
 import { Document, Schema, model, Model, DocumentQuery } from 'mongoose';
 import { hash } from '../lib/common';
 import { generateToken } from '../lib/token';
+import { ILike } from './Like';
 
 export interface IUser extends Document {
   email: string;
@@ -29,6 +30,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
 
+  like_docs?: ILike;
   validatePassword(password: string): boolean;
   generate(): Promise<string>;
 }

@@ -26,6 +26,7 @@ export const getEntireRSS: Middleware = async (ctx: Context) => {
       copyright: 'All rights reserved 2018, veloss',
     });
     const feeds = posts.map(convertToFeed);
+
     feeds.forEach(f => {
       feed.addItem(f);
     });
@@ -86,6 +87,7 @@ export const getUserRSS: Middleware = async (ctx: Context) => {
       copyright: 'All rights reserved 2018, veloss',
     });
     const feeds = posts.map(convertToFeed);
+
     feeds.forEach(f => {
       feed.addItem(f);
     });

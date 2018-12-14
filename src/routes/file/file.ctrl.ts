@@ -2,7 +2,7 @@ import { Middleware, Context } from 'koa';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { TokenPayload } from '../../lib/token';
-import { parseTime } from '../../lib/common';
+import { parseTime, parserImage } from '../../lib/common';
 dotenv.config();
 
 const {
@@ -241,8 +241,6 @@ export const createVideoUploadSignedUrl: Middleware = async (ctx: Context) => {
       public_id: `LogShare/video-upload/${user.profile.username}/${filename}`,
     });
 
-    ctx.body = response;
-
     if (!response) {
       ctx.status = 418;
       ctx.body = {
@@ -254,8 +252,10 @@ export const createVideoUploadSignedUrl: Middleware = async (ctx: Context) => {
     ctx.body = {
       path: `LogShare/video-upload/${user.profile.username}/${filename}`,
       name: filename,
-      url: response.url,
+      url: response.secure_url,
+      thumbnail: parserImage(response.secure_url, response.format, 'jpg'),
       time: parseTime(response.duration),
+      format: response.format,
     };
   } catch (e) {
     ctx.throw(500, e);

@@ -152,3 +152,71 @@ export const usersList: Middleware = async (ctx: Context) => {
     ctx.throw(500, e);
   }
 };
+
+export const featuredUser: Middleware = async (ctx: Context) => {
+  const user: TokenPayload = ctx['user'];
+
+  if (!user) {
+    ctx.body = {
+      users: [],
+    };
+    return;
+  }
+
+  try {
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: 'likes',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'like_docs',
+        },
+      },
+      { $unwind: '$like_docs' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'like_docs.user',
+          foreignField: '_id',
+          as: 'like_docs.user_docs',
+        },
+      },
+      { $unwind: '$like_docs.user_docs' },
+      {
+        $project: {
+          'like_docs.user_docs._id': 1,
+          'like_docs.user_docs.profile': 1,
+        },
+      },
+      {
+        $group: {
+          _id: '$like_docs.user_docs._id',
+          users: { $first: '$like_docs' },
+        },
+      },
+      {
+        $match: {
+          _id: { $ne: Types.ObjectId(user._id) },
+        },
+      },
+    ])
+      .sample(10)
+      .limit(10)
+      .exec();
+
+    const serialized = users.map(user => {
+      const {
+        users: { user_docs },
+      } = user;
+
+      return user_docs;
+    });
+
+    ctx.body = {
+      users: serialized,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
