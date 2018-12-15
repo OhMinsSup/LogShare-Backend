@@ -15,6 +15,7 @@ export const createVideo: Middleware = async (ctx: Context) => {
     description: string | null;
     time: string;
     category: string;
+    format: string;
   };
 
   const schema = Joi.object().keys({
@@ -42,6 +43,7 @@ export const createVideo: Middleware = async (ctx: Context) => {
       )
       .required(),
     time: Joi.string().required(),
+    format: Joi.string().required(),
   });
 
   const result = Joi.validate(ctx.request.body, schema);
@@ -59,9 +61,17 @@ export const createVideo: Middleware = async (ctx: Context) => {
     video_url,
     category,
     time,
+    format,
   }: BodySchema = ctx.request.body;
 
-  const stringsToCheck = [title, category, video_thumbnail, video_url, time];
+  const stringsToCheck = [
+    title,
+    category,
+    video_thumbnail,
+    video_url,
+    time,
+    format,
+  ];
 
   for (let i of stringsToCheck) {
     if (checkEmpty(i)) {
@@ -84,6 +94,7 @@ export const createVideo: Middleware = async (ctx: Context) => {
       video_url,
       category,
       play_time: time,
+      format,
     }).save();
 
     if (!video) {

@@ -68,3 +68,71 @@ export const listVideos: Middleware = async (ctx: Context) => {
     ctx.throw(500, e);
   }
 };
+
+export const SideVideoList: Middleware = async (ctx: Context) => {
+  try {
+    const videos = await Video.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'users_docs',
+        },
+      },
+      {
+        $unwind: '$users_docs',
+      },
+      {
+        $project: {
+          video_thumbnail: 1,
+          video_url: 1,
+          title: 1,
+          format: 1,
+          description: 1,
+          category: 1,
+          play_time: 1,
+          info: 1,
+          createdAt: 1,
+          'users_docs.profile': 1,
+        },
+      },
+    ])
+      .sample(20)
+      .limit(20)
+      .exec();
+
+    const serialized = videos.map(video => {
+      const {
+        video_thumbnail,
+        video_url,
+        title,
+        description,
+        category,
+        play_time,
+        info,
+        format,
+        createdAt,
+        users_docs: { profile },
+      } = video;
+      return {
+        video_thumbnail,
+        video_url,
+        title,
+        description,
+        category,
+        play_time,
+        info,
+        format,
+        createdAt,
+        profile,
+      };
+    });
+
+    ctx.body = {
+      videosWithData: serialized,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};

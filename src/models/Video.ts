@@ -15,6 +15,7 @@ export interface IVideo extends Document {
     likes: number;
     comments: number;
   };
+  format: string;
   createdAt: Date | string;
   updatedAt: Date | string;
 }
@@ -22,6 +23,8 @@ export interface IVideo extends Document {
 export interface IVideoModel extends Model<IVideo> {
   listVideos(userId: string | null, cursor: string | null): Promise<IVideo[]>;
   viewVideoById(videoId: string): Promise<IVideo>;
+  Count(type: 'likes' | 'comments', videoId: string): Promise<IVideo>;
+  unCount(type: 'likes' | 'comments', videoId: string): Promise<IVideo>;
   score(
     userId: IUser,
     videoId: string
@@ -73,6 +76,10 @@ const VideoSchema = new Schema(
         default: 0,
       },
     },
+    format: {
+      type: String,
+      default: 'mp4',
+    },
   },
   { timestamps: true }
 );
@@ -114,6 +121,44 @@ VideoSchema.statics.score = function(userId: IUser, videoId: string) {
     {
       new: true,
     }
+  )
+    .lean()
+    .exec();
+};
+
+VideoSchema.statics.Count = function(
+  type: 'likes' | 'comments',
+  videoId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    videoId,
+    {
+      $inc: {
+        [key]: 1,
+      },
+    },
+    { new: true }
+  )
+    .lean()
+    .exec();
+};
+
+VideoSchema.statics.unCount = function(
+  type: 'likes' | 'comments',
+  videoId: string
+) {
+  const key = `info.${type}`;
+
+  return this.findByIdAndUpdate(
+    videoId,
+    {
+      $inc: {
+        [key]: -1,
+      },
+    },
+    { new: true }
   )
     .lean()
     .exec();

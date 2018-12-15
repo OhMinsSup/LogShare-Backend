@@ -4,6 +4,7 @@ import { Context, Middleware } from 'koa';
 import { TokenPayload } from './token';
 import Post, { IPost } from '../models/Post';
 import { IUser } from '../models/User';
+import Video, { IVideo } from '../models/Video';
 const removeMd = require('remove-markdown');
 
 /**
@@ -160,6 +161,36 @@ export const checkPostExistancy = async (
     }
 
     (ctx['post'] as IPost) = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+  return next();
+};
+
+export const checkVideoExistancy = async (
+  ctx: Context,
+  next: () => Promise<any>
+) => {
+  type ParamsPayload = {
+    id: string;
+  };
+  const { id }: ParamsPayload = ctx.params;
+
+  try {
+    const video: IVideo = await Video.findById(id)
+      .lean()
+      .exec();
+
+    if (!video) {
+      ctx.status = 404;
+      ctx.body = {
+        name: '비디오',
+        payload: '비디오가 존재하지 않습니다',
+      };
+      return;
+    }
+
+    (ctx['video'] as IVideo) = video;
   } catch (e) {
     ctx.throw(500, e);
   }
