@@ -4,10 +4,6 @@ import User from '../../models/User';
 import { TokenPayload } from '../../lib/token';
 import Social, { Profile } from '../../lib/social';
 
-/**@return {void}
- * @description 로컬 회원가입 api
- * @param {Context} ctx koa Context
- */
 export const localRegister: Middleware = async (ctx: Context) => {
   type BodySchema = {
     username: string;
@@ -100,10 +96,6 @@ export const localRegister: Middleware = async (ctx: Context) => {
   }
 };
 
-/**@return {void}
- * @description 로컬 로그인 api
- * @param {Context} ctx koa Context
- */
 export const localLogin: Middleware = async (ctx: Context) => {
   type BodySchema = {
     email: string;
@@ -178,10 +170,6 @@ export const localLogin: Middleware = async (ctx: Context) => {
   }
 };
 
-/**@return {void}
- * @description 로그아웃 api
- * @param {Context} ctx koa Context
- */
 export const logout: Middleware = async (ctx: Context) => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
@@ -191,10 +179,6 @@ export const logout: Middleware = async (ctx: Context) => {
   ctx.status = 204;
 };
 
-/**@return {void}
- * @description 이메일 or 유저명 유효성 검사 api
- * @param {Context} ctx koa Context
- */
 export const checkExists: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     key: 'email' | 'username';
@@ -216,10 +200,6 @@ export const checkExists: Middleware = async (ctx: Context) => {
   }
 };
 
-/**@return {void}
- * @description 유저가 로그인인 중인지 체크하는 api
- * @param {Context} ctx koa Context
- */
 export const checkUser: Middleware = async (ctx: Context) => {
   const user: TokenPayload = ctx['user'];
 
@@ -233,10 +213,6 @@ export const checkUser: Middleware = async (ctx: Context) => {
   };
 };
 
-/**@return {void}
- * @description 소셜 회원가입 api
- * @param {Context} ctx koa Context
- */
 export const socialRegister: Middleware = async (
   ctx: Context
 ): Promise<any> => {
@@ -368,10 +344,6 @@ export const socialRegister: Middleware = async (
   }
 };
 
-/**@return {void}
- * @description 소셜 로그인 api
- * @param {Context} ctx koa Context
- */
 export const socialLogin: Middleware = async (ctx: Context) => {
   type BodySchema = {
     accessToken: string;

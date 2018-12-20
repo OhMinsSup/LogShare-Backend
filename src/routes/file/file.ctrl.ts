@@ -19,11 +19,6 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-/**
- * @description 포스트 이미지 썸네일 url를 만드는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
   const { image } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
@@ -142,11 +137,6 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (
   };
 };
 
-/**
- * @description 유저 이미지 썸네일 url를 만드는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const createCommonThumbnailSignedUrl: Middleware = async (
   ctx: Context
 ) => {

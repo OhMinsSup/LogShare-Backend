@@ -2,10 +2,6 @@ import { Middleware, Context } from 'koa';
 import Like from '../../../models/Like';
 import Post from '../../../models/Post';
 
-/**@return {void}
- * @description 좋아요 api
- * @param {Context} ctx koa Context
- */
 export const like: Middleware = async (ctx: Context) => {
   const postId: string = ctx['post']._id;
   const userId: string = ctx['user']._id;
@@ -52,10 +48,6 @@ export const like: Middleware = async (ctx: Context) => {
   }
 };
 
-/**@return {void}
- * @description 안 좋아요 api
- * @param {Context} ctx koa Context
- */
 export const unlike: Middleware = async (ctx: Context) => {
   const postId: string = ctx['post']._id;
   const userId: string = ctx['user']._id;

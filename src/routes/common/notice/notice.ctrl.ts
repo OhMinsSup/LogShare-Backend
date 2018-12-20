@@ -8,11 +8,6 @@ import Follow, { IFollow } from '../../../models/Follow';
 import { filterUnique, getToDayDate } from '../../../lib/common';
 import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
 
-/**
- * @description 알림방을 만들거나, 알림방을 체크하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const checkNoticeRoom: Middleware = async (ctx: Context) => {
   const userId: TokenPayload = ctx['user'];
 
@@ -62,11 +57,6 @@ export const checkNoticeRoom: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description follower, following 유저에게 메세지를 보내는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const sendMessage: Middleware = async (ctx: Context) => {
   type BodySchema = {
     message: string;
@@ -209,11 +199,6 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 알림방에 속한 메세지를 리스팅해주는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
   type QueryPayload = {
     cursor: string | null;

@@ -123,7 +123,7 @@ export const updateVideo: Middleware = async (ctx: Context) => {
     video_thumbnail: string;
     video_url: string;
     title: string;
-    description: string | null;
+    description: string;
     time: string;
     category: string;
   };
@@ -136,9 +136,7 @@ export const updateVideo: Middleware = async (ctx: Context) => {
     title: Joi.string()
       .min(1)
       .required(),
-    description: Joi.string()
-      .min(1)
-      .allow(null),
+    description: Joi.string().min(1),
     category: Joi.string()
       .valid(
         '개발',
@@ -202,15 +200,6 @@ export const updateVideo: Middleware = async (ctx: Context) => {
     )
       .lean()
       .exec();
-
-    if (!video) {
-      ctx.status = 404;
-      ctx.body = {
-        name: 'Video',
-        payload: '비디오가 만들어지지 않았습니다',
-      };
-      return;
-    }
 
     ctx.body = {
       videoId: video._id,

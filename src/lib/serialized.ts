@@ -1,10 +1,5 @@
 import { pick } from 'lodash';
 
-/**
- * @description 포스트 데이터에서 필요한 데이터만 필터링
- * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
- * @returns {Object<any>} _id, post_thumbnail, title, body, createdAt, tags, user, info
- */
 export const serializePost = (data: any) => {
   const {
     _id: postId,
@@ -71,11 +66,6 @@ export const serializeVideo = (data: any) => {
   };
 };
 
-/**
- * @description 태그정보를 필터링
- * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
- * @returns {Object<any>} tagId, name, count
- */
 export const serializeTag = (data: any) => {
   const {
     count,
@@ -88,11 +78,6 @@ export const serializeTag = (data: any) => {
   };
 };
 
-/**
- * @description Poplate해서 가져온 포스트 데이터에서 필요한 데이터만 필터링
- * @param {any} Data(포스트의 속성과 유저 속성을 가져온다) + 알파
- * @returns {Object<any>} _id, post_thumbnail, title, body, createdAt, tags, user, info
- */
 export const serializePoplatePost = (data: any) => {
   const {
     post: { _id: postId, post_thumbnail, info, title, body, user, createdAt },
@@ -114,11 +99,6 @@ export const serializePoplatePost = (data: any) => {
   };
 };
 
-/**
- * @description 알리방정보를 필터링
- * @param {any} Data
- * @returns {Object<any>} noticeId, creator
- */
 export const serializeNoticeRoom = (data: any) => {
   const { _id: noticeId, creator } = data;
 
@@ -131,11 +111,6 @@ export const serializeNoticeRoom = (data: any) => {
   };
 };
 
-/**
- * @description 팔로워를 필터링
- * @param {any} Data
- * @returns {Object<any>} noticeId, creator
- */
 export const serializeFollower = (data: any) => {
   const { follower } = data;
   return {
@@ -144,11 +119,6 @@ export const serializeFollower = (data: any) => {
   };
 };
 
-/**
- * @description 팔로잉을 필터링
- * @param {any} Data
- * @returns {Object<any>} following: { _id, thumb }
- */
 export const serializeFollowing = (data: any) => {
   const { following } = data;
   return {
@@ -157,11 +127,6 @@ export const serializeFollowing = (data: any) => {
   };
 };
 
-/**
- * @description 팔로잉을 필터링
- * @param {any} Data
- * @returns {Object<any>} following: { _id, thumb }
- */
 export const serializeUsers = (data: any) => {
   const {
     _id,

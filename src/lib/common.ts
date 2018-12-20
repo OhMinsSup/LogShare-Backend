@@ -7,19 +7,10 @@ import { IUser } from '../models/User';
 import Video, { IVideo } from '../models/Video';
 const removeMd = require('remove-markdown');
 
-/**
- * @description 중복된 데이터 없에는 함수
- * @param {string[]} array
- * @returns {string[]} array
- */
 export const filterUnique = (array: string[]): string[] => {
   return [...new Set(array)];
 };
 
-/**
- * @param {string} text
- * @returns {string} text
- */
 export const escapeForUrl = (text: string): string => {
   if (!text) return null;
   return text
@@ -31,11 +22,6 @@ export const escapeForUrl = (text: string): string => {
     .replace(/--+/g, '-');
 };
 
-/**
- * @description 문자가 공백인지 아닌지 체크
- * @param {string} text
- * @returns {boolean}
- */
 export function checkEmpty(text: string) {
   if (!text) return true;
   const replaced = text
@@ -48,12 +34,6 @@ export function checkEmpty(text: string) {
   return false;
 }
 
-/**
- * @description 마크다운 또는 일반 텍스트문자를 제거하고 글자수가 200자 이상이면  나머지 문자를 생략하고 ...으로 교체
- * @param {string} markdown
- * @param {string} type
- * @returns {string}
- */
 export function formatShortDescription(
   value: string,
   type: 'markdown' | 'text'
@@ -72,11 +52,6 @@ export function formatShortDescription(
   }
 }
 
-/**
- * @description 데이터 값을 해시값으로 변경
- * @param {string} value
- * @returns {string} value
- */
 export const hash = (value: string): string => {
   if (!value) return null;
   return crypto
@@ -85,12 +60,6 @@ export const hash = (value: string): string => {
     .digest('hex');
 };
 
-/**
- * @description id값이 오브젝트 id값인지 체크
- * @param {ctx} ctx koa Context
- * @param {() => Promise<any>} next
- * @returns {NextFunction} next()
- */
 export const checkObjectId: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
@@ -111,12 +80,6 @@ export const checkObjectId: Middleware = async (
   return next();
 };
 
-/**
- * @description 로그인 체크
- * @param {Context} ctx
- * @param {() => Promise<any>} next
- * @returns {() => Promise<any>} next()
- */
 export const needsAuth: Middleware = async (
   ctx: Context,
   next: () => Promise<any>
@@ -131,12 +94,6 @@ export const needsAuth: Middleware = async (
   return next();
 };
 
-/**
- * @description 포스트가 존재하는지 체크하는 미들웨어
- * @param {Context} ctx
- * @param {() => Promise<any>} next
- * @returns {() => Promise<any>} next()
- */
 export const checkPostExistancy = async (
   ctx: Context,
   next: () => Promise<any>
@@ -197,16 +154,6 @@ export const checkVideoExistancy = async (
   return next();
 };
 
-/**
- * @description 임시 저장 포스트가 존재하는지 체크하는 미들웨어
- * @param {Context} ctx
- * @param {() => Promise<any>} next
- * @returns {() => Promise<any>} next()
- */
-
-/**
- * @description 포스트의 타입을 가져온다
- */
 export type PostPayload = {
   _id: string;
   user: IUser;
@@ -222,10 +169,6 @@ export type PostPayload = {
   updatedAt: string;
 };
 
-/**
- * @description Rss에서 포스트의 내용을 rss에 필요한 값을 넘겨준다
- * @param {IPost} post
- */
 export const convertToFeed = (post: IPost) => {
   const {
     profile: { username },

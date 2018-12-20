@@ -6,11 +6,6 @@ import { serializeFollowing, serializeFollower } from '../../../lib/serialized';
 import { Types } from 'mongoose';
 import { checkEmpty } from '../../../lib/common';
 
-/**
- * @description 팔로우를 체크하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getFollow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
@@ -57,11 +52,6 @@ export const getFollow: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 팔로우하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const follow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
@@ -131,11 +121,6 @@ export const follow: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 팔로우를 취소하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const unfollow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
@@ -204,11 +189,6 @@ export const unfollow: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 팔로잉 리스트를 가저오는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getFollowingList: Middleware = async (
   ctx: Context
 ): Promise<any> => {
@@ -276,11 +256,6 @@ export const getFollowingList: Middleware = async (
   }
 };
 
-/**
- * @description 팔로우 리스트를 가저오는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getFollowerList: Middleware = async (
   ctx: Context
 ): Promise<any> => {

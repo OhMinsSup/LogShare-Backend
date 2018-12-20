@@ -6,11 +6,6 @@ import { TokenPayload } from '../../../lib/token';
 import { Types } from 'mongoose';
 import { serializeUsers } from '../../../lib/serialized';
 
-/**
- * @description 유저 정보를 보여주는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getUserInfo: Middleware = async (ctx: Context) => {
   type ParamPayload = {
     name: string;

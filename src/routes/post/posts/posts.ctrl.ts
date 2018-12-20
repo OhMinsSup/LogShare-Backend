@@ -2,20 +2,11 @@ import { Context, Middleware } from 'koa';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
 import { serializePost, serializePoplatePost } from '../../../lib/serialized';
-import {
-  formatShortDescription,
-  checkEmpty,
-  filterUnique,
-} from '../../../lib/common';
+import { formatShortDescription, checkEmpty } from '../../../lib/common';
 import { Types } from 'mongoose';
 import Like from '../../../models/Like';
 import { TokenPayload } from '../../../lib/token';
-import PostTag from '../../../models/PostTag';
 
-/**@return {void}
- * @description 포스트 리스트(유저 | Public) API
- * @param {Context} ctx koa Context
- */
 export const listPosts: Middleware = async (ctx: Context) => {
   type ParamPayload = {
     username: string | null;
@@ -85,11 +76,6 @@ export const listPosts: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 트렌딩 포스트를 보여주는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const trendingPostList: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     cursor: string | null;
@@ -133,11 +119,6 @@ export const trendingPostList: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 포스트를 작성한 순서대로 리스트를 출력하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const listSequences: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     postId: string;

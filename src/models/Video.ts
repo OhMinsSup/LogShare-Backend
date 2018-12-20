@@ -111,12 +111,12 @@ VideoSchema.statics.viewVideoById = function(videoId: string) {
 };
 
 VideoSchema.statics.score = function(userId: IUser, videoId: string) {
-  return this.findOneAndUpdate(
+  const promises_score = this.findOneAndUpdate(
     {
       $and: [{ user: userId }, { _id: videoId }],
     },
     {
-      $inc: [{ 'info.views': 1 }, { 'info.score': 1 }],
+      $inc: { 'info.score': 1 },
     },
     {
       new: true,
@@ -124,6 +124,22 @@ VideoSchema.statics.score = function(userId: IUser, videoId: string) {
   )
     .lean()
     .exec();
+
+  const promises_views = this.findOneAndUpdate(
+    {
+      $and: [{ user: userId }, { _id: videoId }],
+    },
+    {
+      $inc: { 'info.views': 1 },
+    },
+    {
+      new: true,
+    }
+  )
+    .lean()
+    .exec();
+
+  return Promise.all([promises_score, promises_views]);
 };
 
 VideoSchema.statics.Count = function(

@@ -6,11 +6,6 @@ import { TokenPayload } from '../../../lib/token';
 import Comment, { IComment } from '../../../models/Comment';
 import Post from '../../../models/Post';
 
-/**
- * @description 댓글을 작성하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const writeComment: Middleware = async (ctx: Context) => {
   type BodySchema = {
     text: string;
@@ -121,11 +116,6 @@ export const writeComment: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 댓글을 수정하는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const updateComment: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     commentId: string;
@@ -204,11 +194,6 @@ export const updateComment: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 댓글을 삭제하는 api(실제로 삭제하는 것이 아닌 데이터를 단순히 안보이게 한다)
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const deleteComment: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     commentId: string;
@@ -265,11 +250,6 @@ export const deleteComment: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 0단 댓글 리스트를 보여주는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getCommentList: Middleware = async (ctx: Context) => {
   const post: PostPayload = ctx['post'];
 
@@ -299,11 +279,6 @@ export const getCommentList: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 댓글의 댓글 리스트를 보여주는 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const getReplyComment: Middleware = async (
   ctx: Context
 ): Promise<any> => {

@@ -1,8 +1,18 @@
 import { Model, Document, Schema, model } from 'mongoose';
+import { IVideo } from './Video';
+import { IUser } from './User';
 
-export interface IVideoComment extends Document {}
+export interface IVideoComment extends Document {
+  video: IVideo;
+  user: IUser;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export interface IVideoCommentModel extends Model<IVideoComment> {}
+export interface IVideoCommentModel extends Model<IVideoComment> {
+  getCommentList(videoId: string): Promise<IVideoComment[]>;
+}
 
 const VideoCommentSchema = new Schema(
   {
@@ -20,6 +30,16 @@ const VideoCommentSchema = new Schema(
     timestamps: true,
   }
 );
+
+VideoCommentSchema.statics.getCommentList = function(videoId: string) {
+  const query = Object.assign({}, { video: videoId });
+
+  return this.find(query)
+    .populate('user')
+    .sort({ _id: -1 })
+    .lean()
+    .exec();
+};
 
 const VideoComment = model<IVideoComment>(
   'VideoComment',

@@ -12,11 +12,6 @@ import { serializePost } from '../../lib/serialized';
 import PostRead from '../../models/PostRead';
 import Comment from '../../models/Comment';
 
-/**
- * @description 포스트를 작성하기 위한 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const writePost: Middleware = async (ctx: Context) => {
   type BodySchema = {
     title: string;
@@ -94,11 +89,6 @@ export const writePost: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 포스트를 수정하기 위한 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const updatePost: Middleware = async (ctx: Context) => {
   type BodySchema = {
     title: string;
@@ -193,11 +183,6 @@ export const updatePost: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 포스트를 삭제하기 위한 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const deletePost: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     id: string;
@@ -232,11 +217,6 @@ export const deletePost: Middleware = async (ctx: Context) => {
   }
 };
 
-/**
- * @description 포스트를 읽기 위한 api
- * @return {Promise<any>}
- * @param {Context} ctx koa Context
- */
 export const readPost: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     id: string;

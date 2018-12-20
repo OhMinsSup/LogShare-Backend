@@ -104,6 +104,7 @@ export const SideVideoList: Middleware = async (ctx: Context) => {
 
     const serialized = videos.map(video => {
       const {
+        _id: videoId,
         video_thumbnail,
         video_url,
         title,
@@ -116,6 +117,7 @@ export const SideVideoList: Middleware = async (ctx: Context) => {
         users_docs: { profile },
       } = video;
       return {
+        videoId,
         video_thumbnail,
         video_url,
         title,
