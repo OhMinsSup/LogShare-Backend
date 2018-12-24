@@ -279,9 +279,7 @@ export const getCommentList: Middleware = async (ctx: Context) => {
   }
 };
 
-export const getReplyComment: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const getReplyComment: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     commentId: string;
   };

@@ -11,9 +11,15 @@ auth.post('/logout', authCtrl.logout);
 auth.get('/check', authCtrl.checkUser);
 auth.get('/exists/:key(email|username)/:value', authCtrl.checkExists);
 
-auth.post('/register/:provider(facebook|google)', authCtrl.socialRegister);
-auth.post('/login/:provider(facebook|google)', authCtrl.socialLogin);
-auth.post('/verify-social/:provider(facebook|google)', authCtrl.verifySocial);
+auth.post(
+  '/register/:provider(facebook|google|github)',
+  authCtrl.socialRegister
+);
+auth.post('/login/:provider(facebook|google|github)', authCtrl.socialLogin);
+auth.post(
+  '/verify-social/:provider(facebook|google|github)',
+  authCtrl.verifySocial
+);
 auth.use('/callback', callback.routes());
 
 export default auth;

@@ -189,9 +189,7 @@ export const unfollow: Middleware = async (ctx: Context) => {
   }
 };
 
-export const getFollowingList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const getFollowingList: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
   };
@@ -256,9 +254,7 @@ export const getFollowingList: Middleware = async (
   }
 };
 
-export const getFollowerList: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const getFollowerList: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
     name: string;
   };

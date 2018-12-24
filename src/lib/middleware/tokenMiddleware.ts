@@ -1,12 +1,6 @@
 import { Context } from 'koa';
 import { decodeToken, TokenPayload } from '../token';
 
-/**
- * @description JWT 미들웨어
- * @param {Context} ctx
- * @param {() => Promise<any>} next
- * @returns {() => Promise<any>} next()
- */
 export default async (ctx: Context, next: () => Promise<any>) => {
   const token: string | void = ctx.cookies.get('access_token');
 

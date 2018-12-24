@@ -199,7 +199,7 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
   }
 };
 
-export const listNotice: Middleware = async (ctx: Context): Promise<any> => {
+export const listNotice: Middleware = async (ctx: Context) => {
   type QueryPayload = {
     cursor: string | null;
   };

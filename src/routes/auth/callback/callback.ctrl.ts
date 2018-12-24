@@ -164,6 +164,48 @@ export const facebookCallback: Middleware = async (ctx: Context) => {
   }
 };
 
+export const githubCallback: Middleware = async (ctx: Context) => {
+  const { GITHUB_ID, GITHUB_SECRET } = process.env;
+
+  try {
+    const response = await axios.post(
+      'https://github.com/login/oauth/access_token',
+      {
+        client_id: GITHUB_ID,
+        client_secret: GITHUB_SECRET,
+        code: ctx.query.code,
+      },
+      {
+        headers: {
+          accept: 'application/json',
+        },
+      }
+    );
+
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+
+    const hash = crypto.randomBytes(40).toString('hex');
+
+    let nextUrl = `http://localhost:3000/callback?type=github&key=${hash}`;
+
+    const { next } = ctx.query;
+
+    if (next) {
+      nextUrl += `&next=${next}`;
+    }
+
+    ctx.session.social_token = response.data.access_token;
+    ctx.redirect(encodeURI(nextUrl));
+    ctx.body = response.data;
+  } catch (e) {
+    ctx.status = 401;
+    let nextUrl = 'http://localhost:4000/callback?error=1';
+    ctx.redirect(nextUrl);
+  }
+};
+
 export const getToken: Middleware = (ctx: Context) => {
   try {
     const token: string = ctx.session.social_token;

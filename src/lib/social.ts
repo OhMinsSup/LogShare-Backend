@@ -1,6 +1,7 @@
 import { google } from 'googleapis';
 import * as dotenv from 'dotenv';
 const Facebook = require('fb');
+const Github = require('github');
 dotenv.config();
 
 export type Profile = {
@@ -11,6 +12,32 @@ export type Profile = {
 };
 
 const profileGetter = {
+  github(accessToken: string): Promise<Profile> {
+    const github = new Github();
+    github.authenticate({
+      type: 'token',
+      token: accessToken,
+    });
+    return new Promise((resolve, reject) => {
+      github.users.get({}, (err, res) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const { id, avatar_url: thumbnail, email, name } = res.data;
+
+        const profile = {
+          id,
+          thumbnail,
+          email,
+          name,
+        };
+
+        resolve(profile);
+      });
+    });
+  },
   facebook(accessToken: string): Promise<Profile> {
     return Facebook.api('me', {
       fields: ['name', 'email', 'picture'],
