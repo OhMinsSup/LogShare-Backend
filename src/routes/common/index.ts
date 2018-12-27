@@ -1,12 +1,19 @@
 import * as Router from 'koa-router';
+import * as commonCtrl from './common.ctrl';
 import follow from './follow';
 import tag from './tag';
 import user from './user';
 import notice from './notice';
 import search from './search';
 import rss from './rss';
+import { needsAuth } from '../../lib/common';
 
 const common = new Router();
+
+common.post('/profile-links', needsAuth, commonCtrl.updateProfileLinks);
+common.get('/profile-info', needsAuth, commonCtrl.getProfileInfo);
+common.post('/email-permission', needsAuth, commonCtrl.updateEmailPermissions);
+common.post('/send-email', commonCtrl.sendEmails);
 
 common.use('/follow', follow.routes());
 common.use('/tags', tag.routes());

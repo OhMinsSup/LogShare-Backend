@@ -60,5 +60,3 @@ export const searchUserList: Middleware = async (ctx: Context) => {
     ctx.throw(500, e);
   }
 };
-
-export const serializeVideo: Middleware = async (ctx: Context) => {};

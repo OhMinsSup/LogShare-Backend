@@ -1,6 +1,7 @@
 import * as Router from 'koa-router';
 import * as authCtrl from './auth.ctrl';
 import callback from './callback';
+import { needsAuth } from '../../lib/common';
 
 const auth = new Router();
 
@@ -20,6 +21,8 @@ auth.post(
   '/verify-social/:provider(facebook|google|github)',
   authCtrl.verifySocial
 );
+auth.get('/unregister-token', needsAuth, authCtrl.generateUnregisterToken);
+auth.post('/unregister', needsAuth, authCtrl.unRegister);
 auth.use('/callback', callback.routes());
 
 export default auth;

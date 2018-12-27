@@ -4,7 +4,7 @@ import { needsAuth } from '../../../lib/common';
 
 const search = new Router();
 
-search.get('/post/:value', needsAuth, searchCtrl.searchPostList);
-search.get('/user/:value', needsAuth, searchCtrl.searchUserList);
+search.get('/post/:value', searchCtrl.searchPostList);
+search.get('/user/:value', searchCtrl.searchUserList);
 
 export default search;

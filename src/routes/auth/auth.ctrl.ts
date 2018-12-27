@@ -1,7 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import User from '../../models/User';
-import { TokenPayload } from '../../lib/token';
+import { TokenPayload, decodeToken, generateToken } from '../../lib/token';
 import Social, { Profile } from '../../lib/social';
 
 export const localRegister: Middleware = async (ctx: Context) => {
@@ -464,6 +464,78 @@ export const verifySocial: Middleware = async (ctx: Context) => {
       profile,
       exists: !!(socialAuth || user),
     };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const generateUnregisterToken: Middleware = async (ctx: Context) => {
+  const {
+    profile: { username },
+  }: TokenPayload = ctx['user'];
+
+  try {
+    const token = await generateToken(
+      { username },
+      {
+        expiresIn: '1h',
+        subject: 'unregister',
+      }
+    );
+
+    ctx.body = {
+      unregister_token: token,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const unRegister: Middleware = async (ctx: Context) => {
+  type BodySchema = {
+    unregister_token: string;
+  };
+
+  const schema = Joi.object().keys({
+    unregister_token: Joi.string().required(),
+  });
+
+  const result = Joi.validate(ctx.request.body, schema);
+
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'WRONG_SCHEMA',
+      payload: result.error,
+    };
+    return;
+  }
+
+  const {
+    _id: userId,
+    profile: { username },
+  }: TokenPayload = ctx['user'];
+
+  const { unregister_token }: BodySchema = ctx.request.body;
+
+  try {
+    const decoded = await decodeToken(unregister_token);
+
+    if (decoded.profile.username !== username) {
+      ctx.status = 400;
+      return;
+    }
+
+    const user = await User.findById(userId).exec();
+
+    if (!user) {
+      ctx.state = 400;
+      return;
+    }
+
+    await user.remove();
+    ctx.cookies.set('access_token', '');
+    ctx.status = 204;
   } catch (e) {
     ctx.throw(500, e);
   }

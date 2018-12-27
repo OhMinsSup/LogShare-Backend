@@ -28,10 +28,4 @@ file.post(
   fileCtrl.createVideoUploadSignedUrl
 );
 
-file.post(
-  '/create-url/video-thumbnail',
-  needsAuth,
-  fileCtrl.createVideoThumbnailSignedUrl
-);
-
 export default file;
