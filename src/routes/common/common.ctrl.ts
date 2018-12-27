@@ -169,3 +169,13 @@ export const sendEmails: Middleware = async (ctx: Context) => {
     ctx.throw(500, e);
   }
 };
+
+export const sendEmail: Middleware = async (ctx: Context) => {
+  await sendMail({
+    to: 'mins5190@naver.com',
+    from: '운영자 <verification@gmail.com>',
+    subject: '이벤트 프로모션',
+    html: Html,
+  });
+  ctx.status = 204;
+};

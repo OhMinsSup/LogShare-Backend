@@ -20,8 +20,8 @@ export const localRegister: Middleware = async (ctx: Context) => {
       .email()
       .required(),
     password: Joi.string()
-      .required()
-      .min(6),
+      .min(6)
+      .required(),
   });
 
   const result = Joi.validate(ctx.request.body, schema);
@@ -213,9 +213,7 @@ export const checkUser: Middleware = async (ctx: Context) => {
   };
 };
 
-export const socialRegister: Middleware = async (
-  ctx: Context
-): Promise<any> => {
+export const socialRegister: Middleware = async (ctx: Context) => {
   type BodySchema = {
     accessToken: string;
     username: string;

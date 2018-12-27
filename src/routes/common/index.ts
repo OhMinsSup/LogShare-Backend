@@ -13,7 +13,8 @@ const common = new Router();
 common.post('/profile-links', needsAuth, commonCtrl.updateProfileLinks);
 common.get('/profile-info', needsAuth, commonCtrl.getProfileInfo);
 common.post('/email-permission', needsAuth, commonCtrl.updateEmailPermissions);
-common.post('/send-email', commonCtrl.sendEmails);
+common.post('/send-emails', commonCtrl.sendEmails);
+common.post('/send-email', commonCtrl.sendEmail);
 
 common.use('/follow', follow.routes());
 common.use('/tags', tag.routes());

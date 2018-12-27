@@ -6,7 +6,7 @@ import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
-import * as serve from "koa-static";
+import * as serve from 'koa-static';
 import * as path from 'path';
 import routes from './routes';
 import corsMiddleware from './lib/middleware/corsMiddleware';
@@ -50,7 +50,7 @@ class Server {
         flush: require('zlib').Z_SYNC_FLUSH,
       })
     );
-    app.use(serve(path.join(__dirname, "../../frontend/build")))
+    app.use(serve(path.join(__dirname, '../../frontend/build')));
   }
 
   private initializeDb(): void {
