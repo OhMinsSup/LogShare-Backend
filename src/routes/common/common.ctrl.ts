@@ -159,7 +159,7 @@ export const sendEmails: Middleware = async (ctx: Context) => {
           to: email.email,
           from: '운영자 <verification@gmail.com>',
           subject: '이벤트 프로모션',
-          html: Html,
+          html: Html(),
         })
       )
     );
@@ -175,7 +175,8 @@ export const sendEmail: Middleware = async (ctx: Context) => {
     to: 'mins5190@naver.com',
     from: '운영자 <verification@gmail.com>',
     subject: '이벤트 프로모션',
-    html: Html,
+    html: Html(),
   });
+
   ctx.status = 204;
 };

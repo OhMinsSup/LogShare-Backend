@@ -1,4 +1,4 @@
-export const Html = `
+export const Html = () => `
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -126,16 +126,6 @@ export const Html = `
 			color: #F0F0F0;" class="preheader">
 								Available on&nbsp;GitHub and&nbsp;CodePen. Highly compatible. Designer friendly. More than 50%&nbsp;of&nbsp;total email opens
 								occurred on&nbsp;a&nbsp;mobile device&nbsp;— a&nbsp;mobile-friendly design is&nbsp;a&nbsp;must for&nbsp;email campaigns.</div>
-
-							<!-- LOGO -->
-							<!-- Image text color should be opposite to background color. Set your url, image src, alt and title. Alt text should fit the image size. Real image size should be x2. URL format: http://domain.com/?utm_source={{Campaign-Source}}&utm_medium=email&utm_content=logo&utm_campaign={{Campaign-Name}} -->
-							<a target="_blank" style="text-decoration: none;" href="https://github.com/konsav/email-templates/"><img border="0" vspace="0" hspace="0"
-				src="https://raw.githubusercontent.com/konsav/email-templates/master/images/logo-black.png"
-				width="100" height="30"
-				alt="Logo" title="Logo" style="
-				color: #000000;
-				font-size: 10px; margin: 0; padding: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;" /></a>
-
 		</td>
 	</tr>
 
@@ -160,17 +150,6 @@ export const Html = `
 		</td>
 	</tr>
 	
-	<!-- SUBHEADER -->
-	<!-- Set text color and font family ("sans-serif" or "Georgia, serif") -->
-	<tr>
-		<td align="center" valign="top" style="border-collapse: collapse; border-spacing: 0; margin: 0; padding: 0; padding-bottom: 3px; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; font-size: 18px; font-weight: 300; line-height: 150%;
-			padding-top: 5px;
-			color: #546e7a;
-			font-style: italic;" class="subheader">
-				"큰 목표를 이루고 싶으면 허락을 구하지 마라." – 미상
-		</td>
-	</tr>
-
 	<!-- HERO IMAGE -->
 	<!-- Image text color should be opposite to background color. Set your url, image src, alt and title. Alt text should fit the image size. Real image size should be x2 (wrapper x2). Do not set height for flexible images (including "auto"). URL format: http://domain.com/?utm_source={{Campaign-Source}}&utm_medium=email&utm_content={{Ìmage-Name}}&utm_campaign={{Campaign-Name}} -->
 	<tr>
@@ -236,33 +215,7 @@ export const Html = `
 					padding-right: 20px;"><img
 				border="0" vspace="0" hspace="0" style="padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;
 					color: #000000;"
-					src="https://raw.githubusercontent.com/konsav/email-templates/master/images/list-item.png"
-					alt="H" title="Highly compatible"
-					width="50" height="50"></td>
-
-				<!-- LIST ITEM TEXT -->
-				<!-- Set text color and font family ("sans-serif" or "Georgia, serif"). Duplicate all text styles in links, including line-height -->
-				<td align="left" valign="top" style="font-size: 17px; font-weight: 400; line-height: 160%; border-collapse: collapse; border-spacing: 0; margin: 0; padding: 0;
-					padding-top: 25px;
-					color: #000000;
-					font-family: sans-serif;" class="paragraph">
-						<b style="color: #333333;">Highly compatible</b><br/>
-						Tested on the most popular email clients for web, desktop and mobile. Checklist included.
-				</td>
-
-			</tr>
-
-			<!-- LIST ITEM -->
-			<tr>
-
-				<!-- LIST ITEM IMAGE -->
-				<!-- Image text color should be opposite to background color. Set your url, image src, alt and title. Alt text should fit the image size. Real image size should be x2 -->
-				<td align="left" valign="top" style="border-collapse: collapse; border-spacing: 0;
-					padding-top: 30px;
-					padding-right: 20px;"><img
-				border="0" vspace="0" hspace="0" style="padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;
-					color: #000000;"
-					src="https://raw.githubusercontent.com/konsav/email-templates/master/images/list-item.png"
+					src="https://byline.network/wp-content/uploads/2018/01/icon-cloud-aws.png"
 					alt="D" title="Designer friendly"
 					width="50" height="50"></td>
 
@@ -272,8 +225,11 @@ export const Html = `
 					padding-top: 25px;
 					color: #000000;
 					font-family: sans-serif;" class="paragraph">
-						<b style="color: #333333;">Designer friendly</b><br/>
-						Sketch app resource file and a&nbsp;bunch of&nbsp;social media icons are&nbsp;also included in&nbsp;GitHub repository.
+						<b style="color: #333333; font-size: 0.85rem; font-weight: 600;">AWSome Day 온라인 컨퍼런스</b><br/>
+						<span style="font-size: 1rem;">온라인으로 참석할 수 있는 무료 AWS 클라우드 교육 행사입니다. 
+						[AWS 기술 에센셜] 과정의 내용을 기반으로 컴퓨팅, 스토리지, 데이터베이스 및 네트워크 등 AWS의 핵심 서비스들에 대해 단계적으로 알아볼 수 있도록 구성되어 있습니다. 
+						AWS의 기술 강사들이 주요 기능과 사용 사례 소개, 기술 데모 시연, 모범사례 소개 등 다양한 활동으로 여러분께 AWS 클라우드 활용의 기초에 대해 소개해 드릴 예정이며, 
+						궁금한 점이 있으신 경우 1:1로 실시간 답변을 받아보실 수 있습니다.</span>
 				</td>
 
 			</tr>
@@ -298,7 +254,7 @@ export const Html = `
 			padding-bottom: 25px;
 			color: #000000;
 			font-family: sans-serif;" class="paragraph">
-				Have a&nbsp;question? <a href="mailto:support@ourteam.com" target="_blank" style="color: #127DB3; font-family: sans-serif; font-size: 17px; font-weight: 400; line-height: 160%;">support@ourteam.com</a>
+				질문이 있다면? <a href="mailto:support@gmail.com" target="_blank" style="color: #127DB3; font-family: sans-serif; font-size: 17px; font-weight: 400; line-height: 160%;">support@gmail.com</a>
 		</td>
 	</tr>
 
@@ -381,10 +337,8 @@ export const Html = `
 
 <!-- End of WRAPPER -->
 </table>
-
 <!-- End of SECTION / BACKGROUND -->
 </td></tr></table>
-
 </body>
 </html>
-`
+`;
