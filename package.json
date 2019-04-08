@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node src/index.ts",
     "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
     "test": "exit"
   },
