@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:server": "set NODE_ENV=development&& tsc-watch --onSuccess \" node dist/index.js\"",
+    "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
     "test": "exit"
   },
   "keywords": [],
@@ -32,8 +32,8 @@
     "@types/remove-markdown": "^0.1.1",
     "@types/shortid": "0.0.29",
     "ts-node": "^7.0.1",
-    "tsc-watch": "^1.0.30",
-    "tslint": "^5.11.0",
+    "ts-node-dev": "^1.0.0-pre.32",
+    "tslint": "^5.15.0",
     "tslint-config-prettier": "^1.16.0",
     "typescript": "^3.1.6"
   },
