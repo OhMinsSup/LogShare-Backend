@@ -78,9 +78,9 @@ export const localRegister: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
     });
-
+    ctx.type = 'application/json';
     ctx.body = {
       user: {
         _id: user._id,
@@ -132,9 +132,7 @@ export const localLogin: Middleware = async (ctx: Context) => {
       ctx.status = 403;
       ctx.body = {
         name: 'ERROR EXIST',
-        payload: !user
-          ? '계정을 찾을 수 없습니다.'
-          : '비밀 번호가 일치하지 않습니다.',
+        payload: !user ? '계정을 찾을 수 없습니다.' : '비밀 번호가 일치하지 않습니다.',
       };
       return;
     }
@@ -153,9 +151,9 @@ export const localLogin: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
     });
-
+    ctx.type = 'application/json';
     ctx.body = {
       user: {
         _id: user._id,
@@ -176,9 +174,9 @@ export const logout: Middleware = async (ctx: Context) => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
     maxAge: 0,
-    domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
+    domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
   });
-
+  ctx.type = 'application/json';
   ctx.status = 204;
 };
 
@@ -194,7 +192,7 @@ export const checkExists: Middleware = async (ctx: Context) => {
     const user = await (key == 'email'
       ? User.findByEmailOrUsername('email', value)
       : User.findByEmailOrUsername('username', value));
-
+    ctx.type = 'application/json';
     ctx.body = {
       exists: !!user,
     };
@@ -211,6 +209,7 @@ export const checkUser: Middleware = async (ctx: Context) => {
     return;
   }
 
+  ctx.type = 'application/json';
   ctx.body = {
     user,
   };
@@ -327,9 +326,9 @@ export const socialRegister: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
     });
-
+    ctx.type = 'application/json';
     ctx.body = {
       user: {
         _id: user._id,
@@ -413,9 +412,9 @@ export const socialLogin: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
     });
-
+    ctx.type = 'application/json';
     ctx.body = {
       user: {
         _id: user._id,
@@ -463,6 +462,7 @@ export const verifySocial: Middleware = async (ctx: Context) => {
       User.findByEmailOrUsername('email', profile.email),
     ]);
 
+    ctx.type = 'application/json';
     ctx.body = {
       profile,
       exists: !!(socialAuth || user),
@@ -486,6 +486,7 @@ export const generateUnregisterToken: Middleware = async (ctx: Context) => {
       }
     );
 
+    ctx.type = 'application/json';
     ctx.body = {
       unregister_token: token,
     };
@@ -537,6 +538,7 @@ export const unRegister: Middleware = async (ctx: Context) => {
     }
 
     await user.remove();
+    ctx.type = 'application/json';
     ctx.cookies.set('access_token', '');
     ctx.status = 204;
   } catch (e) {

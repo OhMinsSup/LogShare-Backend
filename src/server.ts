@@ -1,13 +1,13 @@
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as compress from 'koa-compress';
-import * as cors from 'koa-cors';
+// import * as cors from 'koa-cors';
 import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
-import * as serve from 'koa-static';
-import * as path from 'path';
+// import * as serve from 'koa-static';
+// import * as path from 'path';
 import routes from './routes';
 import corsMiddleware from './lib/middleware/corsMiddleware';
 import tokenMiddleware from './lib/middleware/tokenMiddleware';
@@ -38,7 +38,6 @@ class Server {
     );
     app.use(session(app));
     app.use(helmet());
-    app.use(cors());
     app.use(corsMiddleware);
     app.use(tokenMiddleware);
     app.use(
@@ -50,7 +49,7 @@ class Server {
         flush: require('zlib').Z_SYNC_FLUSH,
       })
     );
-    app.use(serve(path.join(__dirname, '../../frontend/build')));
+    // app.use(serve(path.join(__dirname, '../../frontend/build')));
   }
 
   private initializeDb(): void {
@@ -61,17 +60,12 @@ class Server {
     const MONGO_URL: string = MONGO_URL_WEB;
     (<any>mongoose).Promise = global.Promise;
     mongoose
-      .connect(
-        MONGO_URL,
-        { useNewUrlParser: true }
-      )
+      .connect(MONGO_URL, { useNewUrlParser: true })
       .then(() => {
         console.log('connected to mongoDB ✅');
       })
       .catch(e => {
-        console.log(
-          'MongoDB connection error. Please make sure MongoDB is running. ' + e
-        );
+        console.log('MongoDB connection error. Please make sure MongoDB is running. ' + e);
       });
   }
 

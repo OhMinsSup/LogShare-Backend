@@ -1,8 +1,8 @@
 import { Context, Middleware } from 'koa';
-import Post, { IPost } from '../../../models/Post';
-import User, { IUser } from '../../../models/User';
-import { serializePost, serializeUsers } from '../../../lib/serialized';
-import { formatShortDescription } from '../../../lib/common';
+import Post, { IPost } from '../../models/Post';
+import User, { IUser } from '../../models/User';
+import { serializePost, serializeUsers } from '../../lib/serialized';
+import { formatShortDescription } from '../../lib/common';
 
 export const searchPostList: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
@@ -29,6 +29,7 @@ export const searchPostList: Middleware = async (ctx: Context) => {
       .lean()
       .exec();
 
+    ctx.type = 'application/json';
     ctx.body = post.map(serializePost).map(post => ({
       ...post,
       body: formatShortDescription(post.body, 'markdown'),
@@ -55,6 +56,7 @@ export const searchUserList: Middleware = async (ctx: Context) => {
       .lean()
       .exec();
 
+    ctx.type = 'application/json';
     ctx.body = user.map(serializeUsers);
   } catch (e) {
     ctx.throw(500, e);

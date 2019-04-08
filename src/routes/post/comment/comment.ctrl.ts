@@ -96,7 +96,8 @@ export const writeComment: Middleware = async (ctx: Context) => {
 
     await Post.Count('comments', postId);
 
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
 
     await Post.findOneAndUpdate(
       {
@@ -188,7 +189,8 @@ export const updateComment: Middleware = async (ctx: Context) => {
       return;
     }
 
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -273,6 +275,7 @@ export const getCommentList: Middleware = async (ctx: Context) => {
       .lean()
       .exec();
 
+    ctx.type = 'application/json';
     ctx.body = comments;
   } catch (e) {
     ctx.throw(500, e);
@@ -315,6 +318,7 @@ export const getReplyComment: Middleware = async (ctx: Context) => {
       .lean()
       .exec();
 
+    ctx.type = 'application/json';
     ctx.body = comments;
   } catch (e) {
     ctx.throw(500, e);

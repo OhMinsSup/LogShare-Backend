@@ -1,12 +1,12 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import { Types } from 'mongoose';
-import { TokenPayload } from '../../../lib/token';
-import Notice, { INotice } from '../../../models/Notice';
-import { serializeNoticeRoom } from '../../../lib/serialized';
-import Follow, { IFollow } from '../../../models/Follow';
-import { filterUnique, getToDayDate } from '../../../lib/common';
-import NoticeMessage, { INoticeMessage } from '../../../models/NoticeMessage';
+import { TokenPayload } from '../../lib/token';
+import Notice, { INotice } from '../../models/Notice';
+import { serializeNoticeRoom } from '../../lib/serialized';
+import Follow, { IFollow } from '../../models/Follow';
+import { filterUnique, getToDayDate } from '../../lib/common';
+import NoticeMessage, { INoticeMessage } from '../../models/NoticeMessage';
 
 export const checkNoticeRoom: Middleware = async (ctx: Context) => {
   const userId: TokenPayload = ctx['user'];
@@ -36,12 +36,12 @@ export const checkNoticeRoom: Middleware = async (ctx: Context) => {
     const noticeData: INotice = await Notice.findById(notice._id)
       .populate({
         path: 'creator',
-        select:
-          'username profile.displayName profile.thumbnail profile.shortBio',
+        select: 'username profile.displayName profile.thumbnail profile.shortBio',
       })
       .lean()
       .exec();
 
+    ctx.type = 'application/json';
     ctx.body = {
       noticeWithData: serializeNoticeRoom(noticeData),
     };
@@ -91,10 +91,7 @@ export const sendMessage: Middleware = async (ctx: Context) => {
       .lean()
       .exec();
 
-    if (
-      (!following || following.length === 0) &&
-      (!follower || follower.length === 0)
-    ) {
+    if ((!following || following.length === 0) && (!follower || follower.length === 0)) {
       ctx.status = 204;
       return;
     }
@@ -135,7 +132,8 @@ export const sendMessage: Middleware = async (ctx: Context) => {
       })
     );
 
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -184,6 +182,7 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
       return;
     }
 
+    ctx.type = 'application/json';
     ctx.body = {
       message: message.map(m => {
         const { message, sender, createdAt } = m;
@@ -231,9 +230,7 @@ export const listNotice: Middleware = async (ctx: Context) => {
 
     const query = Object.assign(
       {},
-      cursor
-        ? { _id: { $lt: cursor }, notice: notice._id }
-        : { notice: notice._id }
+      cursor ? { _id: { $lt: cursor }, notice: notice._id } : { notice: notice._id }
     );
 
     const message: INoticeMessage[] = await NoticeMessage.find(query)
@@ -251,9 +248,9 @@ export const listNotice: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const next =
-      message.length === 20 ? `/common/notice?cursor=${message[19]._id}` : null;
+    const next = message.length === 20 ? `/notice?cursor=${message[19]._id}` : null;
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       message: message.map(m => {

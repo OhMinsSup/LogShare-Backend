@@ -16,9 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-
-  },
   "dependencies": {
     "axios": "^0.18.0",
     "cloudinary": "^1.13.2",

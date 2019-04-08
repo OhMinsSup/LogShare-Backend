@@ -1,8 +1,8 @@
 import { Context, Middleware } from 'koa';
 import { Feed } from 'feed';
-import Post, { IPost } from '../../../models/Post';
-import { convertToFeed, checkEmpty } from '../../../lib/common';
-import User from '../../../models/User';
+import Post, { IPost } from '../../models/Post';
+import { convertToFeed, checkEmpty } from '../../lib/common';
+import User from '../../models/User';
 
 export const getEntireRSS: Middleware = async (ctx: Context) => {
   try {
@@ -14,23 +14,21 @@ export const getEntireRSS: Middleware = async (ctx: Context) => {
       .exec();
 
     const feed = new Feed({
-      id: 'http://localhost:4000',
+      id: 'https://logshare.netlify.com/',
       title: 'LogShare',
       description: '블로그 서비스',
-      link: 'http://localhost:4000',
-      feed: 'http://localhost:4000',
+      link: 'https://logshare.netlify.com/',
+      feed: 'https://logshare.netlify.com/',
       feedLinks: {
-        json: 'http://localhost:4000/json',
-        atom: 'http://localhost:4000/atom',
+        json: 'https://logshare.netlify.com/json',
+        atom: 'https://logshare.netlify.com/atom',
       },
       copyright: 'All rights reserved 2018, veloss',
     });
     const feeds = posts.map(convertToFeed);
-
     feeds.forEach(f => {
       feed.addItem(f);
     });
-
     ctx.type = 'text/xml; charset=UTF-8';
     ctx.body = feed.atom1();
   } catch (e) {
@@ -75,19 +73,18 @@ export const getUserRSS: Middleware = async (ctx: Context) => {
       .exec();
 
     const feed = new Feed({
-      id: `http://localhost:4000/@${user.profile.username}`,
+      id: `https://logshare.netlify.com/@${user.profile.username}`,
       title: `LogShare/@${user.profile.username}`,
       description: `${user.profile.shortBio}`,
-      link: `http://localhost:4000/@${user.profile.username}`,
-      feed: `http://localhost:4000/@${user.profile.username}`,
+      link: `https://logshare.netlify.com/@${user.profile.username}`,
+      feed: `https://logshare.netlify.com/@${user.profile.username}`,
       feedLinks: {
-        json: `http://localhost:4000/@${user.profile.username}/json`,
-        atom: `http://localhost:4000/@${user.profile.username}/atom`,
+        json: `https://logshare.netlify.com/@${user.profile.username}/json`,
+        atom: `https://logshare.netlify.com/@${user.profile.username}/atom`,
       },
       copyright: 'All rights reserved 2018, veloss',
     });
     const feeds = posts.map(convertToFeed);
-
     feeds.forEach(f => {
       feed.addItem(f);
     });

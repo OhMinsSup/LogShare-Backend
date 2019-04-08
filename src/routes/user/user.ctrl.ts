@@ -1,10 +1,10 @@
 import { Context, Middleware } from 'koa';
 import * as Joi from 'joi';
-import User, { IUser } from '../../../models/User';
-import { checkEmpty } from '../../../lib/common';
-import { TokenPayload } from '../../../lib/token';
+import User, { IUser } from '../../models/User';
+import { checkEmpty } from '../../lib/common';
+import { TokenPayload } from '../../lib/token';
 import { Types } from 'mongoose';
-import { serializeUsers } from '../../../lib/serialized';
+import { serializeUsers } from '../../lib/serialized';
 
 export const getUserInfo: Middleware = async (ctx: Context) => {
   type ParamPayload = {
@@ -29,6 +29,7 @@ export const getUserInfo: Middleware = async (ctx: Context) => {
       return;
     }
 
+    ctx.type = 'application/json';
     ctx.body = {
       email: user.email,
       profile: user.profile,
@@ -95,6 +96,7 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
 
     await profile.save();
 
+    ctx.type = 'application/json';
     ctx.body = {
       profile,
     };
@@ -136,9 +138,9 @@ export const usersList: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const next =
-      users.length === 10 ? `/common/user?cursor=${users[9]._id}` : null;
+    const next = users.length === 10 ? `/user?cursor=${users[9]._id}` : null;
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       usersWithData: users.map(serializeUsers),
@@ -208,6 +210,7 @@ export const featuredUser: Middleware = async (ctx: Context) => {
       return user_docs;
     });
 
+    ctx.type = 'application/json';
     ctx.body = {
       users: serialized,
     };

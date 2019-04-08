@@ -25,18 +25,12 @@ export function checkEmpty(text: string) {
   if (!text) return true;
   const replaced = text
     .trim()
-    .replace(
-      /([\u3164\u115F\u1160\uFFA0\u200B\u0001-\u0008\u000B-\u000C\u000E-\u001F]+)/g,
-      ''
-    );
+    .replace(/([\u3164\u115F\u1160\uFFA0\u200B\u0001-\u0008\u000B-\u000C\u000E-\u001F]+)/g, '');
   if (replaced === '') return true;
   return false;
 }
 
-export function formatShortDescription(
-  value: string,
-  type: 'markdown' | 'text'
-): string {
+export function formatShortDescription(value: string, type: 'markdown' | 'text'): string {
   let replaced = '';
   if (type === 'markdown') {
     replaced = value.replace(/\n/g, ' ').replace(/```(.*)```/g, '');
@@ -59,10 +53,7 @@ export const hash = (value: string): string => {
     .digest('hex');
 };
 
-export const checkObjectId: Middleware = async (
-  ctx: Context,
-  next: () => Promise<any>
-) => {
+export const checkObjectId: Middleware = async (ctx: Context, next: () => Promise<any>) => {
   type ParamsPayload = {
     id: string;
   };
@@ -79,10 +70,7 @@ export const checkObjectId: Middleware = async (
   return next();
 };
 
-export const needsAuth: Middleware = async (
-  ctx: Context,
-  next: () => Promise<any>
-) => {
+export const needsAuth: Middleware = async (ctx: Context, next: () => Promise<any>) => {
   const user: TokenPayload = ctx['user'];
 
   if (!user) {
@@ -93,10 +81,7 @@ export const needsAuth: Middleware = async (
   return next();
 };
 
-export const checkPostExistancy = async (
-  ctx: Context,
-  next: () => Promise<any>
-) => {
+export const checkPostExistancy = async (ctx: Context, next: () => Promise<any>) => {
   type ParamsPayload = {
     id: string;
   };
@@ -142,7 +127,7 @@ export const convertToFeed = (post: IPost) => {
   const {
     profile: { username },
   } = post.user;
-  const link = `http://localhost:4000/${post._id}`;
+  const link = `https://logshare.netlify.com/${post._id}`;
   return {
     link,
     title: post.title,
@@ -153,7 +138,7 @@ export const convertToFeed = (post: IPost) => {
     author: [
       {
         name: username,
-        link: `http://localhost:4000/@${username}`,
+        link: `https://logshare.netlify.com/@${username}`,
       },
     ],
   };
@@ -212,11 +197,7 @@ export const normalize = (array: any[], key: string) => {
   return allIds;
 };
 
-export const parserImage = (
-  src: string,
-  video_type: string,
-  img_type: string
-) => {
+export const parserImage = (src: string, video_type: string, img_type: string) => {
   let splitUrl = src.split(video_type).concat(img_type);
   return splitUrl[0] + splitUrl[1] + splitUrl[2];
 };

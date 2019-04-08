@@ -1,10 +1,10 @@
 import { Context, Middleware } from 'koa';
-import { TokenPayload } from '../../../lib/token';
-import User from '../../../models/User';
-import Follow from '../../../models/Follow';
-import { serializeFollowing, serializeFollower } from '../../../lib/serialized';
+import { TokenPayload } from '../../lib/token';
+import User from '../../models/User';
+import Follow from '../../models/Follow';
+import { serializeFollowing, serializeFollower } from '../../lib/serialized';
 import { Types } from 'mongoose';
-import { checkEmpty } from '../../../lib/common';
+import { checkEmpty } from '../../lib/common';
 
 export const getFollow: Middleware = async (ctx: Context) => {
   type ParamsPayload = {
@@ -44,6 +44,7 @@ export const getFollow: Middleware = async (ctx: Context) => {
       follow = !!exists;
     }
 
+    ctx.type = 'application/json';
     ctx.body = {
       follow,
     };
@@ -113,6 +114,7 @@ export const follow: Middleware = async (ctx: Context) => {
     await User.Count('follower', userId);
     await User.Count('following', followId);
 
+    ctx.type = 'application/json';
     ctx.body = {
       follow: true,
     };
@@ -181,6 +183,7 @@ export const unfollow: Middleware = async (ctx: Context) => {
     await User.unCount('follower', userId);
     await User.unCount('following', followId);
 
+    ctx.type = 'application/json';
     ctx.body = {
       follow: false,
     };
@@ -241,10 +244,9 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
     }
 
     const next =
-      following.length === 10
-        ? `/common/follow/${name}/following?cursor=${following[9]._id}`
-        : null;
+      following.length === 10 ? `/follow/${name}/following?cursor=${following[9]._id}` : null;
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       usersWithData: following.map(serializeFollowing),
@@ -306,10 +308,9 @@ export const getFollowerList: Middleware = async (ctx: Context) => {
     }
 
     const next =
-      follower.length === 10
-        ? `/common/follow/${name}/follower?cursor=${follower[9]._id}`
-        : null;
+      follower.length === 10 ? `/follow/${name}/follower?cursor=${follower[9]._id}` : null;
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       usersWithData: follower.map(serializeFollower),

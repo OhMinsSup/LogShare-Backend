@@ -11,7 +11,7 @@ const { GOOGLE_ID, GOOGLE_SECRET } = process.env;
 const baseUrl =
   process.env.NODE_ENV === 'development'
     ? 'https://localhost:3000/'
-    : 'https://domain.io/';
+    : 'https://logshare.netlify.com/';
 
 export const redirectGoogleLogin: Middleware = (ctx: Context) => {
   type QueryPayload = {
@@ -22,7 +22,7 @@ export const redirectGoogleLogin: Middleware = (ctx: Context) => {
   const callbackUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:4000/auth/callback/google'
-      : 'https://domain/auth/callback/google';
+      : 'https://logshare-backend.herokuapp.com/auth/callback/google';
 
   if (!GOOGLE_ID || !GOOGLE_SECRET) {
     console.log('Google ENVVAR is missing');
@@ -30,11 +30,7 @@ export const redirectGoogleLogin: Middleware = (ctx: Context) => {
     return;
   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    GOOGLE_ID,
-    GOOGLE_SECRET,
-    callbackUrl
-  );
+  const oauth2Client = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, callbackUrl);
 
   const url = oauth2Client.generateAuthUrl({
     scope: [
@@ -58,7 +54,7 @@ export const googleCallback: Middleware = async (ctx: Context) => {
   const callbackUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:4000/auth/callback/google'
-      : 'https://domain/auth/callback/google';
+      : 'https://logshare-backend.herokuapp.com/auth/callback/google';
 
   if (!code) {
     ctx.redirect(`${baseUrl}/?callback?error=1`);
@@ -71,11 +67,7 @@ export const googleCallback: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    GOOGLE_ID,
-    GOOGLE_SECRET,
-    callbackUrl
-  );
+  const oauth2Client = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, callbackUrl);
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
@@ -121,7 +113,7 @@ export const redirectFacebookLogin: Middleware = (ctx: Context) => {
   const callbackUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:4000/auth/callback/facebook'
-      : 'https://domain/auth/callback/facebook';
+      : 'https://logshare-backend.herokuapp.com/auth/callback/facebook';
 
   const authUrl = `https://www.facebook.com/v3.2/dialog/oauth?client_id=${FACEBOOK_ID}&redirect_uri=${callbackUrl}&state=${state}&scope=email,public_profile`;
   ctx.redirect(encodeURI(authUrl));
@@ -137,7 +129,7 @@ export const facebookCallback: Middleware = async (ctx: Context) => {
   const callbackUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:4000/auth/callback/facebook'
-      : 'https://domain/auth/callback/facebook';
+      : 'https://logshare-backend.herokuapp.com/auth/callback/facebook';
 
   if (!code) {
     ctx.redirect(`${baseUrl}/?callback?error=1`);
@@ -215,6 +207,7 @@ export const githubCallback: Middleware = async (ctx: Context) => {
 
     ctx.session.social_token = response.data.access_token;
     ctx.redirect(encodeURI(nextUrl));
+    ctx.type = 'application/json';
     ctx.body = response.data;
   } catch (e) {
     ctx.status = 401;
@@ -231,6 +224,7 @@ export const getToken: Middleware = (ctx: Context) => {
       ctx.status = 400;
       return;
     }
+    ctx.type = 'application/json';
     ctx.body = {
       token,
     };

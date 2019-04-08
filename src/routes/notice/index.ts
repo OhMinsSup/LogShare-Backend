@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import * as noticeCtrl from './notice.ctrl';
-import { needsAuth } from '../../../lib/common';
+import { needsAuth } from '../../lib/common';
 
 const notice = new Router();
 

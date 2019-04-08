@@ -65,8 +65,7 @@ export const writePost: Middleware = async (ctx: Context) => {
       user: user._id,
       title,
       body,
-      post_thumbnail:
-        post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
+      post_thumbnail: post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
     }).save();
 
     if (!post) {
@@ -81,6 +80,7 @@ export const writePost: Middleware = async (ctx: Context) => {
     await PostTag.Link(post._id, tagIds);
     await User.Count('post', user._id);
 
+    ctx.type = 'application/json';
     ctx.body = {
       postId: post._id,
     };
@@ -141,12 +141,8 @@ export const updatePost: Middleware = async (ctx: Context) => {
     const currentTags = await PostTag.getTagNames(postId);
     const tagNames = currentTags.map(tag => tag.tag.name);
     const tagDiff: string[] = diff(tagNames.sort(), tags.sort()) || [];
-    const tagsToRemove: string[] = tagDiff
-      .filter(info => info[0] === '-')
-      .map(info => info[1]);
-    const tagsToAdd: string[] = tagDiff
-      .filter(info => info[0] === '+')
-      .map(info => info[1]);
+    const tagsToRemove: string[] = tagDiff.filter(info => info[0] === '-').map(info => info[1]);
+    const tagsToAdd: string[] = tagDiff.filter(info => info[0] === '+').map(info => info[1]);
 
     await PostTag.removeTagsPost(postId, tagsToRemove);
     await PostTag.addTagsToPost(postId, tagsToAdd);
@@ -156,8 +152,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
       {
         title,
         body,
-        post_thumbnail:
-          post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
+        post_thumbnail: post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
       },
       {
         new: true,
@@ -175,6 +170,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
       return;
     }
 
+    ctx.type = 'application/json';
     ctx.body = {
       postId: post._id,
     };
@@ -211,7 +207,8 @@ export const deletePost: Middleware = async (ctx: Context) => {
       .exec();
     await User.unCount('post', ctx['user']._id);
 
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -241,6 +238,7 @@ export const readPost: Middleware = async (ctx: Context) => {
       liked = !!exists;
     }
 
+    ctx.type = 'application/json';
     ctx.body = serializePost({
       ...post,
       name: tag.map(tag => tag.tag.name),

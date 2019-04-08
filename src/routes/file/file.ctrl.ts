@@ -2,14 +2,9 @@ import { Middleware, Context } from 'koa';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { TokenPayload } from '../../lib/token';
-import { parseTime, parserImage } from '../../lib/common';
 dotenv.config();
 
-const {
-  CLOUDINARY_API_SECRET,
-  CLOUDINARY_APIKEY,
-  CLOUDINARY_CLOUD_NAME,
-} = process.env;
+const { CLOUDINARY_API_SECRET, CLOUDINARY_APIKEY, CLOUDINARY_CLOUD_NAME } = process.env;
 
 const cloudinary = require('cloudinary');
 
@@ -68,16 +63,15 @@ export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
     };
   }
 
+  ctx.type = 'application/json';
   ctx.body = {
-    url: response.url,
+    url: response.secure_url,
     path: `LogShare/post-image/${user.profile.username}/${filename}`,
     name: filename,
   };
 };
 
-export const createCommonUserCoverBgSignedUrl: Middleware = async (
-  ctx: Context
-) => {
+export const createCommonUserCoverBgSignedUrl: Middleware = async (ctx: Context) => {
   const { cover } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -115,9 +109,7 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (
   const filename: string = splitFileName[0];
 
   const response = await cloudinary.v2.uploader.upload(cover.path, {
-    public_id: `LogShare/common-cover-background/${
-      user.profile.username
-    }/${filename}`,
+    public_id: `LogShare/common-cover-background/${user.profile.username}/${filename}`,
     width: 800,
     height: 533,
   });
@@ -130,16 +122,15 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (
     };
   }
 
+  ctx.type = 'application/json';
   ctx.body = {
-    url: response.url,
+    url: response.secure_url,
     path: `LogShare/common-thumbnail/${user.profile.username}/${filename}`,
     name: filename,
   };
 };
 
-export const createCommonThumbnailSignedUrl: Middleware = async (
-  ctx: Context
-) => {
+export const createCommonThumbnailSignedUrl: Middleware = async (ctx: Context) => {
   const { thumbnail } = ctx.request.files;
   const user: TokenPayload = ctx['user'];
 
@@ -190,64 +181,10 @@ export const createCommonThumbnailSignedUrl: Middleware = async (
     };
   }
 
+  ctx.type = 'application/json';
   ctx.body = {
-    url: response.url,
+    url: response.secure_url,
     path: `LogShare/common-thumbnail/${user.profile.username}/${filename}`,
     name: filename,
   };
-};
-
-export const createVideoUploadSignedUrl: Middleware = async (ctx: Context) => {
-  const { video } = ctx.request.files;
-  const user: TokenPayload = ctx['user'];
-
-  if (!user) {
-    ctx.status = 401;
-    return;
-  }
-
-  if (!video) {
-    ctx.status = 400;
-    ctx.body = {
-      name: 'File',
-      payload: '파일을 전달해 줘야합니다',
-    };
-    return;
-  }
-
-  const stats = fs.statSync(video.path);
-
-  if (!stats) {
-    ctx.throw(500, 'failed to load stats');
-    return;
-  }
-
-  const splitFileName: string[] = video.name.split('.');
-  const filename: string = splitFileName[0];
-
-  try {
-    const response = await cloudinary.v2.uploader.upload(video.path, {
-      resource_type: 'video',
-      public_id: `LogShare/video-upload/${user.profile.username}/${filename}`,
-    });
-
-    if (!response) {
-      ctx.status = 418;
-      ctx.body = {
-        name: 'UPLOAD',
-        payload: '파일 업로드에 실패하였습니다',
-      };
-    }
-
-    ctx.body = {
-      path: `LogShare/video-upload/${user.profile.username}/${filename}`,
-      name: filename,
-      url: response.secure_url,
-      thumbnail: parserImage(response.secure_url, response.format, 'jpg'),
-      time: parseTime(response.duration),
-      format: response.format,
-    };
-  } catch (e) {
-    ctx.throw(500, e);
-  }
 };

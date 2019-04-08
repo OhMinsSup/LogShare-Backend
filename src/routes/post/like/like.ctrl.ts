@@ -25,6 +25,7 @@ export const like: Middleware = async (ctx: Context) => {
 
     await Post.Count('likes', postId);
 
+    ctx.type = 'application/json';
     ctx.body = {
       liked: true,
       likes: (ctx['post'].info.likes + 1) as number,
@@ -77,6 +78,7 @@ export const unlike: Middleware = async (ctx: Context) => {
 
     await Post.unCount('likes', postId);
 
+    ctx.type = 'application/json';
     ctx.body = {
       liked: false,
       likes: (ctx['post'].info.likes - 1) as number,

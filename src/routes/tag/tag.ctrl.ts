@@ -1,8 +1,8 @@
 import { Context, Middleware } from 'koa';
-import PostTag, { IPostTag } from '../../../models/PostTag';
-import { serializeTag, serializePoplatePost } from '../../../lib/serialized';
-import Tag from '../../../models/Tag';
-import { formatShortDescription, checkEmpty } from '../../../lib/common';
+import PostTag, { IPostTag } from '../../models/PostTag';
+import { serializeTag, serializePoplatePost } from '../../lib/serialized';
+import Tag from '../../models/Tag';
+import { formatShortDescription, checkEmpty } from '../../lib/common';
 
 export const getTags: Middleware = async (ctx: Context) => {
   try {
@@ -25,6 +25,7 @@ export const getTags: Middleware = async (ctx: Context) => {
       { $unwind: '$tag_docs' },
     ]).exec();
 
+    ctx.type = 'application/json';
     ctx.body = tagData.map(serializeTag);
   } catch (e) {
     ctx.throw(500, e);
@@ -100,9 +101,8 @@ export const getTagInfo: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const next =
-      post.length === 10 ? `/common/tags/${tag}?cursor=${post[9]._id}` : null;
-
+    const next = post.length === 10 ? `/tags/${tag}?cursor=${post[9]._id}` : null;
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       postWithData: post.map(serializePoplatePost).map(post => ({

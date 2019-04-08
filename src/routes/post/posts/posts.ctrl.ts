@@ -57,9 +57,7 @@ export const listPosts: Middleware = async (ctx: Context) => {
 
     const next =
       post.length === 10
-        ? `/post/list/${username ? `@${username}` : `public`}?cursor=${
-            post[9]._id
-          }`
+        ? `/post/list/${username ? `@${username}` : `public`}?cursor=${post[9]._id}`
         : null;
 
     const postWithData = post.map(serializePost).map(post => ({
@@ -67,6 +65,7 @@ export const listPosts: Middleware = async (ctx: Context) => {
       body: formatShortDescription(post.body, 'markdown'),
     }));
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       postWithData,
@@ -102,14 +101,14 @@ export const trendingPostList: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const next =
-      post.length === 10 ? `/post/list/trending?cursor=${post[9]._id}` : null;
+    const next = post.length === 10 ? `/post/list/trending?cursor=${post[9]._id}` : null;
 
     const postWithData = post.map(serializePost).map(post => ({
       ...post,
       body: formatShortDescription(post.body, 'markdown'),
     }));
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       postWithData,
@@ -167,6 +166,7 @@ export const listSequences: Middleware = async (ctx: Context) => {
     const beforeCount = after.length < 2 ? 4 - after.length : 2;
     const afterCount = before.length < 2 ? 4 - before.length : 2;
 
+    ctx.type = 'application/json';
     ctx.body = [
       ...before.slice(before.length - beforeCount, before.length),
       post,
@@ -230,11 +230,9 @@ export const likePostsList: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const next =
-      post.length === 10
-        ? `/post/list/likes/${username}?cursor=${post[9]._id}`
-        : null;
+    const next = post.length === 10 ? `/post/list/likes/${username}?cursor=${post[9]._id}` : null;
 
+    ctx.type = 'application/json';
     ctx.body = {
       next,
       postWithData: post.map(serializePoplatePost).map(post => ({
@@ -309,6 +307,7 @@ export const featuredPost: Middleware = async (ctx: Context) => {
       return posts_docs;
     });
 
+    ctx.type = 'application/json';
     ctx.body = {
       posts: serialized,
     };

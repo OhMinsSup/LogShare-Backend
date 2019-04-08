@@ -33,6 +33,7 @@ export const getProfileInfo: Middleware = async (ctx: Context) => {
       } = newProfile;
       const { email_promotion } = newMeta;
 
+      ctx.set('Content-Type', 'application/json');
       ctx.body = {
         profile: {
           facebook,
@@ -50,6 +51,7 @@ export const getProfileInfo: Middleware = async (ctx: Context) => {
 
     const { email_promotion } = userMeta;
 
+    ctx.type = 'application/json';
     ctx.body = {
       profile: {
         facebook,
@@ -98,6 +100,7 @@ export const updateProfileLinks: Middleware = async (ctx: Context) => {
     profile.profile_links = profile_links;
     await profile.save();
 
+    ctx.type = 'application/json';
     ctx.body = profile_links;
   } catch (e) {
     ctx.throw(500, e);
@@ -135,6 +138,7 @@ export const updateEmailPermissions: Middleware = async (ctx: Context) => {
     await userMeta.update({
       email_promotion,
     });
+    ctx.type = 'application/json';
     ctx.body = email_promotion;
   } catch (e) {
     ctx.throw(500, e);
@@ -163,20 +167,9 @@ export const sendEmails: Middleware = async (ctx: Context) => {
         })
       )
     );
-
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
   } catch (e) {
     ctx.throw(500, e);
   }
-};
-
-export const sendEmail: Middleware = async (ctx: Context) => {
-  await sendMail({
-    to: 'mins5190@naver.com',
-    from: '운영자 <verification@gmail.com>',
-    subject: '이벤트 프로모션',
-    html: Html(),
-  });
-
-  ctx.status = 204;
 };
