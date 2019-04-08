@@ -8,13 +8,21 @@ dotenv.config();
 
 const { GOOGLE_ID, GOOGLE_SECRET } = process.env;
 
+const baseUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'https://localhost:3000/'
+    : 'https://domain.io/';
+
 export const redirectGoogleLogin: Middleware = (ctx: Context) => {
   type QueryPayload = {
     next: string;
   };
   const { next }: QueryPayload = ctx.query;
 
-  const callbackUrl = 'http://localhost:4000/auth/callback/google';
+  const callbackUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:4000/auth/callback/google'
+      : 'https://domain/auth/callback/google';
 
   if (!GOOGLE_ID || !GOOGLE_SECRET) {
     console.log('Google ENVVAR is missing');
@@ -47,11 +55,13 @@ export const googleCallback: Middleware = async (ctx: Context) => {
   };
 
   const { code, state }: QueryPayload = ctx.query;
-
-  const callbackUrl = 'http://localhost:4000/auth/callback/google';
+  const callbackUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:4000/auth/callback/google'
+      : 'https://domain/auth/callback/google';
 
   if (!code) {
-    ctx.redirect(`http://localhost:4000/?callback?error=1`);
+    ctx.redirect(`${baseUrl}/?callback?error=1`);
     return;
   }
 
@@ -78,7 +88,7 @@ export const googleCallback: Middleware = async (ctx: Context) => {
     const { access_token } = tokens;
     const hash = crypto.randomBytes(40).toString('hex');
 
-    let nextUrl = `http://localhost:3000/callback?type=google&key=${hash}`;
+    let nextUrl = `${baseUrl}/callback?type=google&key=${hash}`;
 
     if (state) {
       const { next } = JSON.parse(state);
@@ -108,7 +118,11 @@ export const redirectFacebookLogin: Middleware = (ctx: Context) => {
   }
 
   const state = JSON.stringify({ next: next || '/recent' });
-  const callbackUrl = 'http://localhost:4000/auth/callback/facebook';
+  const callbackUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:4000/auth/callback/facebook'
+      : 'https://domain/auth/callback/facebook';
+
   const authUrl = `https://www.facebook.com/v3.2/dialog/oauth?client_id=${FACEBOOK_ID}&redirect_uri=${callbackUrl}&state=${state}&scope=email,public_profile`;
   ctx.redirect(encodeURI(authUrl));
 };
@@ -120,10 +134,13 @@ export const facebookCallback: Middleware = async (ctx: Context) => {
   };
 
   const { code, state }: QueryPayload = ctx.query;
-  const callbackUrl = 'http://localhost:4000/auth/callback/facebook';
+  const callbackUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:4000/auth/callback/facebook'
+      : 'https://domain/auth/callback/facebook';
 
   if (!code) {
-    ctx.redirect(`http://localhost:4000/?callback?error=1`);
+    ctx.redirect(`${baseUrl}/?callback?error=1`);
     return;
   }
 
@@ -145,12 +162,12 @@ export const facebookCallback: Middleware = async (ctx: Context) => {
     const { access_token } = response.data;
 
     if (!access_token) {
-      ctx.redirect(`http://localhost:4000/?callback?error=1`);
+      ctx.redirect(`${baseUrl}/?callback?error=1`);
       return;
     }
 
     const hash = crypto.randomBytes(40).toString('hex');
-    let nextUrl = `http://localhost:3000/callback?type=facebook&key=${hash}`;
+    let nextUrl = `${baseUrl}/callback?type=facebook&key=${hash}`;
 
     if (state) {
       const { next } = JSON.parse(state);
@@ -188,7 +205,7 @@ export const githubCallback: Middleware = async (ctx: Context) => {
 
     const hash = crypto.randomBytes(40).toString('hex');
 
-    let nextUrl = `http://localhost:3000/callback?type=github&key=${hash}`;
+    let nextUrl = `${baseUrl}/callback?type=github&key=${hash}`;
 
     const { next } = ctx.query;
 
@@ -201,7 +218,7 @@ export const githubCallback: Middleware = async (ctx: Context) => {
     ctx.body = response.data;
   } catch (e) {
     ctx.status = 401;
-    let nextUrl = 'http://localhost:4000/callback?error=1';
+    let nextUrl = `${baseUrl}/callback?error=1`;
     ctx.redirect(nextUrl);
   }
 };

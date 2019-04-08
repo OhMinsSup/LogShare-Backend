@@ -78,6 +78,7 @@ export const localRegister: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
     });
 
     ctx.body = {
@@ -152,6 +153,7 @@ export const localLogin: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
     });
 
     ctx.body = {
@@ -174,6 +176,7 @@ export const logout: Middleware = async (ctx: Context) => {
   ctx.cookies.set('access_token', null, {
     httpOnly: true,
     maxAge: 0,
+    domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
   });
 
   ctx.status = 204;
@@ -324,6 +327,7 @@ export const socialRegister: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
     });
 
     ctx.body = {
@@ -409,6 +413,7 @@ export const socialLogin: Middleware = async (ctx: Context) => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'development' ? undefined : '.domain',
     });
 
     ctx.body = {
