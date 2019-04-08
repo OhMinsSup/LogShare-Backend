@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
     "start": "npm run build:tsc && node dist/index.js",
     "build:tsc": "tsc",
-    "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
+    "watch:ts": "tsc -w",
+    "watch:node": "node dist/index.js",
     "test": "exit"
+  },
+  "engines": {
+    "node": "10.x"
   },
   "keywords": [],
   "author": "",
