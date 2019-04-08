@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "build:tsc": "tsc",
     "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
     "test": "exit"
   },
@@ -14,7 +15,6 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/dotenv": "^4.0.3",
-    "@types/fb": "0.0.23",
     "@types/github": "^7.1.0",
     "@types/joi": "^13.6.3",
     "@types/jsonwebtoken": "^7.2.8",
