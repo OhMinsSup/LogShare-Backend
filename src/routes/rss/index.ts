@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import * as rssCtrl from './rss.ctrl';
-import { needsAuth } from '../../lib/common';
+import { needsAuth } from '../../lib/utils';
 
 const rss = new Router();
 

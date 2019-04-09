@@ -1,5 +1,5 @@
-import { google } from 'googleapis';
 import * as dotenv from 'dotenv';
+import { google } from 'googleapis';
 const Facebook = require('fb');
 const Github = require('github');
 dotenv.config();
@@ -84,9 +84,6 @@ const profileGetter = {
   },
 };
 
-export default function Social(
-  provier: string,
-  accessToken: string
-): Promise<Profile> {
+export default function Social(provier: string, accessToken: string): Promise<Profile> {
   return profileGetter[provier](accessToken);
 }

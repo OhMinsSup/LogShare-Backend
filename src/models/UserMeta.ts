@@ -10,7 +10,7 @@ export interface IUserMeta extends Document {
 
 export interface IUserMetaModel extends Model<IUserMeta> {}
 
-const UserMetaSchema = new Schema(
+const schema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -24,6 +24,6 @@ const UserMetaSchema = new Schema(
   { timestamps: true }
 );
 
-const UserMeta = model<IUserMeta>('UserMeta', UserMetaSchema) as IUserMetaModel;
+const UserMeta = model<IUserMeta, IUserMetaModel>('UserMeta', schema);
 
 export default UserMeta;

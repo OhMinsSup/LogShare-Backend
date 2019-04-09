@@ -1,5 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import { Context } from 'koa';
 dotenv.config();
 
 const { JWT_SECRET } = process.env;
@@ -38,4 +39,13 @@ export type TokenPayload = {
     shortBio: string;
     username: string;
   };
+};
+
+export const setTokenCookie = (ctx: Context, token: string | null) => {
+  // set cookie
+  ctx.cookies.set('access_token', token, {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
+  });
 };

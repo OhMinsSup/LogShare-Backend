@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import * as followCtrl from './follow.ctrl';
-import { needsAuth } from '../../lib/common';
+import { needsAuth } from '../../lib/utils';
 
 const follow = new Router();
 

@@ -9,9 +9,7 @@ dotenv.config();
 const { GOOGLE_ID, GOOGLE_SECRET } = process.env;
 
 const baseUrl =
-  process.env.NODE_ENV === 'development'
-    ? 'https://localhost:3000/'
-    : 'https://logshare.netlify.com/';
+  process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://logshare.netlify.com';
 
 export const redirectGoogleLogin: Middleware = (ctx: Context) => {
   type QueryPayload = {

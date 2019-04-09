@@ -1,63 +1,62 @@
 import { Context, Middleware } from 'koa';
-import Post, { IPost } from '../../models/Post';
-import User, { IUser } from '../../models/User';
-import { serializePost, serializeUsers } from '../../lib/serialized';
-import { formatShortDescription } from '../../lib/common';
+import { pick } from 'lodash';
+import Post from '../../models/Post';
+import { formatShortDescription } from '../../lib/utils';
 
-export const searchPostList: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
-    value: string;
-  };
-
-  const { value }: ParamsPayload = ctx.params;
-
-  const regex = new RegExp('^' + value);
-
-  try {
-    const post: IPost[] = await Post.find({
-      $or: [
-        {
-          title: { $regex: regex },
-        },
-        {
-          body: { $regex: regex },
-        },
-      ],
-    })
-      .sort({ _id: -1 })
-      .populate('user')
-      .lean()
-      .exec();
-
-    ctx.type = 'application/json';
-    ctx.body = post.map(serializePost).map(post => ({
-      ...post,
-      body: formatShortDescription(post.body, 'markdown'),
-    }));
-  } catch (e) {
-    ctx.throw(500, e);
+export const publicSearch: Middleware = async (ctx: Context) => {
+  interface QuerySchema {
+    q: string;
+    page: string;
   }
-};
-
-export const searchUserList: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
-    value: string;
-  };
-
-  const { value }: ParamsPayload = ctx.params;
-
-  const regex = new RegExp('^' + value);
+  const { q, page } = ctx.request.query as QuerySchema;
+  const parsedPage = parseInt((page || 1) as any, 10);
+  if (!q || isNaN(parsedPage)) {
+    ctx.status = 400;
+    return;
+  }
 
   try {
-    const user: IUser[] = await User.find({
-      'profile.username': { $regex: regex },
-    })
-      .sort({ _id: -1 })
-      .lean()
-      .exec();
+    const [count, searchResult] = await Promise.all([
+      Post.countSearchPosts(q),
+      Post.searchPosts(q, parsedPage),
+    ]);
 
-    ctx.type = 'application/json';
-    ctx.body = user.map(serializeUsers);
+    ctx.body = {
+      parsedPage,
+      count,
+      searchResult: searchResult
+        .map(search => {
+          const {
+            _id: postId,
+            title,
+            body,
+            post_thumbnail,
+            tags: tag,
+            info,
+            user,
+            createdAt,
+          } = search;
+          return {
+            postId,
+            post_thumbnail,
+            title,
+            body,
+            createdAt,
+            tag,
+            info: {
+              ...pick(info, ['likes', 'comments']),
+            },
+            user: {
+              ...pick(user, ['_id']),
+              ...pick(user.profile, ['username', 'thumbnail', 'shortBio']),
+            },
+          };
+        })
+        .map(search => ({
+          ...search,
+          body: formatShortDescription(search.body, 'markdown'),
+        })),
+    };
   } catch (e) {
     ctx.throw(500, e);
   }

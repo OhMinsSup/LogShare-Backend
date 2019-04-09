@@ -1,14 +1,11 @@
 import { Middleware, Context } from 'koa';
 import Like from '../../../models/Like';
-import Post from '../../../models/Post';
 
 export const like: Middleware = async (ctx: Context) => {
-  const postId: string = ctx['post']._id;
-  const userId: string = ctx['user']._id;
-
+  const postId: string = ctx.state.post._id;
+  const userId: string = ctx.state.user._id;
   try {
     const exists = await Like.checkExists(userId, postId);
-
     if (exists) {
       ctx.status = 409;
       ctx.body = {
@@ -17,45 +14,39 @@ export const like: Middleware = async (ctx: Context) => {
       };
       return;
     }
-
-    await new Like({
-      user: userId,
-      post: postId,
-    }).save();
-
-    await Post.Count('likes', postId);
+    try {
+      await Like.create({
+        user: userId,
+        post: postId,
+      });
+    } catch (e) {
+      ctx.status = 409;
+      ctx.body = {
+        name: 'Like',
+        payload: 'ALREADY_LIKED',
+      };
+      return;
+    }
 
     ctx.type = 'application/json';
     ctx.body = {
       liked: true,
-      likes: (ctx['post'].info.likes + 1) as number,
+      likes: ctx.state.post.info.likes + 1,
     };
-
-    await Post.findOneAndUpdate(
-      {
-        $and: [{ user: userId }, { _id: postId }],
-      },
-      {
-        $inc: { 'info.score': 5 },
-      },
-      {
-        new: true,
-      }
-    )
-      .lean()
-      .exec();
+    setImmediate(() => {
+      ctx.state.post.likes(true);
+      ctx.state.post.count(5);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const unlike: Middleware = async (ctx: Context) => {
-  const postId: string = ctx['post']._id;
-  const userId: string = ctx['user']._id;
-
+  const postId: string = ctx.state.post._id;
+  const userId: string = ctx.state.user._id;
   try {
     const exists = await Like.checkExists(userId, postId);
-
     if (!exists) {
       ctx.status = 409;
       ctx.body = {
@@ -64,39 +55,17 @@ export const unlike: Middleware = async (ctx: Context) => {
       };
       return;
     }
-
-    await Like.deleteOne({
-      $and: [
-        {
-          post: postId,
-          user: userId,
-        },
-      ],
-    })
-      .lean()
-      .exec();
-
-    await Post.unCount('likes', postId);
+    await exists.remove();
 
     ctx.type = 'application/json';
     ctx.body = {
       liked: false,
-      likes: (ctx['post'].info.likes - 1) as number,
+      likes: ctx.state.post.info.likes - 1,
     };
-
-    await Post.findOneAndUpdate(
-      {
-        $and: [{ user: userId }, { _id: postId }],
-      },
-      {
-        $inc: { 'info.score': -5 },
-      },
-      {
-        new: true,
-      }
-    )
-      .lean()
-      .exec();
+    setImmediate(() => {
+      ctx.state.post.likes(false);
+      ctx.state.post.count(-5);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }

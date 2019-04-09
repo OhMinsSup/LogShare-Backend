@@ -1,5 +1,5 @@
 import { Document, Schema, model, Model } from 'mongoose';
-import { hash } from '../lib/common';
+import { hash } from '../lib/utils';
 import { generateToken } from '../lib/token';
 import { ILike } from './Like';
 
@@ -30,50 +30,36 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   like_docs?: ILike;
+  count(type: 'post' | 'follower' | 'following', calc: boolean): Promise<any>;
   validatePassword(password: string): boolean;
   generate(): Promise<string>;
 }
 
 export interface IUserModel extends Model<IUser> {
-  findByEmailOrUsername(
-    type: 'email' | 'username',
-    value: string
-  ): Promise<IUser>;
-  findBySocial(provider: string, socialId: string | number): Promise<IUser>;
-  localRegister(
-    username: string,
-    email: string,
-    password: string
-  ): Promise<IUser>;
-  Count(
-    type: 'post' | 'follower' | 'following',
-    userId: string
-  ): Promise<IUser>;
-  unCount(
-    type: 'post' | 'follower' | 'following',
-    userId: string
-  ): Promise<IUser>;
+  followCount: (type: 'follower' | 'following', userId: string, calc: boolean) => Promise<IUser>;
+  findByEmailOrUsername: (email?: string, username?: string) => Promise<IUser>;
+  findBySocial: (provider: string, socialId: string | number) => Promise<IUser | null>;
+  localRegister: (username: string, email: string, password: string) => Promise<IUser>;
 }
 
-const UserSchema = new Schema(
+const schema = new Schema(
   {
-    email: String,
+    email: {
+      type: String,
+      unique: true,
+    },
     password: String,
     profile: {
-      username: String,
+      username: {
+        type: String,
+        unique: true,
+      },
       thumbnail: {
         type: String,
         default: 'https://avatars.io/platform/userId',
       },
-      shortBio: {
-        type: String,
-        default: 'LogShare에 자신을 소개해 주세요',
-      },
-      cover: {
-        type: String,
-        default:
-          'https://cdn.hashnode.com/res/hashnode/image/hashnode-assets/misc/upload/w_700,h_240,c_thumb/v1520405545406/S1-4hZadG.jpeg',
-      },
+      shortBio: String,
+      cover: String,
     },
     social: {
       facebook: {
@@ -105,21 +91,18 @@ const UserSchema = new Schema(
   }
 );
 
-UserSchema.statics.findByEmailOrUsername = function(
-  type: 'email' | 'username',
-  value: string
-) {
-  const key = type === 'email' ? 'email' : 'profile.username';
+schema.statics.findByEmailOrUsername = function(
+  email?: string,
+  username?: string
+): Promise<IUser | null> {
+  const User: IUserModel = this;
 
-  return this.findOne({
-    [key]: value,
+  return User.findOne({
+    $or: [{ email }, { 'profile.username': username }],
   }).exec();
 };
 
-UserSchema.statics.findBySocial = function(
-  provider: string,
-  socialId: string | number
-) {
+schema.statics.findBySocial = function(provider: string, socialId: string | number) {
   const key = `social.${provider}.id`;
 
   return this.findOne({
@@ -127,66 +110,71 @@ UserSchema.statics.findBySocial = function(
   }).exec();
 };
 
-UserSchema.statics.localRegister = function(
+schema.statics.localRegister = function(
   username: string,
   email: string,
   password: string
-) {
-  const user: IUser = new this({
+): Promise<IUser> {
+  const User: IUserModel = this;
+  const user = new User({
     profile: {
       username,
     },
     email,
     password: hash(password),
-  });
+  }).save();
 
-  return user.save();
+  if (!user) {
+    const error = new Error('UserError');
+    error.message = 'UserNotCreatedError';
+    throw error;
+  }
+
+  return user;
 };
 
-UserSchema.statics.Count = function(
+schema.methods.count = function count(
   type: 'post' | 'follower' | 'following',
-  userId: string
-) {
+  calc: boolean = true
+): Promise<any> {
+  const result = calc ? 1 : -1;
   const key = `info.${type}`;
+  const query = {
+    $inc: {
+      [key]: result,
+    },
+  };
+  return this.update(query).exec();
+};
 
-  return this.findByIdAndUpdate(
-    userId,
+schema.statics.followCount = function followCount(
+  type: 'follower' | 'following',
+  userId: string,
+  calc: boolean = true
+): Promise<IUser> {
+  const User: IUserModel = this;
+  const key = `info.${type}`;
+  const result = calc ? 1 : -1;
+
+  return User.findOneAndUpdate(
+    {
+      _id: userId,
+    },
     {
       $inc: {
-        [key]: 1,
+        [key]: result,
       },
     },
     { new: true }
-  )
-    .lean()
-    .exec();
+  ).exec();
 };
 
-UserSchema.statics.unCount = function(
-  type: 'post' | 'follower' | 'following',
-  userId: string
-) {
-  const key = `info.${type}`;
-
-  return this.findByIdAndUpdate(
-    userId,
-    {
-      $inc: {
-        [key]: -1,
-      },
-    },
-    { new: true }
-  )
-    .lean()
-    .exec();
-};
-
-UserSchema.methods.validatePassword = function(password: string) {
+schema.methods.validatePassword = function(password: string) {
   const hashed: string = hash(password);
   return this.password === hashed;
 };
 
-UserSchema.methods.generate = function() {
+schema.methods.generate = function() {
   const user = {
     _id: this._id,
     email: this.email,
@@ -196,6 +184,6 @@ UserSchema.methods.generate = function() {
   return generateToken(user);
 };
 
-const User = model<IUser>('User', UserSchema) as IUserModel;
+const User = model<IUser, IUserModel>('User', schema);
 
 export default User;

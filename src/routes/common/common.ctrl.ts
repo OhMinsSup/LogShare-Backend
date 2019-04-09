@@ -1,14 +1,13 @@
-import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
+import { Middleware, Context } from 'koa';
 import UserProfile from '../../models/UserProfile';
 import UserMeta from '../../models/UserMeta';
-import { TokenPayload } from '../../lib/token';
 import UserEmail from '../../models/UserEmail';
 import { sendMail } from '../../lib/sendMail';
 import { Html } from '../../lib/emailTemplate';
 
 export const getProfileInfo: Middleware = async (ctx: Context) => {
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const { _id: userId } = ctx.state.user;
 
   try {
     const userProfile = await UserProfile.findOne({
@@ -33,7 +32,7 @@ export const getProfileInfo: Middleware = async (ctx: Context) => {
       } = newProfile;
       const { email_promotion } = newMeta;
 
-      ctx.set('Content-Type', 'application/json');
+      ctx.type = 'application/json';
       ctx.body = {
         profile: {
           facebook,
@@ -89,8 +88,8 @@ export const updateProfileLinks: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const profile_links: BodySchema = ctx.request.body;
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const profile_links = ctx.request.body as BodySchema;
+  const { _id: userId } = ctx.state.user;
 
   try {
     const profile = await UserProfile.findOne({
@@ -127,8 +126,8 @@ export const updateEmailPermissions: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { email_promotion }: BodySchema = ctx.request.body;
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const { email_promotion } = ctx.request.body as BodySchema;
+  const { _id: userId } = ctx.state.user;
 
   try {
     const userMeta = await UserMeta.findOne({

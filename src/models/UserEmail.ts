@@ -13,7 +13,7 @@ export interface IUserEmailModel extends Model<IUserEmail> {
   use(code: string): Promise<IUserEmail>;
 }
 
-const UserEmailSchema = new Schema(
+const schema = new Schema(
   {
     code: {
       type: String,
@@ -25,7 +25,7 @@ const UserEmailSchema = new Schema(
   { timestamps: true }
 );
 
-UserEmailSchema.statics.findCode = function(code: string) {
+schema.statics.findCode = function(code: string) {
   return this.findOne({
     code,
     logged: false,
@@ -34,7 +34,7 @@ UserEmailSchema.statics.findCode = function(code: string) {
     .exec();
 };
 
-UserEmailSchema.statics.use = function(code: string) {
+schema.statics.use = function(code: string) {
   return this.findOneAndUpdate(
     code,
     {
@@ -48,9 +48,6 @@ UserEmailSchema.statics.use = function(code: string) {
     .exec();
 };
 
-const UserEmail = model<IUserEmail>(
-  'UserEmail',
-  UserEmailSchema
-) as IUserEmailModel;
+const UserEmail = model<IUserEmail, IUserEmailModel>('UserEmail', schema);
 
 export default UserEmail;

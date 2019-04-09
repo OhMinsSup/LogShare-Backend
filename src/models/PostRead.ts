@@ -11,10 +11,10 @@ export interface IPostRead extends Document {
 }
 
 export interface IPostReadModel extends Model<IPostRead> {
-  view(hashIp: string, postId: string): Promise<IPostRead>;
+  view: (hashIp: string, postId: string) => Promise<IPostRead | null>;
 }
 
-const PostReadSchema = new Schema(
+const schema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -31,17 +31,15 @@ const PostReadSchema = new Schema(
   }
 );
 
-PostReadSchema.statics.view = function(hashIp: string, postId: string) {
-  return this.findOne({
+schema.statics.view = function view(hashIp: string, postId: string): Promise<IPostRead | null> {
+  const PostRead: IPostReadModel = this;
+  return PostRead.findOne({
     $and: [{ ip: hashIp }, { post: postId }],
   })
-    .lean()
+    .sort({ _id: -1 })
     .exec();
 };
 
-const PostRead: IPostReadModel = model<IPostRead>(
-  'PostRead',
-  PostReadSchema
-) as IPostReadModel;
+const PostRead = model<IPostRead, IPostReadModel>('PostRead', schema);
 
 export default PostRead;

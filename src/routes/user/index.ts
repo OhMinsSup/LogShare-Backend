@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import * as userCtrl from './user.ctrl';
-import { needsAuth } from '../../lib/common';
+import { needsAuth } from '../../lib/utils';
 
 const user = new Router();
 

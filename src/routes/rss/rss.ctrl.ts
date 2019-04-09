@@ -1,16 +1,15 @@
 import { Context, Middleware } from 'koa';
 import { Feed } from 'feed';
-import Post, { IPost } from '../../models/Post';
-import { convertToFeed, checkEmpty } from '../../lib/common';
+import Post from '../../models/Post';
 import User from '../../models/User';
+import { convertToFeed, checkEmpty } from '../../lib/utils';
 
 export const getEntireRSS: Middleware = async (ctx: Context) => {
   try {
-    const posts: IPost[] = await Post.find()
+    const posts = await Post.find()
       .limit(20)
       .sort({ _id: -1 })
       .populate('user')
-      .lean()
       .exec();
 
     const feed = new Feed({
@@ -25,10 +24,12 @@ export const getEntireRSS: Middleware = async (ctx: Context) => {
       },
       copyright: 'All rights reserved 2018, veloss',
     });
+
     const feeds = posts.map(convertToFeed);
     feeds.forEach(f => {
       feed.addItem(f);
     });
+
     ctx.type = 'text/xml; charset=UTF-8';
     ctx.body = feed.atom1();
   } catch (e) {
@@ -62,14 +63,12 @@ export const getUserRSS: Middleware = async (ctx: Context) => {
       };
       return;
     }
-
-    const posts: IPost[] = await Post.find({
+    const posts = await Post.find({
       user: user._id,
     })
       .limit(20)
       .sort({ _id: -1 })
       .populate('user')
-      .lean()
       .exec();
 
     const feed = new Feed({
@@ -84,6 +83,7 @@ export const getUserRSS: Middleware = async (ctx: Context) => {
       },
       copyright: 'All rights reserved 2018, veloss',
     });
+
     const feeds = posts.map(convertToFeed);
     feeds.forEach(f => {
       feed.addItem(f);

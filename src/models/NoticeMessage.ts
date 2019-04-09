@@ -13,19 +13,15 @@ export interface INoticeMessage extends Document {
 
 export interface INoticeMessageModel extends Model<INoticeMessage> {}
 
-const ignoreEmpty = val => (val !== '' ? val : undefined);
-
-const NoticeMessageSchema = new Schema(
+const schema = new Schema(
   {
     sender: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      set: ignoreEmpty,
     },
     recipient: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      set: ignoreEmpty,
     },
     notice: {
       type: Schema.Types.ObjectId,
@@ -38,9 +34,6 @@ const NoticeMessageSchema = new Schema(
   }
 );
 
-const NoticeMessage = model<INoticeMessage>(
-  'NoticeMessage',
-  NoticeMessageSchema
-) as INoticeMessageModel;
+const NoticeMessage = model<INoticeMessage, INoticeMessageModel>('NoticeMessage', schema);
 
 export default NoticeMessage;

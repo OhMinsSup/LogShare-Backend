@@ -1,18 +1,14 @@
-import { Context, Middleware } from 'koa';
 import * as Joi from 'joi';
-import User, { IUser } from '../../models/User';
-import { checkEmpty } from '../../lib/common';
-import { TokenPayload } from '../../lib/token';
+import { Context, Middleware } from 'koa';
 import { Types } from 'mongoose';
-import { serializeUsers } from '../../lib/serialized';
+import User from '../../models/User';
+import { checkEmpty } from '../../lib/utils';
 
 export const getUserInfo: Middleware = async (ctx: Context) => {
-  type ParamPayload = {
+  interface ParamSchema {
     name: string;
-  };
-
-  const { name }: ParamPayload = ctx.params;
-
+  }
+  const { name } = ctx.params as ParamSchema;
   if (checkEmpty(name)) {
     ctx.status = 400;
     ctx.body = {
@@ -22,8 +18,7 @@ export const getUserInfo: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 404;
       return;
@@ -42,11 +37,11 @@ export const getUserInfo: Middleware = async (ctx: Context) => {
 };
 
 export const profileUpdate: Middleware = async (ctx: Context) => {
-  type BodySchema = {
+  interface BodySchema {
     username: string;
     thumbnail: string;
     shortBio: string;
-  };
+  }
 
   const schema = Joi.object().keys({
     username: Joi.string()
@@ -58,7 +53,6 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
   });
 
   const result = Joi.validate(ctx.request.body, schema);
-
   if (result.error) {
     ctx.status = 400;
     ctx.body = {
@@ -68,9 +62,8 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const body: BodySchema = ctx.request.body;
+  const body = ctx.request.body as BodySchema;
   const { username } = body;
-
   if (username && checkEmpty(username)) {
     ctx.status = 400;
     ctx.body = {
@@ -79,11 +72,10 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const { _id: userId } = ctx.state.user;
 
   try {
-    const profile: IUser = await User.findById(userId).exec();
-
+    const profile = await User.findOne({ _id: userId }).exec();
     if (!profile) {
       ctx.throw(500, 'Invalid Profile');
     }
@@ -93,7 +85,6 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
         profile.profile[key] = body[key];
       }
     });
-
     await profile.save();
 
     ctx.type = 'application/json';
@@ -106,12 +97,11 @@ export const profileUpdate: Middleware = async (ctx: Context) => {
 };
 
 export const usersList: Middleware = async (ctx: Context) => {
-  type QueryPayload = {
+  interface QueryShema {
     cursor: string | null;
-  };
+  }
 
-  const { cursor }: QueryPayload = ctx.query;
-
+  const { cursor } = ctx.query as QueryShema;
   if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
@@ -123,27 +113,30 @@ export const usersList: Middleware = async (ctx: Context) => {
   const query = Object.assign({}, cursor ? { _id: { $lt: cursor } } : {});
 
   try {
-    const users: IUser[] = await User.find(query)
+    const users = await User.find(query)
       .select('profile')
       .sort({ _id: -1 })
       .limit(10)
-      .lean()
       .exec();
-
-    if (users.length === 0 || !users) {
-      ctx.body = {
-        next: '',
-        usersWithData: [],
-      };
-      return;
-    }
 
     const next = users.length === 10 ? `/user?cursor=${users[9]._id}` : null;
 
     ctx.type = 'application/json';
     ctx.body = {
       next,
-      usersWithData: users.map(serializeUsers),
+      usersWithData: users.map(user => {
+        const {
+          _id,
+          profile: { username, thumbnail, shortBio, cover },
+        } = user;
+        return {
+          _id,
+          username,
+          thumbnail,
+          shortBio,
+          cover,
+        };
+      }),
     };
   } catch (e) {
     ctx.throw(500, e);
@@ -151,14 +144,7 @@ export const usersList: Middleware = async (ctx: Context) => {
 };
 
 export const featuredUser: Middleware = async (ctx: Context) => {
-  const user: TokenPayload = ctx['user'];
-
-  if (!user) {
-    ctx.body = {
-      users: [],
-    };
-    return;
-  }
+  const user = ctx.state.user;
 
   try {
     const users = await User.aggregate([

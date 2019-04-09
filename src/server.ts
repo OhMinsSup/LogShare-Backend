@@ -1,13 +1,10 @@
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as compress from 'koa-compress';
-// import * as cors from 'koa-cors';
 import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
-// import * as serve from 'koa-static';
-// import * as path from 'path';
 import routes from './routes';
 import corsMiddleware from './lib/middleware/corsMiddleware';
 import tokenMiddleware from './lib/middleware/tokenMiddleware';
@@ -49,24 +46,26 @@ class Server {
         flush: require('zlib').Z_SYNC_FLUSH,
       })
     );
-    // app.use(serve(path.join(__dirname, '../../frontend/build')));
   }
 
   private initializeDb(): void {
     const { MONGO_URL_WEB } = process.env;
 
-    if (!MONGO_URL_WEB) return null;
+    if (!MONGO_URL_WEB) {
+      const error = new Error('InvalidMogoUrlError');
+      error.message = 'Url is missing.';
+      throw error;
+    }
 
-    const MONGO_URL: string = MONGO_URL_WEB;
-    (<any>mongoose).Promise = global.Promise;
     mongoose
-      .connect(MONGO_URL, { useNewUrlParser: true })
+      .connect(MONGO_URL_WEB, { useNewUrlParser: true })
       .then(() => {
         console.log('connected to mongoDB ✅');
       })
       .catch(e => {
         console.log('MongoDB connection error. Please make sure MongoDB is running. ' + e);
       });
+    mongoose.set('useCreateIndex', true);
   }
 
   private routes(): void {

@@ -1,7 +1,6 @@
 import { Middleware, Context } from 'koa';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-import { TokenPayload } from '../../lib/token';
 dotenv.config();
 
 const { CLOUDINARY_API_SECRET, CLOUDINARY_APIKEY, CLOUDINARY_CLOUD_NAME } = process.env;
@@ -16,7 +15,7 @@ cloudinary.config({
 
 export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
   const { image } = ctx.request.files;
-  const user: TokenPayload = ctx['user'];
+  const user = ctx.state.user;
 
   if (!user) {
     ctx.status = 401;
@@ -73,7 +72,7 @@ export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
 
 export const createCommonUserCoverBgSignedUrl: Middleware = async (ctx: Context) => {
   const { cover } = ctx.request.files;
-  const user: TokenPayload = ctx['user'];
+  const user = ctx.state.user;
 
   if (!user) {
     ctx.status = 401;
@@ -132,7 +131,7 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (ctx: Context)
 
 export const createCommonThumbnailSignedUrl: Middleware = async (ctx: Context) => {
   const { thumbnail } = ctx.request.files;
-  const user: TokenPayload = ctx['user'];
+  const user = ctx.state.user;
 
   if (!user) {
     ctx.status = 401;

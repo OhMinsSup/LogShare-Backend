@@ -11,11 +11,10 @@ export interface ILike extends Document {
 }
 
 export interface ILikeModel extends Model<ILike> {
-  checkExists(userId: string, postId: string): Promise<ILike>;
-  likePosts(userId: string, cursor: string | null): Promise<ILike[]>;
+  checkExists: (userId: string, postId: string) => Promise<ILike>;
 }
 
-const LikeSchema = new Schema(
+const schema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -31,38 +30,17 @@ const LikeSchema = new Schema(
   }
 );
 
-LikeSchema.statics.checkExists = function(
-  userId: string,
-  postId: string
-): Promise<any> {
+schema.index({
+  user: -1,
+  post: -1,
+});
+
+schema.statics.checkExists = function(userId: string, postId: string): Promise<any> {
   return this.findOne({
     $and: [{ user: userId }, { post: postId }],
-  })
-    .lean()
-    .exec();
+  }).exec();
 };
 
-LikeSchema.statics.likePosts = function(userId: string, cursor: string | null) {
-  const query = Object.assign(
-    {},
-    cursor ? { _id: { $lt: cursor }, user: userId } : { user: userId }
-  );
-
-  return this.find(query)
-    .populate({
-      path: 'post',
-      populate: {
-        path: 'user',
-        select: 'profile',
-      },
-    })
-    .select('post')
-    .sort({ _id: -1 })
-    .limit(10)
-    .lean()
-    .exec();
-};
-
-const Like = model<ILike>('Like', LikeSchema) as ILikeModel;
+const Like = model<ILike, ILikeModel>('Like', schema);
 
 export default Like;

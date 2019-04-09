@@ -1,7 +1,7 @@
 import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
 import User from '../../models/User';
-import { TokenPayload, decodeToken, generateToken } from '../../lib/token';
+import { TokenPayload, decodeToken, generateToken, setTokenCookie } from '../../lib/token';
 import Social, { Profile } from '../../lib/social';
 
 export const localRegister: Middleware = async (ctx: Context) => {
@@ -38,48 +38,20 @@ export const localRegister: Middleware = async (ctx: Context) => {
   const { username, email, password }: BodySchema = ctx.request.body;
 
   try {
-    const [emailExists, usernameExists] = await Promise.all([
-      User.findByEmailOrUsername('email', email),
-      User.findByEmailOrUsername('username', username),
-    ]);
+    const exists = await User.findByEmailOrUsername(email, username);
 
-    if (emailExists || usernameExists) {
+    if (exists) {
       ctx.status = 409;
       ctx.body = {
         name: '중복된 계정',
-        payload: emailExists ? 'email' : 'username',
+        payload: email === exists.email ? 'email' : 'username',
       };
       return;
     }
 
     const user = await User.localRegister(username, email, password);
-
-    if (!user) {
-      ctx.status = 404;
-      ctx.body = {
-        name: 'User',
-        payload: '유저가 만들어지지 않았습니다.',
-      };
-      return;
-    }
-
     const token = await user.generate();
-
-    if (!token) {
-      await user.remove();
-      ctx.status = 409;
-      ctx.body = {
-        name: '토큰 발급',
-        payload: '토큰이 만들어지지 않았습니다 다시 회원가입을 해주세요',
-      };
-      return;
-    }
-
-    ctx.cookies.set('access_token', token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
-    });
+    setTokenCookie(ctx, token);
     ctx.type = 'application/json';
     ctx.body = {
       user: {
@@ -126,8 +98,7 @@ export const localLogin: Middleware = async (ctx: Context) => {
   const { email, password }: BodySchema = ctx.request.body;
 
   try {
-    const user = await User.findByEmailOrUsername('email', email);
-
+    const user = await User.findByEmailOrUsername(email);
     if (!user || !user.validatePassword(password)) {
       ctx.status = 403;
       ctx.body = {
@@ -138,21 +109,7 @@ export const localLogin: Middleware = async (ctx: Context) => {
     }
 
     const token = await user.generate();
-
-    if (!token) {
-      ctx.status = 409;
-      ctx.body = {
-        name: '토큰 발급',
-        payload: '토큰이 만들어지지 않았습니다 다시 로그인해주세요',
-      };
-      return;
-    }
-
-    ctx.cookies.set('access_token', token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
-    });
+    setTokenCookie(ctx, token);
     ctx.type = 'application/json';
     ctx.body = {
       user: {
@@ -171,13 +128,9 @@ export const localLogin: Middleware = async (ctx: Context) => {
 };
 
 export const logout: Middleware = async (ctx: Context) => {
-  ctx.cookies.set('access_token', null, {
-    httpOnly: true,
-    maxAge: 0,
-    domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
-  });
+  setTokenCookie(ctx, null);
   ctx.type = 'application/json';
-  ctx.status = 204;
+  ctx.status = 200;
 };
 
 export const checkExists: Middleware = async (ctx: Context) => {
@@ -190,8 +143,8 @@ export const checkExists: Middleware = async (ctx: Context) => {
 
   try {
     const user = await (key == 'email'
-      ? User.findByEmailOrUsername('email', value)
-      : User.findByEmailOrUsername('username', value));
+      ? User.findByEmailOrUsername(value, null)
+      : User.findByEmailOrUsername(null, value));
     ctx.type = 'application/json';
     ctx.body = {
       exists: !!user,
@@ -202,8 +155,7 @@ export const checkExists: Middleware = async (ctx: Context) => {
 };
 
 export const checkUser: Middleware = async (ctx: Context) => {
-  const user: TokenPayload = ctx['user'];
-
+  const user = ctx.state.user;
   if (!user) {
     ctx.status = 403;
     return;

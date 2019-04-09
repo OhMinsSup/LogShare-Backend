@@ -6,6 +6,7 @@ export interface IPost extends Document {
   post_thumbnail: string;
   title: string;
   body: string;
+  tags: string[];
   info: {
     likes: number;
     comments: number;
@@ -13,21 +14,18 @@ export interface IPost extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  count(count: number): Promise<any>;
+  likes(calc: boolean): Promise<any>;
+  comments(calc: boolean): Promise<any>;
 }
 
 export interface IPostModel extends Model<IPost> {
-  readPostById(postId: string): Promise<IPost>;
-  listPosts(userId: string | null, cursor: string | null): Promise<IPost[]>;
-  trendingPostList(cursor: string | null): Promise<IPost[]>;
-  Count(type: 'likes' | 'comments', postId: string): Promise<IPost>;
-  unCount(type: 'likes' | 'comments', postId: string): Promise<IPost>;
-  score(
-    userId: IUser,
-    postId: string
-  ): Promise<DocumentQuery<IPost, IPost, {}>>;
+  readPostById: (postId: string, userId: string) => Promise<IPost>;
+  countSearchPosts: (query: string) => Promise<number>;
+  searchPosts: (query: string, page: number) => Promise<IPost[]>;
 }
 
-const PostSchema = new Schema(
+const schema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -36,6 +34,7 @@ const PostSchema = new Schema(
     post_thumbnail: String,
     title: String,
     body: String,
+    tags: [String],
     info: {
       likes: {
         type: Number,
@@ -56,97 +55,83 @@ const PostSchema = new Schema(
   }
 );
 
-PostSchema.statics.readPostById = function(postId: string) {
-  return this.findById(postId)
+schema.index({ user: -1, _id: -1 });
+schema.index(
+  { title: 'text', body: 'text', tags: 'text' },
+  { weights: { title: 3, tags: 2, body: 1 } }
+);
+
+schema.statics.readPostById = function readPostById(
+  postId: string,
+  userId: string
+): Promise<IPost> {
+  const Post: IPostModel = this;
+  return Post.findOne({
+    $and: [{ _id: postId }, { user: userId }],
+  })
+    .sort({ _id: -1 })
     .populate('user')
-    .lean()
     .exec();
 };
 
-PostSchema.statics.trendingPostList = function(cursor: string | null) {
-  const query = Object.assign({}, cursor ? { _id: { $lt: cursor } } : {});
-
-  return this.find(query)
-    .populate('user')
-    .sort({ 'info.score': -1 })
-    .limit(10)
-    .lean()
-    .exec();
+schema.methods.comments = function comments(calc: boolean = true): Promise<any> {
+  const result = calc ? 1 : -1;
+  const key = `info.comments`;
+  const query = {
+    $inc: {
+      [key]: result,
+    },
+  };
+  return this.update(query).exec();
 };
 
-PostSchema.statics.listPosts = function(
-  userId: string | null,
-  cursor: string | null
-) {
-  const query = Object.assign(
-    {},
-    cursor && !userId ? { _id: { $lt: cursor } } : {},
-    userId && !cursor ? { user: userId } : {},
-    userId && cursor ? { _id: { $lt: cursor }, user: userId } : {}
-  );
+schema.methods.likes = function likes(calc: boolean = true): Promise<any> {
+  const result = calc ? 1 : -1;
+  const key = `info.likes`;
+  const query = {
+    $inc: {
+      [key]: result,
+    },
+  };
+  return this.update(query).exec();
+};
 
-  return this.find(query)
-    .populate('user')
+schema.methods.count = function count(count: number): Promise<any> {
+  const key = `info.score`;
+  const query = {
+    $inc: {
+      [key]: count,
+    },
+  };
+  return this.update(query).exec();
+};
+
+schema.statics.searchPosts = function searchPosts(query: string, page: number): Promise<IPost[]> {
+  const Post: IPostModel = this;
+  return Post.find({
+    $text: {
+      $search: query,
+    },
+  })
     .sort({ _id: -1 })
     .limit(10)
-    .lean()
+    .skip((page - 1) * 10)
+    .populate('user')
     .exec();
 };
 
-PostSchema.statics.Count = function(
-  type: 'likes' | 'comments',
-  postId: string
-) {
-  const key = `info.${type}`;
-
-  return this.findByIdAndUpdate(
-    postId,
-    {
-      $inc: {
-        [key]: 1,
-      },
+schema.statics.countSearchPosts = function countSearchPosts(query: string): Promise<number> {
+  const Post: IPostModel = this;
+  return Post.find({
+    $text: {
+      $search: query,
     },
-    { new: true }
-  )
-    .lean()
+  })
+    .sort({ _id: -1 })
+    .countDocuments()
     .exec();
 };
 
-PostSchema.statics.unCount = function(
-  type: 'likes' | 'comments',
-  postId: string
-) {
-  const key = `info.${type}`;
-
-  return this.findByIdAndUpdate(
-    postId,
-    {
-      $inc: {
-        [key]: -1,
-      },
-    },
-    { new: true }
-  )
-    .lean()
-    .exec();
-};
-
-PostSchema.statics.score = function(userId: IUser, postId: string) {
-  return this.findOneAndUpdate(
-    {
-      $and: [{ user: userId }, { _id: postId }],
-    },
-    {
-      $inc: { 'info.score': 1 },
-    },
-    {
-      new: true,
-    }
-  )
-    .lean()
-    .exec();
-};
-
-const Post = model<IPost>('Post', PostSchema) as IPostModel;
+const Post = model<IPost, IPostModel>('Post', schema);
 
 export default Post;

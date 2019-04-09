@@ -1,16 +1,15 @@
-import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
-import { checkEmpty, PostPayload } from '../../../lib/common';
 import { Types } from 'mongoose';
-import { TokenPayload } from '../../../lib/token';
-import Comment, { IComment } from '../../../models/Comment';
-import Post from '../../../models/Post';
+import { Middleware, Context } from 'koa';
+import { pick } from 'lodash';
+import Comment from '../../../models/Comment';
+import { checkEmpty } from '../../../lib/utils';
 
 export const writeComment: Middleware = async (ctx: Context) => {
-  type BodySchema = {
+  interface BodySchema {
     text: string;
     reply: string | null;
-  };
+  }
 
   const schema = Joi.object().keys({
     text: Joi.string()
@@ -27,7 +26,7 @@ export const writeComment: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { text, reply }: BodySchema = ctx.request.body;
+  const { text, reply } = ctx.request.body as BodySchema;
 
   if (checkEmpty(text)) {
     ctx.status = 400;
@@ -42,19 +41,17 @@ export const writeComment: Middleware = async (ctx: Context) => {
     ctx.body = {
       name: 'Not ObjectId',
     };
-    return; // 400 Bad Request
+    return;
   }
 
-  const { _id: postId, user }: PostPayload = ctx['post'];
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const postData = ctx.state.post;
+  const userData = ctx.state.user;
   let level = 0;
-  let reply_to: IComment | string;
+  let reply_to;
 
   try {
     if (reply) {
-      const c: IComment = await Comment.findById(reply)
-        .lean()
-        .exec();
+      const c = await Comment.findOne({ $and: [{ _id: reply }, { post: postData._id }] }).exec();
 
       if (!c) {
         ctx.status = 404;
@@ -81,50 +78,34 @@ export const writeComment: Middleware = async (ctx: Context) => {
       }
     }
 
-    const comment = await new Comment({
-      post: postId,
-      user: userId,
+    new Comment({
+      post: postData._id,
+      user: userData._id,
       text,
       level,
       reply: reply_to,
     }).save();
 
-    if (!comment) {
-      ctx.status = 500;
-      return;
-    }
-
-    await Post.Count('comments', postId);
-
     ctx.type = 'application/json';
     ctx.status = 200;
 
-    await Post.findOneAndUpdate(
-      {
-        $and: [{ user }, { _id: postId }],
-      },
-      {
-        $inc: { 'info.score': 2 },
-      },
-      {
-        new: true,
-      }
-    )
-      .lean()
-      .exec();
+    setImmediate(() => {
+      ctx.state.post.comments(true);
+      ctx.state.post.count(3);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const updateComment: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     commentId: string;
-  };
+  }
 
-  type BodySchema = {
+  interface BodySchema {
     text: string;
-  };
+  }
 
   const schema = Joi.object().keys({
     text: Joi.string()
@@ -140,9 +121,9 @@ export const updateComment: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const post: PostPayload = ctx['post'];
-  const { text }: BodySchema = ctx.request.body;
-  const { commentId }: ParamsPayload = ctx.params;
+  const post = ctx.state.post;
+  const { text } = ctx.request.body as BodySchema;
+  const { commentId } = ctx.params as ParamSchema;
 
   if (checkEmpty(text)) {
     ctx.status = 400;
@@ -157,11 +138,11 @@ export const updateComment: Middleware = async (ctx: Context) => {
     ctx.body = {
       name: 'Not ObjectId',
     };
-    return; // 400 Bad Request
+    return;
   }
 
   try {
-    const comment: IComment = await Comment.findOneAndUpdate(
+    await Comment.findOneAndUpdate(
       {
         $and: [
           {
@@ -176,18 +157,7 @@ export const updateComment: Middleware = async (ctx: Context) => {
       {
         new: true,
       }
-    )
-      .lean()
-      .exec();
-
-    if (!comment) {
-      ctx.status = 404;
-      ctx.body = {
-        name: 'Comment',
-        payload: '댓글이 업데이트되지 않았습니다',
-      };
-      return;
-    }
+    ).exec();
 
     ctx.type = 'application/json';
     ctx.status = 200;
@@ -197,25 +167,23 @@ export const updateComment: Middleware = async (ctx: Context) => {
 };
 
 export const deleteComment: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     commentId: string;
-  };
+  }
 
-  const post: PostPayload = ctx['post'];
-  const { commentId }: ParamsPayload = ctx.params;
+  const post = ctx.state.post;
+  const { commentId } = ctx.params as ParamSchema;
 
   if (!Types.ObjectId.isValid(commentId)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',
     };
-    return; // 400 Bad Request
+    return;
   }
 
   try {
-    const c: IComment = await Comment.findById(commentId)
-      .lean()
-      .exec();
+    const c = await Comment.findOne({ _id: commentId }).exec();
 
     if (!c) {
       ctx.status = 404;
@@ -241,85 +209,108 @@ export const deleteComment: Middleware = async (ctx: Context) => {
       {
         new: true,
       }
-    )
-      .lean()
-      .exec();
+    ).exec();
 
-    await Post.unCount('comments', post._id);
-    ctx.status = 204;
+    ctx.type = 'application/json';
+    ctx.status = 200;
+    setImmediate(() => {
+      ctx.state.post.comments(false);
+      ctx.state.post.count(-3);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const getCommentList: Middleware = async (ctx: Context) => {
-  const post: PostPayload = ctx['post'];
-
+  const post = ctx.state.post;
   try {
-    const comments: IComment[] = await Comment.find(
+    const comments: any[] = await Comment.aggregate([
       {
-        post: post._id,
-        level: 0,
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
       },
-      {
-        text: true,
-        level: true,
-        visible: true,
-        reply: true,
-        createdAt: true,
-        user: true,
-      }
-    )
-      .populate('user', 'profile')
+      { $unwind: '$user' },
+    ])
+      .match({
+        $and: [{ post: Types.ObjectId(post._id) }, { level: 0 }],
+      })
       .sort({ _id: -1 })
-      .lean()
       .exec();
 
     ctx.type = 'application/json';
-    ctx.body = comments;
+    ctx.body = comments.map(comment => {
+      const { level, visible, _id, user, text, createdAt } = comment;
+      return {
+        _id,
+        visible,
+        level,
+        text,
+        createdAt,
+        user: {
+          ...pick(user, ['_id']),
+          ...pick(user.profile, ['thumbnail', 'shortBio', 'cover', 'username']),
+        },
+      };
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const getReplyComment: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     commentId: string;
-  };
+  }
 
-  const post: PostPayload = ctx['post'];
-  const { commentId }: ParamsPayload = ctx.params;
+  const post = ctx.state.post;
+  const { commentId } = ctx.params as ParamSchema;
 
   if (!Types.ObjectId.isValid(commentId)) {
     ctx.status = 400;
     ctx.body = {
       name: 'Not ObjectId',
     };
-    return; // 400 Bad Request
+    return;
   }
 
   try {
-    const comments: IComment[] = await Comment.find(
+    const comments: any[] = await Comment.aggregate([
       {
-        post: post._id,
-        reply: commentId,
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
       },
-      {
-        text: true,
-        level: true,
-        reply: true,
-        visible: true,
-        createdAt: true,
-        user: true,
-      }
-    )
-      .populate('user', 'profile')
+      { $unwind: '$user' },
+    ])
+      .match({
+        $and: [{ post: Types.ObjectId(post._id) }, { reply: Types.ObjectId(commentId) }],
+      })
       .sort({ _id: -1 })
-      .lean()
       .exec();
 
     ctx.type = 'application/json';
-    ctx.body = comments;
+    ctx.body = comments.map(comment => {
+      const { level, visible, _id, user, text, createdAt } = comment;
+      return {
+        _id,
+        visible,
+        level,
+        text,
+        createdAt,
+        user: {
+          ...pick(user, ['_id']),
+          ...pick(user.profile, ['thumbnail', 'shortBio', 'cover', 'username']),
+        },
+      };
+    });
   } catch (e) {
     ctx.throw(500, e);
   }

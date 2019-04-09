@@ -5,7 +5,7 @@ import { TokenPayload } from '../../lib/token';
 import Notice, { INotice } from '../../models/Notice';
 import { serializeNoticeRoom } from '../../lib/serialized';
 import Follow, { IFollow } from '../../models/Follow';
-import { filterUnique, getToDayDate } from '../../lib/common';
+import { filterUnique, getToDayDate } from '../../lib/utils';
 import NoticeMessage, { INoticeMessage } from '../../models/NoticeMessage';
 
 export const checkNoticeRoom: Middleware = async (ctx: Context) => {

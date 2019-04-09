@@ -1,19 +1,17 @@
 import { Context, Middleware } from 'koa';
-import { TokenPayload } from '../../lib/token';
+import { Types } from 'mongoose';
+import { pick } from 'lodash';
 import User from '../../models/User';
 import Follow from '../../models/Follow';
-import { serializeFollowing, serializeFollower } from '../../lib/serialized';
-import { Types } from 'mongoose';
-import { checkEmpty } from '../../lib/common';
+import { checkEmpty } from '../../lib/utils';
 
 export const getFollow: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     name: string;
-  };
+  }
 
-  const { _id: userId }: TokenPayload = ctx['user'];
-  const { name }: ParamsPayload = ctx.params;
-
+  const { _id: userId } = ctx.state.user;
+  const { name } = ctx.params as ParamSchema;
   if (checkEmpty(name)) {
     ctx.status = 400;
     ctx.body = {
@@ -26,8 +24,7 @@ export const getFollow: Middleware = async (ctx: Context) => {
 
   try {
     // 팔로우 되어있는지 확인
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 403;
       ctx.body = {
@@ -54,15 +51,15 @@ export const getFollow: Middleware = async (ctx: Context) => {
 };
 
 export const follow: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     name: string;
-  };
+  }
 
-  const { name }: ParamsPayload = ctx.params;
+  const { name } = ctx.params as ParamSchema;
   const {
     _id: userId,
     profile: { username },
-  }: TokenPayload = ctx['user'];
+  } = ctx.state.user;
 
   if (checkEmpty(name)) {
     ctx.status = 400;
@@ -82,8 +79,7 @@ export const follow: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 403;
       ctx.body = {
@@ -93,10 +89,9 @@ export const follow: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const followId: string = user._id;
+    const followId = user._id;
 
     const exists = await Follow.checkExists(userId, followId);
-
     if (exists) {
       ctx.status = 409;
       ctx.body = {
@@ -106,33 +101,35 @@ export const follow: Middleware = async (ctx: Context) => {
       return;
     }
 
-    await new Follow({
+    new Follow({
       following: followId,
       follower: userId,
     }).save();
-
-    await User.Count('follower', userId);
-    await User.Count('following', followId);
 
     ctx.type = 'application/json';
     ctx.body = {
       follow: true,
     };
+
+    setImmediate(() => {
+      User.followCount('follower', userId, true);
+      User.followCount('following', followId, true);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const unfollow: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     name: string;
-  };
+  }
 
-  const { name }: ParamsPayload = ctx.params;
+  const { name } = ctx.params as ParamSchema;
   const {
     _id: userId,
     profile: { username },
-  }: TokenPayload = ctx['user'];
+  } = ctx.state.user;
 
   if (checkEmpty(name)) {
     ctx.status = 400;
@@ -152,8 +149,7 @@ export const unfollow: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 403;
       ctx.body = {
@@ -163,10 +159,9 @@ export const unfollow: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const followId: string = user._id;
+    const followId = user._id;
 
     const exists = await Follow.checkExists(userId, followId);
-
     if (!exists) {
       ctx.status = 409;
       ctx.body = {
@@ -176,33 +171,32 @@ export const unfollow: Middleware = async (ctx: Context) => {
       return;
     }
 
-    await Follow.deleteOne({ following: followId, follower: userId })
-      .lean()
-      .exec();
-
-    await User.unCount('follower', userId);
-    await User.unCount('following', followId);
+    await Follow.deleteOne({ $and: [{ following: followId }, { follower: userId }] }).exec();
 
     ctx.type = 'application/json';
     ctx.body = {
       follow: false,
     };
+
+    setImmediate(() => {
+      User.followCount('follower', userId, false);
+      User.followCount('following', followId, false);
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const getFollowingList: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     name: string;
-  };
+  }
 
-  type QueryPayload = {
+  interface QuerySchema {
     cursor: string | null;
-  };
+  }
 
-  const { name }: ParamsPayload = ctx.params;
-
+  const { name } = ctx.params as ParamSchema;
   if (checkEmpty(name)) {
     ctx.status = 400;
     ctx.body = {
@@ -211,8 +205,7 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { cursor }: QueryPayload = ctx.params;
-
+  const { cursor } = ctx.params as QuerySchema;
   if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
@@ -222,8 +215,7 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 404;
       ctx.body = {
@@ -233,23 +225,43 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const following = await Follow.getfollowingList(user._id, cursor);
+    const query = Object.assign(
+      {},
+      cursor
+        ? {
+            $and: [
+              {
+                _id: { $lt: cursor },
+              },
+              {
+                follower: user._id,
+              },
+            ],
+          }
+        : {
+            follower: user._id,
+          }
+    );
 
-    if (following.length === 0 || !following) {
-      ctx.body = {
-        next: '',
-        usersWithData: [],
-      };
-      return;
-    }
+    const follow = await Follow.find(query)
+      .sort({ _id: -1 })
+      .select('following')
+      .populate('following')
+      .limit(10)
+      .exec();
 
-    const next =
-      following.length === 10 ? `/follow/${name}/following?cursor=${following[9]._id}` : null;
+    const next = follow.length === 10 ? `/follow/${name}/following?cursor=${follow[9]._id}` : null;
 
     ctx.type = 'application/json';
     ctx.body = {
       next,
-      usersWithData: following.map(serializeFollowing),
+      usersWithData: follow.map(follow => {
+        const { following } = follow;
+        return {
+          ...pick(following, ['_id']),
+          ...pick(following.profile, ['username', 'thumbnail', 'shortBio']),
+        };
+      }),
     };
   } catch (e) {
     ctx.throw(500, e);
@@ -257,16 +269,15 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
 };
 
 export const getFollowerList: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
+  interface ParamSchema {
     name: string;
-  };
+  }
 
-  type QueryPayload = {
+  interface QuerySchema {
     cursor: string | null;
-  };
+  }
 
-  const { name }: ParamsPayload = ctx.params;
-
+  const { name } = ctx.params as ParamSchema;
   if (checkEmpty(name)) {
     ctx.status = 400;
     ctx.body = {
@@ -275,7 +286,7 @@ export const getFollowerList: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { cursor }: QueryPayload = ctx.params;
+  const { cursor } = ctx.params as QuerySchema;
 
   if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
@@ -286,8 +297,7 @@ export const getFollowerList: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const user = await User.findByEmailOrUsername('username', name);
-
+    const user = await User.findByEmailOrUsername(null, name);
     if (!user) {
       ctx.status = 404;
       ctx.body = {
@@ -297,23 +307,43 @@ export const getFollowerList: Middleware = async (ctx: Context) => {
       return;
     }
 
-    const follower = await Follow.getfollowerList(user._id, cursor);
+    const query = Object.assign(
+      {},
+      cursor
+        ? {
+            $and: [
+              {
+                _id: { $lt: cursor },
+              },
+              {
+                following: user._id,
+              },
+            ],
+          }
+        : {
+            following: user._id,
+          }
+    );
 
-    if (follower.length === 0 || !follower) {
-      ctx.body = {
-        next: '',
-        usersWithData: [],
-      };
-      return;
-    }
+    const follow = await Follow.find(query)
+      .sort({ _id: -1 })
+      .select('follower')
+      .populate('follower')
+      .limit(10)
+      .exec();
 
-    const next =
-      follower.length === 10 ? `/follow/${name}/follower?cursor=${follower[9]._id}` : null;
+    const next = follow.length === 10 ? `/follow/${name}/follower?cursor=${follow[9]._id}` : null;
 
     ctx.type = 'application/json';
     ctx.body = {
       next,
-      usersWithData: follower.map(serializeFollower),
+      usersWithData: follow.map(follow => {
+        const { follower } = follow;
+        return {
+          ...pick(follower, ['_id', 'username']),
+          ...pick(follower.profile, ['username', 'thumbnail', 'shortBio']),
+        };
+      }),
     };
   } catch (e) {
     ctx.throw(500, e);

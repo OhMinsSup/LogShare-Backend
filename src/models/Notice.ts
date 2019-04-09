@@ -9,11 +9,12 @@ export interface INotice extends Document {
 
 export interface INoticeModel extends Model<INotice> {}
 
-const NoticeSchema = new Schema(
+const schema = new Schema(
   {
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      unique: true,
     },
   },
   {
@@ -21,6 +22,6 @@ const NoticeSchema = new Schema(
   }
 );
 
-const Notice = model<INotice>('Notice', NoticeSchema) as INoticeModel;
+const Notice = model<INotice, INoticeModel>('Notice', schema);
 
 export default Notice;

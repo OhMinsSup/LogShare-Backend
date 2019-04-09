@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import * as postCtrl from './post.ctrl';
-import { needsAuth, checkObjectId, checkPostExistancy } from '../../lib/common';
+import { needsAuth } from '../../lib/utils';
 import posts from './posts';
 import like from './like';
 import comment from './comment';
@@ -8,23 +8,40 @@ import comment from './comment';
 const post = new Router();
 
 post.post('/', needsAuth, postCtrl.writePost);
-post.put('/:id', needsAuth, checkObjectId, postCtrl.updatePost);
-post.delete('/:id', needsAuth, checkObjectId, postCtrl.deletePost);
-post.get('/:id', checkObjectId, postCtrl.readPost);
+post.put(
+  '/:postId',
+  needsAuth,
+  postCtrl.checkPostObjectId,
+  postCtrl.checkPostExistancy,
+  postCtrl.checkPostOwnership,
+  postCtrl.updatePost
+);
+post.delete(
+  '/:postId',
+  needsAuth,
+  postCtrl.checkPostObjectId,
+  postCtrl.checkPostExistancy,
+  postCtrl.checkPostOwnership,
+  postCtrl.deletePost
+);
+
+post.get('/:postId', postCtrl.checkPostObjectId, postCtrl.readPost);
 
 post.use('/list', posts.routes());
+
 post.use(
-  '/:id/like',
+  '/:postId/like',
   needsAuth,
-  checkObjectId,
-  checkPostExistancy,
+  postCtrl.checkPostObjectId,
+  postCtrl.checkPostExistancy,
   like.routes()
 );
+
 post.use(
-  '/:id/comment',
+  '/:postId/comment',
   needsAuth,
-  checkObjectId,
-  checkPostExistancy,
+  postCtrl.checkPostObjectId,
+  postCtrl.checkPostExistancy,
   comment.routes()
 );
 

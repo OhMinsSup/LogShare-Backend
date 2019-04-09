@@ -1,23 +1,71 @@
-import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
-import { diff } from 'json-diff';
-import { TokenPayload } from '../../lib/token';
-import { checkEmpty, filterUnique, hash } from '../../lib/common';
-import Tag from '../../models/Tag';
-import Post, { IPost } from '../../models/Post';
-import PostTag from '../../models/PostTag';
+import { Middleware, Context } from 'koa';
+import { Types } from 'mongoose';
+import { pick } from 'lodash';
 import User from '../../models/User';
 import Like from '../../models/Like';
-import { serializePost } from '../../lib/serialized';
 import PostRead from '../../models/PostRead';
-import Comment from '../../models/Comment';
+import Post, { IPost } from '../../models/Post';
+import { checkEmpty, filterUnique, hash } from '../../lib/utils';
+
+export const checkPostExistancy: Middleware = async (ctx: Context, next: () => Promise<void>) => {
+  interface CheckPostExistancyParamSchema {
+    postId: string;
+  }
+  const { postId } = ctx.params as CheckPostExistancyParamSchema;
+  try {
+    const post = await Post.findOne({
+      _id: postId,
+    }).exec();
+    if (!post) {
+      ctx.status = 404;
+      ctx.body = {
+        name: 'POST_DATA_NOT_FOUND',
+      };
+      return;
+    }
+    ctx.state.post = post;
+  } catch (e) {
+    ctx.throw(500, e);
+    return;
+  }
+  return next();
+};
+
+export const checkPostOwnership: Middleware = (ctx: Context, next: () => Promise<void>) => {
+  const { user, post } = ctx.state;
+
+  if (post.user.toString() !== user._id.toString()) {
+    ctx.status = 403;
+    ctx.body = {
+      name: 'NO_PERMISSION',
+    };
+    return;
+  }
+  return next();
+};
+
+export const checkPostObjectId: Middleware = async (ctx: Context, next: () => Promise<void>) => {
+  interface ParamSchema {
+    postId: string;
+  }
+  const { postId } = ctx.params as ParamSchema;
+  if (!Types.ObjectId.isValid(postId)) {
+    ctx.status = 400;
+    ctx.body = {
+      name: 'Not ObjectId',
+    };
+    return;
+  }
+  return next();
+};
 
 export const writePost: Middleware = async (ctx: Context) => {
   type BodySchema = {
     title: string;
     body: string;
     post_thumbnail: string | null;
-    tags: string[] | null;
+    tags: string[];
   };
 
   const schema = Joi.object().keys({
@@ -42,7 +90,7 @@ export const writePost: Middleware = async (ctx: Context) => {
   }
 
   const { title, body, post_thumbnail, tags }: BodySchema = ctx.request.body;
-  const user: TokenPayload = ctx['user'];
+  const user = ctx.state.user;
 
   const stringsToCheck = [title, body, ...tags];
 
@@ -56,15 +104,26 @@ export const writePost: Middleware = async (ctx: Context) => {
     }
   }
 
+  if (tags) {
+    for (const key in tags) {
+      if (key.length > 25) {
+        ctx.status = 400;
+        ctx.body = {
+          name: 'TAG_TOO_LONG',
+        };
+        return;
+      }
+    }
+  }
+
   const uniqueTags = filterUnique(tags);
 
   try {
-    const tagIds = await Promise.all(uniqueTags.map(tag => Tag.getTagId(tag)));
-
     const post = await new Post({
       user: user._id,
       title,
       body,
+      tags: uniqueTags,
       post_thumbnail: post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
     }).save();
 
@@ -77,13 +136,19 @@ export const writePost: Middleware = async (ctx: Context) => {
       return;
     }
 
-    await PostTag.Link(post._id, tagIds);
-    await User.Count('post', user._id);
-
     ctx.type = 'application/json';
     ctx.body = {
       postId: post._id,
     };
+
+    setImmediate(() => {
+      User.findOne({
+        _id: user._id,
+      }).then(user => {
+        if (!user) return;
+        user.count('post', true);
+      });
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -94,11 +159,7 @@ export const updatePost: Middleware = async (ctx: Context) => {
     title: string;
     body: string;
     post_thumbnail: string | null;
-    tags: string[] | null;
-  };
-
-  type ParamsPayload = {
-    id: string;
+    tags: string[];
   };
 
   const schema = Joi.object().keys({
@@ -123,7 +184,6 @@ export const updatePost: Middleware = async (ctx: Context) => {
   }
 
   const { title, body, post_thumbnail, tags }: BodySchema = ctx.request.body;
-  const { id: postId }: ParamsPayload = ctx.params;
 
   const stringsToCheck = [title, body, ...tags];
 
@@ -137,38 +197,42 @@ export const updatePost: Middleware = async (ctx: Context) => {
     }
   }
 
+  if (tags) {
+    for (const key in tags) {
+      if (key.length > 25) {
+        ctx.status = 400;
+        ctx.body = {
+          name: 'TAG_TOO_LONG',
+        };
+        return;
+      }
+    }
+  }
+
+  const uniqueTags = filterUnique(tags);
+
   try {
-    const currentTags = await PostTag.getTagNames(postId);
-    const tagNames = currentTags.map(tag => tag.tag.name);
-    const tagDiff: string[] = diff(tagNames.sort(), tags.sort()) || [];
-    const tagsToRemove: string[] = tagDiff.filter(info => info[0] === '-').map(info => info[1]);
-    const tagsToAdd: string[] = tagDiff.filter(info => info[0] === '+').map(info => info[1]);
-
-    await PostTag.removeTagsPost(postId, tagsToRemove);
-    await PostTag.addTagsToPost(postId, tagsToAdd);
-
-    const post: IPost = await Post.findByIdAndUpdate(
-      postId,
+    const post: IPost = await Post.findOneAndUpdate(
+      {
+        $and: [
+          {
+            _id: ctx.state.post._id,
+          },
+          {
+            user: ctx.state.user._id,
+          },
+        ],
+      },
       {
         title,
         body,
-        post_thumbnail: post_thumbnail === null || !post_thumbnail ? '' : post_thumbnail,
+        tags: uniqueTags,
+        post_thumbnail: !post_thumbnail ? '' : post_thumbnail,
       },
       {
         new: true,
       }
-    )
-      .lean()
-      .exec();
-
-    if (!post) {
-      ctx.status = 404;
-      ctx.body = {
-        name: 'Post',
-        payload: '포스트가 업데이트되지 않았습니다',
-      };
-      return;
-    }
+    ).exec();
 
     ctx.type = 'application/json';
     ctx.body = {
@@ -180,83 +244,77 @@ export const updatePost: Middleware = async (ctx: Context) => {
 };
 
 export const deletePost: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
-    id: string;
-  };
-
-  const { id: postId }: ParamsPayload = ctx.params;
-
+  const { user, post } = ctx.state;
   try {
-    await Promise.all([
-      PostTag.deleteMany({ post: postId })
-        .lean()
-        .exec(),
-      Like.deleteMany({ post: postId })
-        .lean()
-        .exec(),
-      Comment.deleteMany({ post: postId })
-        .lean()
-        .exec(),
-      PostRead.deleteOne({ post: postId })
-        .lean()
-        .exec(),
-    ]);
-
-    await Post.deleteOne({ _id: postId })
-      .lean()
-      .exec();
-    await User.unCount('post', ctx['user']._id);
-
+    await Post.deleteOne({
+      $and: [{ _id: post._id }, { user: user._id }],
+    }).exec();
     ctx.type = 'application/json';
     ctx.status = 200;
+
+    setImmediate(() => {
+      User.findOne({
+        _id: user._id,
+      }).then(user => {
+        if (!user) return;
+        user.count('post', false);
+      });
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
-export const readPost: Middleware = async (ctx: Context) => {
-  type ParamsPayload = {
-    id: string;
+function serializePost(data: any) {
+  const {
+    postData: { _id: postId, title, body, post_thumbnail, createdAt, user, info, tags: tag },
+    liked,
+  } = data;
+  return {
+    postId,
+    title,
+    body,
+    liked,
+    tag,
+    post_thumbnail,
+    createdAt,
+    info: {
+      ...pick(info, ['likes', 'comments']),
+    },
+    user: {
+      ...pick(user, ['_id']),
+      ...pick(user.profile, ['username', 'thumbnail', 'shortBio']),
+    },
   };
+}
 
-  const { id }: ParamsPayload = ctx.params;
-  const user: TokenPayload = ctx['user'];
+export const readPost: Middleware = async (ctx: Context) => {
+  interface ParamSchema {
+    postId: string;
+  }
+  const { postId } = ctx.params as ParamSchema;
+  const { user } = ctx.state;
+  let liked = false;
 
   try {
-    const post = await Post.readPostById(id);
-    const tag = await PostTag.getTagNames(id);
+    const postData = await Post.readPostById(postId, user._id);
+    const exists = await Like.checkExists(user._id, postId);
+    liked = !!exists;
 
-    if (!post) {
-      ctx.status = 404;
-      return;
-    }
+    ctx.body = serializePost({ postData, liked });
 
-    let liked = false;
+    setImmediate(async () => {
+      const hashIp = hash(ctx.request.ip);
+      const postRead = await PostRead.view(hashIp, postData._id);
+      if (postRead) return;
 
-    if (user) {
-      const exists = await Like.checkExists(user._id, post._id);
-      liked = !!exists;
-    }
-
-    ctx.type = 'application/json';
-    ctx.body = serializePost({
-      ...post,
-      name: tag.map(tag => tag.tag.name),
-      liked,
+      await PostRead.create({
+        ip: hashIp,
+        post: postData._id,
+        user: user._id,
+      });
+      await postData.count(1);
     });
-
-    const hashIp = hash(ctx.request.ip);
-    const postRead = await PostRead.view(hashIp, post._id);
-
-    if (postRead) return;
-
-    await new PostRead({
-      ip: hashIp,
-      post: post._id,
-      user: user._id,
-    }).save();
-
-    await Post.score(post.user, post._id);
   } catch (e) {
     ctx.throw(500, e);
   }

@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, DocumentQuery } from 'mongoose';
+import { Schema, model, Model, Document } from 'mongoose';
 import { IUser } from './User';
 
 export interface IFollow extends Document {
@@ -9,18 +9,10 @@ export interface IFollow extends Document {
 }
 
 export interface IFollowModel extends Model<IFollow> {
-  checkExists(userId: string, followId: string): Promise<IFollow>;
-  getfollowingList(
-    followerId: string,
-    cursor: string | null
-  ): Promise<IFollow[]>;
-  getfollowerList(
-    followingId: string,
-    cursor: string | null
-  ): Promise<IFollow[]>;
+  checkExists: (userId: string, followId: string) => Promise<IFollow>;
 }
 
-const FollowSchema = new Schema(
+const schema = new Schema(
   {
     following: {
       type: Schema.Types.ObjectId,
@@ -36,67 +28,16 @@ const FollowSchema = new Schema(
   }
 );
 
-FollowSchema.statics.checkExists = function(
+schema.statics.checkExists = function checkExists(
   userId: string,
   followId: string
-): Promise<any> {
-  return this.findOne({
+): Promise<IFollow> {
+  const Follow: IFollowModel = this;
+  return Follow.findOne({
     $and: [{ following: followId }, { follower: userId }],
-  })
-    .lean()
-    .exec();
+  }).exec();
 };
 
-FollowSchema.statics.getfollowingList = function(
-  followerId: string,
-  cursor: string | null
-) {
-  const query = Object.assign(
-    {},
-    cursor
-      ? {
-          _id: { $lt: cursor },
-          follower: followerId,
-        }
-      : {
-          follower: followerId,
-        }
-  );
-
-  return this.find(query)
-    .sort({ _id: -1 })
-    .select('following')
-    .populate('following')
-    .limit(10)
-    .lean()
-    .exec();
-};
-
-FollowSchema.statics.getfollowerList = function(
-  followingId: string,
-  cursor: string | null
-) {
-  const query = Object.assign(
-    {},
-    cursor
-      ? {
-          _id: { $lt: cursor },
-          following: followingId,
-        }
-      : {
-          following: followingId,
-        }
-  );
-
-  return this.find(query)
-    .sort({ _id: -1 })
-    .select('follower')
-    .populate('follower')
-    .limit(10)
-    .lean()
-    .exec();
-};
-
-const Follow = model<IFollow>('Follow', FollowSchema) as IFollowModel;
+const Follow = model<IFollow, IFollowModel>('Follow', schema);
 
 export default Follow;

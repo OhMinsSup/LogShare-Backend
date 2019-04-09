@@ -14,7 +14,7 @@ export interface IUserProfile extends Document {
 
 export interface IUserProfileModel extends Model<IUserProfile> {}
 
-const UserProfileSchema = new Schema(
+const schema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -38,9 +38,6 @@ const UserProfileSchema = new Schema(
   { timestamps: true }
 );
 
-const UserProfile = model<IUserProfile>(
-  'UserProfile',
-  UserProfileSchema
-) as IUserProfileModel;
+const UserProfile = model<IUserProfile, IUserProfileModel>('UserProfile', schema);
 
 export default UserProfile;

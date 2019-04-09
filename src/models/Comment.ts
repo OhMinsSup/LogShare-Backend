@@ -15,7 +15,7 @@ export interface IComment extends Document {
 
 export interface ICommentModel extends Model<IComment> {}
 
-const CommentSchema = new Schema(
+const schema = new Schema(
   {
     post: {
       type: Schema.Types.ObjectId,
@@ -44,6 +44,6 @@ const CommentSchema = new Schema(
   }
 );
 
-const Comment = model<IComment>('Comment', CommentSchema) as ICommentModel;
+const Comment = model<IComment, ICommentModel>('Comment', schema);
 
 export default Comment;
