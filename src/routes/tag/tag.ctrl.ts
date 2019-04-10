@@ -3,39 +3,15 @@ import { pick } from 'lodash';
 import Post from '../../models/Post';
 import { formatShortDescription, checkEmpty } from '../../lib/utils';
 
-export const getTags: Middleware = async (ctx: Context) => {
-  try {
-    const tagData: any[] = await Post.aggregate([
-      {
-        $unwind: '$tags',
-      },
-      { $sortByCount: '$tags' },
-    ]).exec();
-
-    ctx.type = 'application/json';
-    ctx.body = tagData.map(tag => {
-      const { _id: name, count } = tag;
-      return {
-        name,
-        count,
-      };
-    });
-  } catch (e) {
-    ctx.throw(500, e);
-  }
-};
-
 export const getTagInfo: Middleware = async (ctx: Context) => {
   interface ParamSchema {
     tag: string;
   }
-
   interface QuerySchema {
     cursor: string | null;
   }
 
   const { tag } = ctx.params as ParamSchema;
-
   if (checkEmpty(tag)) {
     ctx.status = 400;
     ctx.body = {
@@ -87,11 +63,21 @@ export const getTagInfo: Middleware = async (ctx: Context) => {
       next,
       postWithData: posts
         .map(post => {
-          const { _id: postId, post_thumbnail, info, title, body, user, createdAt } = post;
+          const {
+            _id: postId,
+            post_thumbnail,
+            tags: tag,
+            info,
+            title,
+            body,
+            user,
+            createdAt,
+          } = post;
           return {
             postId,
             title,
             body,
+            tag,
             post_thumbnail,
             createdAt,
             info: {

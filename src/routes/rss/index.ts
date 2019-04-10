@@ -4,7 +4,7 @@ import { needsAuth } from '../../lib/utils';
 
 const rss = new Router();
 
-rss.get('/', needsAuth, rssCtrl.getEntireRSS);
+rss.get('/', rssCtrl.getEntireRSS);
 rss.get('/@:username', needsAuth, rssCtrl.getUserRSS);
 
 export default rss;

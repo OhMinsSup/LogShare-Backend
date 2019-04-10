@@ -4,7 +4,7 @@ import { needsAuth } from '../../lib/utils';
 
 const user = new Router();
 
-user.get('/info/@:name', needsAuth, userCtrl.getUserInfo);
+user.get('/info/@:name', userCtrl.getUserInfo);
 user.post('/profile', needsAuth, userCtrl.profileUpdate);
 user.get('/featured', userCtrl.featuredUser);
 user.get('/', userCtrl.usersList);
