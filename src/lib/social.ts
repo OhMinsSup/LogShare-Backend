@@ -1,8 +1,6 @@
-import * as dotenv from 'dotenv';
 import { google } from 'googleapis';
 const Facebook = require('fb');
 const Github = require('github');
-dotenv.config();
 
 export type Profile = {
   id: number | string;

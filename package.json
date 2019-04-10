@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
-    "start": "node dist/index.js",
+    "start": "set NODE_ENV=production&& node dist/index.js",
     "postinstall": "npm run build:tsc",
     "build:tsc": "tsc",
     "test": "exit"

@@ -49,16 +49,19 @@ class Server {
   }
 
   private initializeDb(): void {
-    const { MONGO_URL_WEB } = process.env;
+    const URL =
+      process.env.NODE_ENV === 'development'
+        ? process.env.MONGODB_DEV_URI
+        : process.env.MONGODB_URI;
 
-    if (!MONGO_URL_WEB) {
+    if (!URL) {
       const error = new Error('InvalidMogoUrlError');
-      error.message = 'Url is missing.';
+      error.message = 'MONGODB_CONNECT_URI is missing.';
       throw error;
     }
 
     mongoose
-      .connect(MONGO_URL_WEB, { useNewUrlParser: true })
+      .connect(URL, { useNewUrlParser: true })
       .then(() => {
         console.log('connected to mongoDB ✅');
       })
