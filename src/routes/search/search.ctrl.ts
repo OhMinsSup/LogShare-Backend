@@ -2,6 +2,7 @@ import { Context, Middleware } from 'koa';
 import { pick } from 'lodash';
 import Post from '../../models/Post';
 import { formatShortDescription } from '../../lib/utils';
+import PostFeeds from '../../models/PostFeeds';
 
 export const publicSearch: Middleware = async (ctx: Context) => {
   interface QuerySchema {
@@ -57,6 +58,15 @@ export const publicSearch: Middleware = async (ctx: Context) => {
           body: formatShortDescription(search.body, 'markdown'),
         })),
     };
+
+    setImmediate(() => {
+      searchResult.map(s => {
+        const { _id } = s;
+        const userId = ctx.state.user._id;
+        if (!userId) return;
+        PostFeeds.createPostFeed(userId, _id);
+      });
+    });
   } catch (e) {
     ctx.throw(500, e);
   }

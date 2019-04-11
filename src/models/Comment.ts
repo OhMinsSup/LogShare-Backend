@@ -44,6 +44,8 @@ const schema = new Schema(
   }
 );
 
+schema.index({ post: -1, user: -1, reply: -1 });
+
 const Comment = model<IComment, ICommentModel>('Comment', schema);
 
 export default Comment;

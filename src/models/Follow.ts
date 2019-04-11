@@ -28,6 +28,8 @@ const schema = new Schema(
   }
 );
 
+schema.index({ following: -1, follower: -1 });
+
 schema.statics.checkExists = function checkExists(
   userId: string,
   followId: string

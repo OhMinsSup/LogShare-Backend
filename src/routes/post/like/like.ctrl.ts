@@ -1,5 +1,6 @@
 import { Middleware, Context } from 'koa';
 import Like from '../../../models/Like';
+import PostFeeds from '../../../models/PostFeeds';
 
 export const like: Middleware = async (ctx: Context) => {
   const postId: string = ctx.state.post._id;
@@ -33,9 +34,10 @@ export const like: Middleware = async (ctx: Context) => {
       liked: true,
       likes: ctx.state.post.info.likes + 1,
     };
-    setImmediate(() => {
-      ctx.state.post.likes(true);
-      ctx.state.post.count(5);
+    setImmediate(async () => {
+      await ctx.state.post.likes(true);
+      await ctx.state.post.count(5);
+      await PostFeeds.createPostFeed(userId, postId);
     });
   } catch (e) {
     ctx.throw(500, e);

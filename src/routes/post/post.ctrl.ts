@@ -7,6 +7,7 @@ import Like from '../../models/Like';
 import PostRead from '../../models/PostRead';
 import Post, { IPost } from '../../models/Post';
 import { checkEmpty, filterUnique, hash } from '../../lib/utils';
+import PostFeeds from '../../models/PostFeeds';
 
 export const checkPostExistancy: Middleware = async (ctx: Context, next: () => Promise<void>) => {
   interface CheckPostExistancyParamSchema {
@@ -315,6 +316,7 @@ export const readPost: Middleware = async (ctx: Context) => {
         user: user._id,
       });
       await postData.count(1);
+      await PostFeeds.createPostFeed(user._id, postData._id);
     });
   } catch (e) {
     ctx.throw(500, e);

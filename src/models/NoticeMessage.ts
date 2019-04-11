@@ -34,6 +34,8 @@ const schema = new Schema(
   }
 );
 
+schema.index({ sender: -1, notice: -1, recipient: -1 });
+
 const NoticeMessage = model<INoticeMessage, INoticeMessageModel>('NoticeMessage', schema);
 
 export default NoticeMessage;

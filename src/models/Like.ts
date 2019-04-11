@@ -30,10 +30,7 @@ const schema = new Schema(
   }
 );
 
-schema.index({
-  user: -1,
-  post: -1,
-});
+schema.index({ user: -1, post: -1 });
 
 schema.statics.checkExists = function(userId: string, postId: string): Promise<any> {
   return this.findOne({

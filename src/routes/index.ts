@@ -9,6 +9,7 @@ import user from './user';
 import search from './search';
 import rss from './rss';
 import follow from './follow';
+import feed from './feed';
 
 const router = new Router();
 
@@ -22,11 +23,12 @@ router.use('/search', search.routes());
 router.use('/common', common.routes());
 router.use('/rss', rss.routes());
 router.use('/follow', follow.routes());
+router.use('/feed', feed.routes());
 
-router.get('/', ctx => {
+router.get('/version', ctx => {
   ctx.type = 'application/json';
   ctx.body = {
-    result: 'Hello',
+    version: 'v1/LogShare',
   };
 });
 
