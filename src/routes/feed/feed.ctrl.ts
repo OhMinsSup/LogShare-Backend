@@ -93,17 +93,19 @@ export const privateFeedUsers: Middleware = async (ctx: Context) => {
       .limit(15)
       .exec();
 
-    ctx.body = feed
-      .map(f => {
-        const {
-          result: { _id: userId, profile },
-        } = f;
-        return {
-          userId,
-          profile,
-        };
-      })
-      .filter(f => f.userId.toString() !== user._id.toString());
+    ctx.body = {
+      feed: feed
+        .map(f => {
+          const {
+            result: { _id: userId, profile },
+          } = f;
+          return {
+            userId,
+            profile,
+          };
+        })
+        .filter(f => f.userId.toString() !== user._id.toString()),
+    };
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -202,24 +204,23 @@ export const privateFeedPosts: Middleware = async (ctx: Context) => {
       .limit(15)
       .exec();
 
-    ctx.body = feed
-      .map(f => {
-        const {
-          result: { title, body, tags, _id, user },
-        } = f;
-        return {
-          postId: _id,
-          userId: user,
-          title,
-          body,
-          tags,
-        };
-      })
-      .map(f => ({
-        ...f,
-        body: formatShortDescription(f.body, 'markdown'),
-      }))
-      .filter(f => f.userId.toString() !== user._id.toString());
+    ctx.body = {
+      feed: feed
+        .map(f => {
+          const {
+            result: { title, tags, _id, user, info, post_thumbnail },
+          } = f;
+          return {
+            postId: _id,
+            userId: user,
+            post_thumbnail,
+            title,
+            tags,
+            info,
+          };
+        })
+        .filter(f => f.userId.toString() !== user._id.toString()),
+    };
   } catch (e) {
     ctx.throw(500, e);
   }
