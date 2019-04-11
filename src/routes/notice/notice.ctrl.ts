@@ -1,66 +1,76 @@
-import { Middleware, Context } from 'koa';
 import * as Joi from 'joi';
+import { Middleware, Context } from 'koa';
 import { Types } from 'mongoose';
-import { TokenPayload } from '../../lib/token';
-import Notice, { INotice } from '../../models/Notice';
-import { serializeNoticeRoom } from '../../lib/serialized';
-import Follow, { IFollow } from '../../models/Follow';
+import { pick } from 'lodash';
+import Notice from '../../models/Notice';
+import Follow from '../../models/Follow';
+import NoticeMessage from '../../models/NoticeMessage';
 import { filterUnique, getToDayDate } from '../../lib/utils';
-import NoticeMessage, { INoticeMessage } from '../../models/NoticeMessage';
+
+function serializeNotice(data: any) {
+  const { _id: noticeId, creator } = data;
+
+  return {
+    noticeId,
+    creator: {
+      ...pick(creator, ['_id']),
+      ...pick(creator.profile, ['username', 'thumbnail', 'shortBio']),
+    },
+  };
+}
 
 export const checkNoticeRoom: Middleware = async (ctx: Context) => {
-  const userId: TokenPayload = ctx['user'];
-
+  const { _id: userId } = ctx.state.user;
   try {
-    const exists: INotice = await Notice.findOne({
+    const exists = await Notice.findOne({
       creator: userId,
     })
       .populate({
         path: 'creator',
         select: 'username profile.username profile.thumbnail',
       })
-      .lean()
       .exec();
 
     if (exists) {
       ctx.body = {
-        noticeWithData: serializeNoticeRoom(exists),
+        noticeWithData: serializeNotice(exists),
       };
       return;
     }
 
-    const notice = await new Notice({
+    const notice = await Notice.create({
       creator: userId,
-    }).save();
+    });
 
-    const noticeData: INotice = await Notice.findById(notice._id)
+    const noticeData = await Notice.findOne({ _id: notice._id })
       .populate({
         path: 'creator',
         select: 'username profile.displayName profile.thumbnail profile.shortBio',
       })
-      .lean()
       .exec();
 
     ctx.type = 'application/json';
     ctx.body = {
-      noticeWithData: serializeNoticeRoom(noticeData),
+      noticeWithData: serializeNotice(noticeData),
     };
 
-    await new NoticeMessage({
-      sender: userId,
-      recipient: userId,
-      notice: notice._id,
-      message: 'LogShare에 가입한 것을 환영합니다.',
-    }).save();
+    setImmediate(() => {
+      NoticeMessage.create({
+        sender: userId,
+        recipient: userId,
+        notice: notice._id,
+        message: 'LogShare에 가입한 것을 환영합니다.',
+      });
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 export const sendMessage: Middleware = async (ctx: Context) => {
-  type BodySchema = {
+  interface BodySchema {
     message: string;
-  };
+  }
 
   const schema = Joi.object().keys({
     message: Joi.string().required(),
@@ -74,22 +84,18 @@ export const sendMessage: Middleware = async (ctx: Context) => {
     return;
   }
 
-  const { message }: BodySchema = ctx.request.body;
-  const { _id: userId }: TokenPayload = ctx['user'];
+  const { message } = ctx.request.body as BodySchema;
+  const { _id: userId } = ctx.state.user;
   let userIds: string[] = [];
 
   try {
-    const following: IFollow[] = await Follow.find({
+    const following = await Follow.find({
       follower: userId,
-    })
-      .lean()
-      .exec();
+    }).exec();
 
-    const follower: IFollow[] = await Follow.find({
+    const follower = await Follow.find({
       following: userId,
-    })
-      .lean()
-      .exec();
+    }).exec();
 
     if ((!following || following.length === 0) && (!follower || follower.length === 0)) {
       ctx.status = 204;
@@ -99,8 +105,11 @@ export const sendMessage: Middleware = async (ctx: Context) => {
     // 팔로우, 팔로잉 유저의 아이디를 가져와 userIds에 저장
     following.map(user => userIds.push(user.following as any));
     follower.map(user => userIds.push(user.follower as any));
+    console.log(userIds);
+    console.log('test');
 
     const uniqueUserIds = filterUnique(userIds);
+    console.log(uniqueUserIds);
 
     if (!uniqueUserIds || uniqueUserIds.length === 0) {
       ctx.status = 204;
@@ -108,14 +117,13 @@ export const sendMessage: Middleware = async (ctx: Context) => {
     }
 
     // 각 아이디의 notice를 찾아서 온다
-    const notice: INotice[] = await Promise.all(
+    const notice = await Promise.all(
       uniqueUserIds.map(userId => {
         return Notice.findOne({ creator: userId })
           .populate({
             path: 'creator',
             select: 'profile.username profile.thumbnail',
           })
-          .lean()
           .exec();
       })
     );
@@ -139,16 +147,13 @@ export const sendMessage: Middleware = async (ctx: Context) => {
   }
 };
 
-export const simpleListNotice: Middleware = async (ctx: Context) => {
-  const { _id: userId }: TokenPayload = ctx['user'];
+export const alreadyListNotice: Middleware = async (ctx: Context) => {
+  const { _id: userId } = ctx.state.user;
 
   try {
-    const notice: INotice = await Notice.findOne({
+    const notice = await Notice.findOne({
       creator: userId,
-    })
-      .lean()
-      .exec();
-
+    }).exec();
     if (!notice) {
       ctx.status = 404;
       ctx.body = {
@@ -159,8 +164,7 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
     }
 
     const { startDate, endDate } = getToDayDate();
-
-    const message: INoticeMessage[] = await NoticeMessage.find({
+    const message = await NoticeMessage.find({
       $and: [
         { notice: notice._id },
         {
@@ -172,15 +176,7 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
       ],
     })
       .populate('sender')
-      .lean()
       .exec();
-
-    if (message.length === 0 || !message) {
-      ctx.body = {
-        message: [],
-      };
-      return;
-    }
 
     ctx.type = 'application/json';
     ctx.body = {
@@ -189,6 +185,7 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
         return {
           message,
           thumbnail: sender.profile.thumbnail,
+          username: sender.profile.username,
           createdAt,
         };
       }),
@@ -199,13 +196,12 @@ export const simpleListNotice: Middleware = async (ctx: Context) => {
 };
 
 export const listNotice: Middleware = async (ctx: Context) => {
-  type QueryPayload = {
+  interface QuerySchema {
     cursor: string | null;
-  };
+  }
 
-  const { _id: userId }: TokenPayload = ctx['user'];
-  const { cursor }: QueryPayload = ctx.query;
-
+  const { _id: userId } = ctx.state.user;
+  const { cursor } = ctx.query as QuerySchema;
   if (cursor && !Types.ObjectId.isValid(cursor)) {
     ctx.status = 400;
     ctx.body = {
@@ -215,9 +211,7 @@ export const listNotice: Middleware = async (ctx: Context) => {
   }
 
   try {
-    const notice: INotice = await Notice.findOne({ creator: userId })
-      .lean()
-      .exec();
+    const notice = await Notice.findOne({ creator: userId }).exec();
 
     if (!notice) {
       ctx.status = 404;
@@ -233,20 +227,11 @@ export const listNotice: Middleware = async (ctx: Context) => {
       cursor ? { _id: { $lt: cursor }, notice: notice._id } : { notice: notice._id }
     );
 
-    const message: INoticeMessage[] = await NoticeMessage.find(query)
+    const message = await NoticeMessage.find(query)
       .populate('sender')
       .limit(20)
       .sort({ _id: -1 })
-      .lean()
       .exec();
-
-    if (message.length === 0 || !message) {
-      ctx.body = {
-        next: '',
-        message: [],
-      };
-      return;
-    }
 
     const next = message.length === 20 ? `/notice?cursor=${message[19]._id}` : null;
 
@@ -258,6 +243,7 @@ export const listNotice: Middleware = async (ctx: Context) => {
         return {
           message,
           thumbnail: sender.profile.thumbnail,
+          username: sender.profile.username,
           createdAt,
         };
       }),

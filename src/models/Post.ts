@@ -20,7 +20,7 @@ export interface IPost extends Document {
 }
 
 export interface IPostModel extends Model<IPost> {
-  readPostById: (postId: string, userId: string) => Promise<IPost>;
+  readPostById: (postId: string) => Promise<IPost>;
   countSearchPosts: (query: string) => Promise<number>;
   searchPosts: (query: string, page: number) => Promise<IPost[]>;
 }
@@ -61,13 +61,10 @@ schema.index(
   { weights: { title: 3, tags: 2, body: 1 } }
 );
 
-schema.statics.readPostById = function readPostById(
-  postId: string,
-  userId: string
-): Promise<IPost> {
+schema.statics.readPostById = function readPostById(postId: string): Promise<IPost> {
   const Post: IPostModel = this;
   return Post.findOne({
-    $and: [{ _id: postId }, { user: userId }],
+    _id: postId,
   })
     .sort({ _id: -1 })
     .populate('user')

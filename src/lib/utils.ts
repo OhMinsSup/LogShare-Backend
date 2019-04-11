@@ -1,8 +1,6 @@
 import * as crypto from 'crypto';
-import { Types } from 'mongoose';
 import { Context, Middleware } from 'koa';
-import Post, { IPost } from '../models/Post';
-import { IUser } from '../models/User';
+import { IPost } from '../models/Post';
 const removeMd = require('remove-markdown');
 
 export const filterUnique = (array: string[]): string[] => {
@@ -50,23 +48,6 @@ export const hash = (value: string): string => {
     .createHmac('sha256', 'ds')
     .update(value)
     .digest('hex');
-};
-
-export const checkObjectId: Middleware = async (ctx: Context, next: () => Promise<any>) => {
-  type ParamsPayload = {
-    id: string;
-  };
-
-  const { id }: ParamsPayload = ctx.params;
-
-  if (!Types.ObjectId.isValid(id)) {
-    ctx.status = 400;
-    ctx.body = {
-      name: 'Not ObjectId',
-    };
-    return; // 400 Bad Request
-  }
-  return next();
 };
 
 export const needsAuth: Middleware = async (ctx: Context, next: () => Promise<any>) => {

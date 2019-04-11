@@ -5,13 +5,7 @@ import { needsAuth } from '../../lib/utils';
 const file = new Router();
 
 file.post('/create-url/post-images', needsAuth, fileCtrl.createPostImageSignedUrl);
-
-file.post(
-  '/create-url/common-cover-background',
-  needsAuth,
-  fileCtrl.createCommonUserCoverBgSignedUrl
-);
-
-file.post('/create-url/common-thumbnail', needsAuth, fileCtrl.createCommonThumbnailSignedUrl);
+file.post('/create-url/thumbnail', needsAuth, fileCtrl.createCommonThumbnailSignedUrl);
+file.post('/create-url/cover', needsAuth, fileCtrl.createCommonUserCoverBgSignedUrl);
 
 export default file;

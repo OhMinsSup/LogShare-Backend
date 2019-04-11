@@ -2,7 +2,6 @@ import { Context, Middleware } from 'koa';
 import { pick } from 'lodash';
 import User from '../../../models/User';
 import Post, { IPost } from '../../../models/Post';
-import { serializePost, serializePoplatePost } from '../../../lib/serialized';
 import { formatShortDescription, checkEmpty } from '../../../lib/utils';
 import { Types } from 'mongoose';
 import Like from '../../../models/Like';

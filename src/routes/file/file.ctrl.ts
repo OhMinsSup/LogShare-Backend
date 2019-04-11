@@ -17,11 +17,6 @@ export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
   const { image } = ctx.request.files;
   const user = ctx.state.user;
 
-  if (!user) {
-    ctx.status = 401;
-    return;
-  }
-
   if (!image) {
     ctx.status = 400;
     ctx.body = {
@@ -73,12 +68,6 @@ export const createPostImageSignedUrl: Middleware = async (ctx: Context) => {
 export const createCommonUserCoverBgSignedUrl: Middleware = async (ctx: Context) => {
   const { cover } = ctx.request.files;
   const user = ctx.state.user;
-
-  if (!user) {
-    ctx.status = 401;
-    return;
-  }
-
   if (!cover) {
     ctx.status = 400;
     ctx.body = {
@@ -132,11 +121,6 @@ export const createCommonUserCoverBgSignedUrl: Middleware = async (ctx: Context)
 export const createCommonThumbnailSignedUrl: Middleware = async (ctx: Context) => {
   const { thumbnail } = ctx.request.files;
   const user = ctx.state.user;
-
-  if (!user) {
-    ctx.status = 401;
-    return;
-  }
 
   if (!thumbnail) {
     ctx.status = 400;

@@ -8,7 +8,7 @@ follow.get('/@:name', needsAuth, followCtrl.getFollow);
 follow.post('/@:name', needsAuth, followCtrl.follow);
 follow.delete('/@:name', needsAuth, followCtrl.unfollow);
 
-follow.get('/@:name/following', needsAuth, followCtrl.getFollowingList);
-follow.get('/@:name/follower', needsAuth, followCtrl.getFollowerList);
+follow.get('/@:name/following', followCtrl.getFollowingList);
+follow.get('/@:name/follower', followCtrl.getFollowerList);
 
 export default follow;

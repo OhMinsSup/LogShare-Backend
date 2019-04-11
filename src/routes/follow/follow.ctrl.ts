@@ -259,7 +259,7 @@ export const getFollowingList: Middleware = async (ctx: Context) => {
         const { following } = follow;
         return {
           ...pick(following, ['_id']),
-          ...pick(following.profile, ['username', 'thumbnail', 'shortBio']),
+          ...pick(following.profile, ['username', 'thumbnail', 'shortBio', 'cover']),
         };
       }),
     };
@@ -341,7 +341,7 @@ export const getFollowerList: Middleware = async (ctx: Context) => {
         const { follower } = follow;
         return {
           ...pick(follower, ['_id', 'username']),
-          ...pick(follower.profile, ['username', 'thumbnail', 'shortBio']),
+          ...pick(follower.profile, ['username', 'thumbnail', 'shortBio', 'cover']),
         };
       }),
     };

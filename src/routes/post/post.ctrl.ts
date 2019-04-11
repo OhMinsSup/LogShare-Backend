@@ -297,17 +297,18 @@ export const readPost: Middleware = async (ctx: Context) => {
   let liked = false;
 
   try {
-    const postData = await Post.readPostById(postId, user._id);
-    const exists = await Like.checkExists(user._id, postId);
-    liked = !!exists;
+    const postData = await Post.readPostById(postId);
+    if (user) {
+      const exists = await Like.checkExists(user._id, postId);
+      liked = !!exists;
+    }
 
     ctx.body = serializePost({ postData, liked });
 
     setImmediate(async () => {
       const hashIp = hash(ctx.request.ip);
       const postRead = await PostRead.view(hashIp, postData._id);
-      if (postRead) return;
-
+      if (postRead || !user) return;
       await PostRead.create({
         ip: hashIp,
         post: postData._id,

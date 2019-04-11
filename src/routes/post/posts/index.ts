@@ -3,7 +3,7 @@ import * as postsCtrl from './posts.ctrl';
 
 const posts = new Router();
 
-posts.get('/@:username', postsCtrl.listPosts);
+posts.get('/@:username', postsCtrl.userPostsList);
 posts.get('/public', postsCtrl.listPosts);
 posts.get('/trending', postsCtrl.trendingPostList);
 posts.get('/like/@:username', postsCtrl.likePostsList);
