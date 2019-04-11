@@ -86,7 +86,6 @@ export const sendMessage: Middleware = async (ctx: Context) => {
 
   const { message } = ctx.request.body as BodySchema;
   const { _id: userId } = ctx.state.user;
-  let userIds: string[] = [];
 
   try {
     const following = await Follow.find({
@@ -102,14 +101,13 @@ export const sendMessage: Middleware = async (ctx: Context) => {
       return;
     }
 
-    // 팔로우, 팔로잉 유저의 아이디를 가져와 userIds에 저장
-    following.map(user => userIds.push(user.following as any));
-    follower.map(user => userIds.push(user.follower as any));
-    console.log(userIds);
-    console.log('test');
+    // 팔로우, 팔로잉 유저 정보를 가져오고 중복된 id값을 제거
+    const f1 = following.map(user => user.following.toString());
+    const f2 = follower.map(user => user.follower.toString());
 
-    const uniqueUserIds = filterUnique(userIds);
-    console.log(uniqueUserIds);
+    const results = f1.concat(f2);
+
+    const uniqueUserIds = filterUnique(results);
 
     if (!uniqueUserIds || uniqueUserIds.length === 0) {
       ctx.status = 204;
