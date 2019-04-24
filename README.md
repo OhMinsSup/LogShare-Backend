@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/OhMinsSup/logshare-backend.svg?branch=master)](https://travis-ci.org/OhMinsSup/logshare-backend)
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+
 LogShares는 블로그형 sns 서비스 입니다. hashnode 서비스를 참고해서 제작
 백엔드에서는 Koa, MongoDB, Typescript, Webpack, Prettier, rss 기술들을 사용하였습니다.
 

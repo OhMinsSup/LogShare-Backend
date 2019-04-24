@@ -8,6 +8,7 @@ import PostRead from '../../models/PostRead';
 import Post, { IPost } from '../../models/Post';
 import { checkEmpty, filterUnique, hash } from '../../lib/utils';
 import PostFeeds from '../../models/PostFeeds';
+import Comment from '../../models/Comment';
 
 export const checkPostExistancy: Middleware = async (ctx: Context, next: () => Promise<void>) => {
   interface CheckPostExistancyParamSchema {
@@ -247,6 +248,14 @@ export const updatePost: Middleware = async (ctx: Context) => {
 export const deletePost: Middleware = async (ctx: Context) => {
   const { user, post } = ctx.state;
   try {
+    await Promise.all([
+      Comment.deleteMany({
+        post: post._id,
+      }).exec(),
+      Like.deleteMany({
+        post: post._id,
+      }).exec(),
+    ]);
     await Post.deleteOne({
       $and: [{ _id: post._id }, { user: user._id }],
     }).exec();

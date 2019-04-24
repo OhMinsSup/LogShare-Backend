@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import routes from './routes';
 import corsMiddleware from './lib/middleware/corsMiddleware';
 import tokenMiddleware from './lib/middleware/tokenMiddleware';
+import redisClient from './lib/redisClient';
 dotenv.config();
 
 class Server {
@@ -69,6 +70,15 @@ class Server {
         console.log('MongoDB connection error. Please make sure MongoDB is running. ' + e);
       });
     mongoose.set('useCreateIndex', true);
+  }
+
+  private async initializeRedis() {
+    // connect redis
+    if (!redisClient.connected) {
+      await redisClient.connect();
+    } else {
+      console.log('reusing redis connection...');
+    }
   }
 
   private routes(): void {

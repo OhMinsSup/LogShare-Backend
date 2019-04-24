@@ -42,10 +42,12 @@ export type TokenPayload = {
 };
 
 export const setTokenCookie = (ctx: Context, token: string | null) => {
+  console.log(process.env.NODE_ENV);
+
   // set cookie
   ctx.cookies.set('access_token', token, {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    domain: process.env.NODE_ENV === 'development' ? undefined : '.logshare.netlify.com',
+    domain: process.env.NODE_ENV === 'development' ? undefined : 'logshare.netlify.com',
   });
 };

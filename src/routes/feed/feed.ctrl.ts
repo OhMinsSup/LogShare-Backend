@@ -1,7 +1,6 @@
 import { Context, Middleware } from 'koa';
 import { Types } from 'mongoose';
 import PostFeeds from '../../models/PostFeeds';
-import { formatShortDescription } from '../../lib/utils';
 
 export const privateFeedUsers: Middleware = async (ctx: Context) => {
   interface FeedsData {
