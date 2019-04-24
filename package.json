@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:server": "set NODE_ENV=development&&  ts-node-dev --respawn src/index.ts",
+    "dev:server": "set NODE_ENV=development&& ts-node-dev --respawn src/index.ts",
     "start": "set NODE_ENV=production&& node dist/index.js",
     "postinstall": "npm run build:tsc",
     "build:tsc": "tsc",
