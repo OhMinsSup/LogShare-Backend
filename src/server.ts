@@ -24,6 +24,7 @@ class Server {
   private middleware(): void {
     const { app } = this;
 
+    app.proxy = true;
     app.keys = ['social_token'];
     app.use(session(app));
     app.use(corsMiddleware);
