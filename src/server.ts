@@ -1,6 +1,6 @@
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
-// import * as compress from 'koa-compress';
+import * as compress from 'koa-compress';
 import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
@@ -29,7 +29,6 @@ class Server {
     app.use(session(app));
     app.use(corsMiddleware);
     app.use(tokenMiddleware);
-    /*
     app.use(
       compress({
         filter: contentType => {
@@ -39,7 +38,6 @@ class Server {
         flush: require('zlib').Z_SYNC_FLUSH,
       })
     );
-    */
     app.use(
       koaBody({
         multipart: true,
