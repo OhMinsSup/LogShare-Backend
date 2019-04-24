@@ -1,7 +1,7 @@
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
-import * as compress from 'koa-compress';
-// import * as helmet from 'koa-helmet';
+// import * as compress from 'koa-compress';
+import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
@@ -25,19 +25,10 @@ class Server {
     const { app } = this;
 
     app.keys = ['social_token'];
-
-    app.use(
-      koaBody({
-        multipart: true,
-        formidable: {
-          keepExtensions: true,
-        },
-      })
-    );
-    app.use(session(app));
-    // app.use(helmet());
     app.use(corsMiddleware);
+    app.use(session(app));
     app.use(tokenMiddleware);
+    /*
     app.use(
       compress({
         filter: contentType => {
@@ -47,6 +38,16 @@ class Server {
         flush: require('zlib').Z_SYNC_FLUSH,
       })
     );
+    */
+    app.use(
+      koaBody({
+        multipart: true,
+        formidable: {
+          keepExtensions: true,
+        },
+      })
+    );
+    app.use(helmet());
   }
 
   private initializeDb(): void {
