@@ -39,7 +39,6 @@ post.use(
 
 post.use(
   '/:postId/comment',
-  needsAuth,
   postCtrl.checkPostObjectId,
   postCtrl.checkPostExistancy,
   comment.routes()

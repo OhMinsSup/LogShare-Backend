@@ -5,7 +5,6 @@ import Post, { IPost } from '../../../models/Post';
 import { formatShortDescription, checkEmpty } from '../../../lib/utils';
 import { Types } from 'mongoose';
 import Like from '../../../models/Like';
-import { TokenPayload } from '../../../lib/token';
 
 export const listPosts: Middleware = async (ctx: Context) => {
   interface QuerySchema {

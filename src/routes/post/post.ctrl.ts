@@ -255,6 +255,9 @@ export const deletePost: Middleware = async (ctx: Context) => {
       Like.deleteMany({
         post: post._id,
       }).exec(),
+      PostFeeds.deleteMany({
+        feed_post: post._id,
+      }).exec(),
     ]);
     await Post.deleteOne({
       $and: [{ _id: post._id }, { user: user._id }],
