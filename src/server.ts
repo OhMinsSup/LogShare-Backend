@@ -25,8 +25,8 @@ class Server {
     const { app } = this;
 
     app.keys = ['social_token'];
-    app.use(corsMiddleware);
     app.use(session(app));
+    app.use(corsMiddleware);
     app.use(tokenMiddleware);
     /*
     app.use(
@@ -42,9 +42,6 @@ class Server {
     app.use(
       koaBody({
         multipart: true,
-        formidable: {
-          keepExtensions: true,
-        },
       })
     );
     app.use(helmet());
