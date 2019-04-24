@@ -13,6 +13,6 @@ export default async (ctx: Context, next: () => Promise<any>) => {
 
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  ctx.set('Access-Control-Allow-Credentials', true as any);
+  ctx.set('Access-Control-Allow-Credentials', 'true');
   return await next();
 };
