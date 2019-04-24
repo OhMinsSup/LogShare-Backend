@@ -1,7 +1,7 @@
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as compress from 'koa-compress';
-import * as helmet from 'koa-helmet';
+// import * as helmet from 'koa-helmet';
 import * as mongoose from 'mongoose';
 import * as session from 'koa-session';
 import * as dotenv from 'dotenv';
@@ -35,7 +35,7 @@ class Server {
       })
     );
     app.use(session(app));
-    app.use(helmet());
+    // app.use(helmet());
     app.use(corsMiddleware);
     app.use(tokenMiddleware);
     app.use(
